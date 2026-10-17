@@ -152,6 +152,7 @@ const tunelMat = {
   franja: new THREE.MeshStandardMaterial({ color: '#FF5F1F', roughness: 0.4, emissive: '#FF5F1F', emissiveIntensity: 0.25 }),
   ventana: new THREE.MeshStandardMaterial({ color: '#ffe9b8', emissive: '#ffd98a', emissiveIntensity: 1.6 }),
   faro: new THREE.MeshStandardMaterial({ color: '#ffffff', emissive: '#ffffff', emissiveIntensity: 3 }),
+  oscuro: new THREE.MeshStandardMaterial({ color: '#33373d', roughness: 0.8 }),
 };
 
 // Anillo de dovelas que aparece con un leve rebote, de derecha a izquierda.
