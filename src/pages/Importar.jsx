@@ -50,7 +50,7 @@ function interpretar(texto) {
 }
 
 export default function Importar() {
-  const { E, trabajadores, obras, contratos, evaluaciones, recargar } = useDatos();
+  const { E, trabajadores, obras, contratos, evaluaciones, recargar, esGerente } = useDatos();
   const avisar = useToast();
   const [texto, setTexto] = useState('');
   const [progreso, setProgreso] = useState(null);
@@ -134,7 +134,7 @@ export default function Importar() {
         Copia las columnas desde Excel (nombre, RUT y cargo) y pégalas aquí, o sube un CSV. Los RUT que ya están en la base se omiten.
       </Encabezado>
 
-      {demo.length > 0 && (
+      {esGerente && demo.length > 0 && (
         <div className="slab mb-6 flex flex-col gap-4 overflow-hidden p-5 sm:flex-row sm:items-center">
           <div className="hazard absolute inset-y-0 left-0 w-2" />
           <div className="flex-1 pl-2">
