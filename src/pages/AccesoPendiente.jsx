@@ -9,7 +9,12 @@ export default function AccesoPendiente({ usuario }) {
   // Si el jefe de personal de obra lo invitó como jefe de obra, el acceso se activa solo.
   useEffect(() => {
     base44.functions.invoke('reclamar-acceso', {})
-      .then((r) => { if (r.data?.acceso) window.location.reload(); else setRevisando(false); })
+      .then((r) => {
+        // Solo recarga si la invitación realmente resolvió lo que falta (cargo para admin, acceso para jefe de obra).
+        const listo = usuario.role === 'admin' ? !!r.data?.perfil : !!r.data?.acceso;
+        if (listo) window.location.reload();
+        else setRevisando(false);
+      })
       .catch(() => setRevisando(false));
   }, []);
 
