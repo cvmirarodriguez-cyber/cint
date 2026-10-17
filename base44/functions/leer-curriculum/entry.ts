@@ -18,7 +18,7 @@ export default async function (req: Request): Promise<Response> {
   const base44 = createClientFromRequest(req);
   const yo = await base44.auth.me().catch(() => null);
   const perfil = yo?.perfil ?? yo?.data?.perfil;
-  if (!yo || yo.role !== "admin" || perfil !== "gerente_rrhh") {
+  if (!yo || yo.role !== "admin" || !["gerente_rrhh", "soporte"].includes(perfil)) {
     return Response.json({ error: "Solo el gerente de RRHH puede leer currículums" }, { status: 403 });
   }
 
