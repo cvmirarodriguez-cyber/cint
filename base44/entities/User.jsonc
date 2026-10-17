@@ -29,9 +29,22 @@
       "description": "Cargo dentro de la app; los dos primeros tienen acceso total",
       "rls": {
         "write": {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "$nor": [
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            }
+          ]
         }
       }
     }
