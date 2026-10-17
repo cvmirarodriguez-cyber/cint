@@ -1,12 +1,12 @@
 import { createClientFromRequest } from "npm:@base44/sdk";
 
-// Solo el jefe de personal (admin) lista usuarios y aprueba o revoca su acceso.
+// Solo el jefe de personal de obra (admin) lista usuarios y aprueba o revoca su acceso.
 export default async function (req: Request): Promise<Response> {
   const base44 = createClientFromRequest(req);
   const yo = await base44.auth.me().catch(() => null);
   const miPerfil = yo?.perfil ?? yo?.data?.perfil;
   if (!yo || yo.role !== "admin" || !["gerente_rrhh", "jefe_personal"].includes(miPerfil)) {
-    return Response.json({ error: "Solo el gerente o un jefe de personal pueden gestionar accesos" }, { status: 403 });
+    return Response.json({ error: "Solo el gerente o un jefe de personal de obra pueden gestionar accesos" }, { status: 403 });
   }
 
   const { accion, userId, acceso, perfil } = await req.json();
@@ -28,10 +28,10 @@ export default async function (req: Request): Promise<Response> {
 
   if (accion === "cambiar" && userId) {
     if (userId === yo.id) return Response.json({ error: "No puedes cambiar tu propio acceso" }, { status: 400 });
-    // El jefe de personal solo aprueba o revoca jefes de obra.
+    // El jefe de personal de obra solo aprueba o revoca jefes de obra.
     if (miPerfil !== "gerente_rrhh") {
       const otro = await base44.asServiceRole.entities.User.get(userId);
-      if (otro?.role === "admin") return Response.json({ error: "Solo el gerente de RRHH gestiona a otros jefes de personal" }, { status: 403 });
+      if (otro?.role === "admin") return Response.json({ error: "Solo el gerente de RRHH gestiona a otros jefes de personal de obra" }, { status: 403 });
     }
     await base44.asServiceRole.entities.User.update(userId, { acceso: !!acceso });
     return Response.json({ ok: true });
