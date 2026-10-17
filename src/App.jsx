@@ -60,6 +60,7 @@ export default function App() {
   if (!usuario) return <Login />;
   // La app es pública: una cuenta nueva no ve datos hasta que el jefe de personal la aprueba.
   if (usuario.role !== 'admin' && !(usuario.acceso || usuario.data?.acceso)) return <AccesoPendiente usuario={usuario} />;
+  if (usuario.role === 'admin' && !(usuario.perfil || usuario.data?.perfil)) return <AccesoPendiente usuario={usuario} />;
 
   const admin = usuario.role === 'admin';
   return (
