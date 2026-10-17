@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import { esGerente, esJefePersonal } from '@/lib/dominio';
 
 const E = base44.entities;
 const DatosCtx = createContext(null);
@@ -31,7 +32,7 @@ export function DatosProvider({ usuario, children }) {
     const pendientes = estado.contratos.filter(
       (c) => c.estado === 'pendiente' && (esAdmin || (c.jefe_terreno_email || '').toLowerCase() === usuario?.email?.toLowerCase()),
     );
-    return { ...estado, usuario, esAdmin, evalsPor, pendientes, recargar, E };
+    return { ...estado, usuario, esAdmin, esGerente: esGerente(usuario), esJefePersonal: esJefePersonal(usuario), evalsPor, pendientes, recargar, E };
   }, [estado, usuario, recargar]);
 
   return <DatosCtx.Provider value={valor}>{children}</DatosCtx.Provider>;
