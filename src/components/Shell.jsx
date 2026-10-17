@@ -61,7 +61,7 @@ export default function Shell({ children }) {
           ))}
         </nav>
         <div className="mt-auto">
-          <BotonSoporte className="mb-4 px-3 text-sm" />
+          <BotonSoporte className="mb-4 px-3 text-sm" usuario={usuario} />
           <div className="hazard mb-4 h-1.5 rounded-full opacity-80" />
           <div className="flex items-center gap-3 px-1">
             <Avatar nombre={usuario.full_name || usuario.email} size={38} />
@@ -80,7 +80,7 @@ export default function Shell({ children }) {
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-white/[.06] bg-ink/80 px-4 py-3 backdrop-blur-xl md:hidden" style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}>
         <Marca />
         <div className="flex items-center gap-1">
-          <BotonSoporte soloIcono />
+          <BotonSoporte soloIcono usuario={usuario} />
           <button onClick={() => base44.auth.logout('/')} className="rounded-lg p-2 text-bone-500" aria-label="Cerrar sesión">
             <LogOut className="h-5 w-5" />
           </button>
