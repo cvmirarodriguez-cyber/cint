@@ -1,16 +1,101 @@
 {
-  "name": "User",
   "type": "object",
+  "name": "User",
   "properties": {
     "acceso": {
       "type": "boolean",
+      "description": "Aprobado por el jefe de personal de obra para ver y registrar evaluaciones",
       "default": false,
-      "description": "Aprobado por el jefe de personal para ver y registrar evaluaciones",
       "rls": {
         "write": {
           "user_condition": {
             "role": "admin"
           }
+        }
+      }
+    },
+    "perfil": {
+      "type": "string",
+      "enum": [
+        "gerente_rrhh",
+        "jefe_personal",
+        "jefe_obra",
+        "soporte"
+      ],
+      "enumNames": [
+        "Gerente de RRHH",
+        "Jefe de personal de obra",
+        "Jefe de obra",
+        "Soporte"
+      ],
+      "description": "Cargo dentro de la app; los dos primeros tienen acceso total",
+      "rls": {
+        "write": {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "$nor": [
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "suspendido": {
+      "type": "boolean",
+      "default": false,
+      "description": "Cuenta suspendida por el gerente de RRHH",
+      "rls": {
+        "write": {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "$nor": [
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "perfil_previo": {
+      "type": "string",
+      "description": "Cargo antes de suspender, para reactivar",
+      "rls": {
+        "write": {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "$nor": [
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            }
+          ]
         }
       }
     }
