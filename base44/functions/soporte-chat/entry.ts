@@ -9,6 +9,7 @@ Cuadrilla es la app web interna de una constructora chilena para guardar el hist
 (supervisores, capataces, maestros primera, maestros segunda y jornales). Dirección: cuadrilla.base44.app. Funciona en celular y computador.
 En computador el menú está a la izquierda; en celular, abajo (y arriba a la derecha están Soporte y Salir).
 Los datos de alcohol y drogas son confidenciales.
+Políticas públicas (se abren sin sesión, con enlaces en la entrada y abajo en el menú): Privacidad cuadrilla.base44.app/legal/privacidad, Seguridad /legal/seguridad y Términos de uso /legal/terminos. Ahí se explica qué datos se tratan, quién los ve, cómo pedir acceso, corrección o eliminación de datos (por soporte o RRHH, respuesta en máximo 30 días) y las reglas para evaluar.
 
 ACCESO (para todos)
 - Uso interno y solo por invitación; nadie se registra libremente.
