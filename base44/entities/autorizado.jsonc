@@ -1,14 +1,29 @@
 {
-  "name": "Autorizado",
   "type": "object",
+  "name": "Autorizado",
   "properties": {
     "email": {
       "type": "string",
-      "format": "email",
-      "description": "Correo invitado, en min\u00fasculas"
+      "description": "Correo invitado, en min\u00fasculas",
+      "format": "email"
     },
     "invitado_por": {
       "type": "string"
+    },
+    "perfil": {
+      "type": "string",
+      "enum": [
+        "gerente_rrhh",
+        "jefe_personal",
+        "jefe_obra"
+      ],
+      "enumNames": [
+        "Gerente de RRHH",
+        "Jefe de personal de obra",
+        "Jefe de obra"
+      ],
+      "default": "jefe_obra",
+      "description": "Perfil con el que fue invitado"
     }
   },
   "required": [
@@ -21,19 +36,98 @@
       }
     },
     "create": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "$or": [
+                {
+                  "user_condition": {
+                    "data.perfil": "gerente_rrhh"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "soporte"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "$and": [
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            },
+            {
+              "data.perfil": "jefe_obra"
+            }
+          ]
+        }
+      ]
     },
     "update": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$and": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "$or": [
+            {
+              "user_condition": {
+                "data.perfil": "gerente_rrhh"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "soporte"
+              }
+            }
+          ]
+        }
+      ]
     },
     "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$and": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "$or": [
+            {
+              "user_condition": {
+                "data.perfil": "gerente_rrhh"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "soporte"
+              }
+            }
+          ]
+        }
+      ]
     }
   }
 }
