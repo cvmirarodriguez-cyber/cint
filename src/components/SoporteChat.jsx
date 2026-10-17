@@ -3,12 +3,26 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUp, LifeBuoy, Loader2, MessageCircle, X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { enlaceWhatsApp } from '@/lib/soporte';
+import { etiquetaPerfil, perfilDe } from '@/lib/dominio';
 import { Capa, ease } from '@/components/ui';
 
-const BIENVENIDA = { rol: 'asistente', texto: 'Hola, soy el asistente de soporte de Cuadrilla. ¿En qué te ayudo? Por ejemplo: cómo entrar con tu invitación, qué hace cada cargo o cómo evaluar.' };
-const RAPIDAS = ['No puedo entrar', 'Me invitaron, ¿cómo activo mi acceso?', '¿Qué puede hacer un jefe de obra?'];
+// Preguntas rápidas según el cargo de quien abre el soporte.
+const RAPIDAS = {
+  anonimo: ['No puedo entrar', 'Me invitaron, ¿cómo activo mi acceso?', '¿Qué puede hacer un jefe de obra?'],
+  gerente_rrhh: ['¿Cómo asigno un jefe de personal a una obra?', '¿Cómo cargo currículums?', '¿Cómo suspendo una cuenta?'],
+  soporte: ['¿Cómo asigno un jefe de personal a una obra?', '¿Cómo cargo una planilla Excel?', '¿Qué puede hacer cada cargo?'],
+  jefe_personal: ['¿Cómo armo la cuadrilla de mi obra?', '¿Cómo designo al jefe de obra?', '¿Cómo pido recomendaciones?'],
+  jefe_obra: ['¿Cómo evalúo a un trabajador?', '¿Qué significa cada nota?', '¿Dónde veo mis evaluaciones?'],
+};
 
-export function BotonSoporte({ className = '', soloIcono = false }) {
+const bienvenida = (usuario) => ({
+  rol: 'asistente',
+  texto: usuario
+    ? `Hola${usuario.full_name ? `, ${usuario.full_name.split(' ')[0]}` : ''}. Soy el asistente de soporte de Cuadrilla y conozco todas las funciones de tu cargo (${etiquetaPerfil(usuario)}). ¿En qué te ayudo?`
+    : 'Hola, soy el asistente de soporte de Cuadrilla. ¿En qué te ayudo? Por ejemplo: cómo entrar con tu invitación, qué hace cada cargo o cómo evaluar.',
+});
+
+export function BotonSoporte({ className = '', soloIcono = false, usuario = null }) {
   const [abierto, setAbierto] = useState(false);
   return (
     <>
@@ -21,13 +35,14 @@ export function BotonSoporte({ className = '', soloIcono = false }) {
           <LifeBuoy className="h-4 w-4" /> Solicitar soporte
         </button>
       )}
-      <SoporteChat abierto={abierto} onClose={() => setAbierto(false)} />
+      <SoporteChat abierto={abierto} onClose={() => setAbierto(false)} usuario={usuario} />
     </>
   );
 }
 
-export default function SoporteChat({ abierto, onClose }) {
-  const [mensajes, setMensajes] = useState([BIENVENIDA]);
+export default function SoporteChat({ abierto, onClose, usuario = null }) {
+  const [mensajes, setMensajes] = useState(() => [bienvenida(usuario)]);
+  const rapidas = RAPIDAS[usuario ? perfilDe(usuario) : 'anonimo'] ?? RAPIDAS.anonimo;
   const [texto, setTexto] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [derivar, setDerivar] = useState(false);
@@ -43,7 +58,8 @@ export default function SoporteChat({ abierto, onClose }) {
     setTexto('');
     setEnviando(true);
     try {
-      const r = await base44.functions.invoke('soporte-chat', { mensajes: nuevos.slice(1) });
+      // El servidor obtiene el cargo de la sesión; la pantalla ayuda a contextualizar la respuesta.
+      const r = await base44.functions.invoke('soporte-chat', { mensajes: nuevos.slice(1), pantalla: window.location.pathname });
       setMensajes((m) => [...m, { rol: 'asistente', texto: r.data?.respuesta || 'No pude responder.' }]);
       if (r.data?.derivar) setDerivar(true);
     } catch {
@@ -81,7 +97,7 @@ export default function SoporteChat({ abierto, onClose }) {
                 ))}
                 {mensajes.length === 1 && (
                   <div className="flex flex-wrap gap-2 pt-1">
-                    {RAPIDAS.map((r) => <button key={r} onClick={() => enviar(r)} className="rounded-full border border-white/10 px-3 py-1.5 text-xs text-bone-300 hover:border-obra/40 hover:text-bone">{r}</button>)}
+                    {rapidas.map((r) => <button key={r} onClick={() => enviar(r)} className="rounded-full border border-white/10 px-3 py-1.5 text-xs text-bone-300 hover:border-obra/40 hover:text-bone">{r}</button>)}
                   </div>
                 )}
                 {enviando && <p className="flex items-center gap-2 text-sm text-bone-500"><Loader2 className="h-4 w-4 animate-spin text-obra" /> Escribiendo…</p>}
