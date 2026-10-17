@@ -6,6 +6,8 @@ import { createClientFromRequest } from "npm:@base44/sdk";
 // Nadie puede actuar sobre sí mismo, y la cuenta de Soporte solo la toca Soporte.
 const TOTAL = ["gerente_rrhh", "soporte"];
 const perfilDe = (u: any) => u?.perfil ?? u?.data?.perfil ?? null;
+// Cargo real aunque esté suspendido (el cargo "suspendido" no da acceso a nada).
+const cargoReal = (u: any) => { const p = perfilDe(u); return p && p !== "suspendido" ? p : (u?.perfil_previo ?? null); };
 
 export default async function (req: Request): Promise<Response> {
   const base44 = createClientFromRequest(req);
@@ -28,7 +30,7 @@ export default async function (req: Request): Promise<Response> {
         full_name: u.full_name,
         role: u.role,
         acceso: !u.suspendido && (u.role === "admin" || u.acceso === true || u.data?.acceso === true),
-        perfil: perfilDe(u) ?? u.perfil_previo ?? (u.role === "admin" ? "jefe_personal" : "jefe_obra"),
+        perfil: cargoReal(u) ?? (u.role === "admin" ? "jefe_personal" : "jefe_obra"),
         suspendido: u.suspendido === true || u.data?.suspendido === true,
         created_date: u.created_date,
       })),
@@ -39,7 +41,7 @@ export default async function (req: Request): Promise<Response> {
   if (userId === yo.id) return Response.json({ error: "No puedes cambiar tu propia cuenta" }, { status: 400 });
   const otro: any = await Users.get(userId).catch(() => null);
   if (!otro) return Response.json({ error: "Usuario no encontrado" }, { status: 404 });
-  const perfilOtro = perfilDe(otro) ?? otro.perfil_previo;
+  const perfilOtro = cargoReal(otro);
   if (perfilOtro === "soporte" && miPerfil !== "soporte") {
     return Response.json({ error: "La cuenta de Soporte no se puede modificar" }, { status: 403 });
   }
@@ -69,10 +71,11 @@ export default async function (req: Request): Promise<Response> {
   if (accion === "suspender") {
     if (suspender) {
       // Sin cargo ni acceso, las reglas del servidor no le muestran ningún dato.
-      await Users.update(userId, { suspendido: true, acceso: false, perfil_previo: perfilDe(otro) ?? otro.perfil_previo ?? null, perfil: null });
+      const previo = cargoReal(otro);
+      await Users.update(userId, { suspendido: true, acceso: false, perfil: "suspendido", ...(previo ? { perfil_previo: previo } : {}) });
     } else {
       const restaurar: any = { suspendido: false, acceso: true };
-      if (otro.role === "admin") restaurar.perfil = otro.perfil_previo || "jefe_personal";
+      restaurar.perfil = otro.perfil_previo || (otro.role === "admin" ? "jefe_personal" : "jefe_obra");
       await Users.update(userId, restaurar);
     }
     return Response.json({ ok: true });
@@ -80,7 +83,7 @@ export default async function (req: Request): Promise<Response> {
 
   if (accion === "eliminar") {
     // Primero se le quita todo acceso; luego se borra la cuenta y su invitación.
-    await Users.update(userId, { suspendido: true, acceso: false, perfil: null });
+    await Users.update(userId, { suspendido: true, acceso: false, perfil: "suspendido" });
     // Con los permisos de quien elimina (gerente o Soporte), que son los que pueden borrar invitaciones.
     const invitaciones = await base44.entities.Autorizado.filter({ email: String(otro.email).toLowerCase() });
     for (const inv of invitaciones) await base44.entities.Autorizado.delete(inv.id);
