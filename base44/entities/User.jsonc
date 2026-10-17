@@ -19,14 +19,65 @@
       "enum": [
         "gerente_rrhh",
         "jefe_personal",
-        "jefe_obra"
+        "jefe_obra",
+        "soporte"
       ],
       "enumNames": [
         "Gerente de RRHH",
         "Jefe de personal de obra",
-        "Jefe de obra"
+        "Jefe de obra",
+        "Soporte"
       ],
       "description": "Cargo dentro de la app; los dos primeros tienen acceso total",
+      "rls": {
+        "write": {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "$nor": [
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "suspendido": {
+      "type": "boolean",
+      "default": false,
+      "description": "Cuenta suspendida por el gerente de RRHH",
+      "rls": {
+        "write": {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "$nor": [
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "perfil_previo": {
+      "type": "string",
+      "description": "Cargo antes de suspender, para reactivar",
       "rls": {
         "write": {
           "$and": [
