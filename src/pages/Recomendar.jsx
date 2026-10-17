@@ -7,22 +7,42 @@ import { Encabezado, ease, useToast } from '@/components/ui';
 
 const AGENTE = 'recomendador';
 
-// Markdown mínimo: negritas y listas, suficiente para las respuestas del agente.
+// Markdown mínimo: títulos, negritas, listas y tablas, suficiente para las respuestas del agente.
+const enLinea = (l) => l.split(/(\*\*[^*]+\*\*)/g).map((p, i) => (p.startsWith('**') && p.endsWith('**') ? <b key={i} className="text-bone">{p.slice(2, -2)}</b> : <Fragment key={i}>{p}</Fragment>));
+const celdas = (l) => l.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
+
 function Texto({ texto }) {
   const lineas = String(texto || '').split('\n');
-  const enLinea = (l) => l.split(/(\*\*[^*]+\*\*)/g).map((p, i) => (p.startsWith('**') && p.endsWith('**') ? <b key={i} className="text-bone">{p.slice(2, -2)}</b> : <Fragment key={i}>{p}</Fragment>));
-  return (
-    <div className="space-y-1.5 text-[15px] leading-relaxed">
-      {lineas.map((l, i) => {
-        const t = l.trim();
-        if (!t) return <div key={i} className="h-1" />;
-        const lista = t.match(/^(\d+[.)]|[-•*])\s+(.*)$/);
-        if (lista) return <p key={i} className="flex gap-2 pl-1"><span className="shrink-0 font-mono text-obra">{/\d/.test(lista[1]) ? lista[1] : '•'}</span><span>{enLinea(lista[2])}</span></p>;
-        if (/^#{1,3}\s/.test(t)) return <p key={i} className="pt-1 font-bold text-bone">{t.replace(/^#+\s/, '')}</p>;
-        return <p key={i}>{enLinea(t)}</p>;
-      })}
-    </div>
-  );
+  const bloques = [];
+  for (let i = 0; i < lineas.length; i++) {
+    const t = lineas[i].trim();
+    if (t.startsWith('|')) {
+      // Junta las filas seguidas de una tabla; la fila de guiones separa el encabezado.
+      const filas = [];
+      while (i < lineas.length && lineas[i].trim().startsWith('|')) { filas.push(lineas[i]); i++; }
+      i--;
+      const datos = filas.filter((f) => !/^\|?\s*:?-{2,}/.test(f.trim().replace(/^\|/, '')));
+      const [enc, ...cuerpo] = datos.map(celdas);
+      bloques.push(
+        <div key={i} className="-mx-1 overflow-x-auto py-1">
+          <table className="w-full min-w-[520px] text-left text-sm">
+            <thead className="text-xs text-bone-500"><tr>{enc.map((c, j) => <th key={j} className="border-b border-white/10 px-2 py-2 font-semibold">{enLinea(c)}</th>)}</tr></thead>
+            <tbody className="divide-y divide-white/[.05]">
+              {cuerpo.map((f, k) => <tr key={k}>{f.map((c, j) => <td key={j} className="px-2 py-2 align-top">{enLinea(c)}</td>)}</tr>)}
+            </tbody>
+          </table>
+        </div>,
+      );
+      continue;
+    }
+    if (!t) { bloques.push(<div key={i} className="h-1" />); continue; }
+    if (/^-{3,}$/.test(t)) { bloques.push(<hr key={i} className="my-2 border-white/10" />); continue; }
+    if (/^#{1,4}\s/.test(t)) { bloques.push(<p key={i} className="pt-2 font-bold text-bone">{enLinea(t.replace(/^#+\s/, ''))}</p>); continue; }
+    const lista = t.match(/^(\d+[.)]|[-•*])\s+(.*)$/);
+    if (lista) { bloques.push(<p key={i} className="flex gap-2 pl-1"><span className="shrink-0 font-mono text-obra">{/\d/.test(lista[1]) ? lista[1] : '•'}</span><span>{enLinea(lista[2])}</span></p>); continue; }
+    bloques.push(<p key={i}>{enLinea(t)}</p>);
+  }
+  return <div className="space-y-1.5 text-[15px] leading-relaxed">{bloques}</div>;
 }
 
 export default function Recomendar() {
