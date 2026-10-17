@@ -20,8 +20,7 @@
     "react-router-dom": "^6.30.6",
     "read-excel-file": "9.3.10",
     "recharts": "^2.15.4",
-    "three": "^0.169.0",
-    "write-excel-file": "^4.1.1"
+    "three": "^0.169.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",

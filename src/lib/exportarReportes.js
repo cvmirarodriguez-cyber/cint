@@ -1,4 +1,4 @@
-import writeExcelFile from 'write-excel-file/browser';
+import * as XLSX from 'xlsx';
 import { cargoLabel, nota } from '@/lib/dominio';
 
 const RECON = { si: 'Sí', con_reservas: 'Con reservas', no: 'No' };
@@ -14,26 +14,22 @@ function nombreArchivo(prefijo) {
   return `${prefijo}_${f}`;
 }
 
-// Convierte una lista de objetos en filas (encabezado + valores) para una hoja.
-const hoja = (sheet, objetos) => {
-  if (!objetos.length) return { sheet, data: [['Sin datos']] };
-  const cols = Object.keys(objetos[0]);
-  return { sheet, data: [cols, ...objetos.map((o) => cols.map((c) => (o[c] === '' || o[c] == null ? null : o[c])))] };
-};
+export function exportarExcel({ kpis, filtradas, porMes, peores, headcount, mesLabel, obraLabel }) {
+  const wb = XLSX.utils.book_new();
 
-export async function exportarExcel({ kpis, filtradas, porMes, peores, headcount, mesLabel, obraLabel }) {
   const resumen = [
     ['Reporte de gestión — Cuadrilla'],
     ['Período', mesLabel],
     ['Obra', obraLabel],
     ['Generado', new Date().toLocaleString('es-CL')],
-    [null],
+    [''],
     ['Métrica', 'Valor'],
     ['Evaluaciones', kpis.n],
     ['Promedio general', +kpis.promedio.toFixed(2)],
     ['Bajo desempeño (<3)', kpis.bajos],
     ['Alertas alcohol/drogas', kpis.alertas],
   ];
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(resumen), 'Resumen');
 
   const evals = filtradas.map((e) => ({
     Trabajador: e.trabajador_nombre || '',
@@ -48,7 +44,11 @@ export async function exportarExcel({ kpis, filtradas, porMes, peores, headcount
     Evaluador: e.evaluador_nombre || '',
     Fecha: fechaCorta(e.created_date),
   }));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(evals.length ? evals : [{}]), 'Evaluaciones');
+
   const mesRows = porMes.map((d) => ({ Mes: d.label, Evaluaciones: d.n, Promedio: d.prom }));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(mesRows.length ? mesRows : [{}]), 'Por mes');
+
   const peoresRows = peores.map((t, i) => ({
     '#': i + 1,
     Trabajador: t.nombre,
@@ -58,15 +58,12 @@ export async function exportarExcel({ kpis, filtradas, porMes, peores, headcount
     Promedio: +t.r.promedio.toFixed(1),
     'Alerta A/D': t.r.alerta ? 'Sí' : 'No',
   }));
-  const dot = headcount.map((h) => ({ Obra: h.nombre, Headcount: h.headcount, Vigentes: h.vigentes, Pendientes: h.pendientes }));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(peoresRows.length ? peoresRows : [{}]), 'Peores calificados');
 
-  await writeExcelFile([
-    { sheet: 'Resumen', data: resumen },
-    hoja('Evaluaciones', evals),
-    hoja('Por mes', mesRows),
-    hoja('Peores calificados', peoresRows),
-    hoja('Dotación', dot),
-  ]).toFile(`${nombreArchivo('reporte')}.xlsx`);
+  const dot = headcount.map((h) => ({ Obra: h.nombre, Headcount: h.headcount, Vigentes: h.vigentes, Pendientes: h.pendientes }));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dot.length ? dot : [{}]), 'Dotación');
+
+  XLSX.writeFile(wb, `${nombreArchivo('reporte')}.xlsx`);
 }
 
 // Escapa texto antes de insertarlo en el HTML del PDF (los nombres vienen de datos cargados por usuarios).
