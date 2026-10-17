@@ -4,6 +4,7 @@ import { ArrowRight, Loader2, Lock } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { Marca } from '@/components/Shell';
 import { ease } from '@/components/ui';
+import { BotonSoporte } from '@/components/SoporteChat';
 
 const Obra3D = lazy(() => import('@/components/Obra3D'));
 
@@ -145,6 +146,9 @@ export default function Login() {
         <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-bone-600">
           <Lock className="h-3.5 w-3.5" /> Uso interno · acceso solo por invitación
         </p>
+        <div className="mt-4 border-t border-white/[.06] pt-4 text-center text-sm text-bone-500">
+          ¿Problemas para entrar? <BotonSoporte />
+        </div>
       </div>
     </Escenario>
   );
