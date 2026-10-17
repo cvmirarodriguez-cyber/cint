@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ClipboardCheck, ClipboardList, HardHat, LayoutGrid, LogOut, Building2, Upload, Users } from 'lucide-react';
+import { ClipboardCheck, ClipboardList, HardHat, LayoutGrid, LogOut, Building2, Sparkles, Upload, Users } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useDatos } from '@/lib/datos';
 import { etiquetaPerfil } from '@/lib/dominio';
@@ -27,6 +27,7 @@ export default function Shell({ children }) {
         { to: '/trabajadores', label: 'Personal', icono: HardHat },
         { to: '/evaluar', label: 'Evaluar', icono: ClipboardCheck, badge: pendientes.length },
         { to: '/obras', label: 'Obras', icono: Building2 },
+        { to: '/recomendar', label: 'Recomendar', icono: Sparkles },
         ...(esGerente ? [{ to: '/importar', label: 'Importar', icono: Upload, soloDesktop: true }] : []),
         { to: '/equipo', label: 'Equipo', icono: Users, soloDesktop: true },
       ]
