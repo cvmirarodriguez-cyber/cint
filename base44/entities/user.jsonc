@@ -20,13 +20,15 @@
         "gerente_rrhh",
         "jefe_personal",
         "jefe_obra",
-        "soporte"
+        "soporte",
+        "suspendido"
       ],
       "enumNames": [
         "Gerente de RRHH",
         "Jefe de personal de obra",
         "Jefe de obra",
-        "Soporte"
+        "Soporte",
+        "Suspendido"
       ],
       "description": "Cargo dentro de la app; los dos primeros tienen acceso total",
       "rls": {
