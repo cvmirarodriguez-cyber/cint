@@ -76,7 +76,7 @@ export default function App() {
                 <Route path="/evaluar" element={<Pagina><Evaluar /></Pagina>} />
                 <Route path="/obras" element={<Pagina><Obras /></Pagina>} />
                 <Route path="/obras/:id" element={<Pagina><ObraDetalle /></Pagina>} />
-                <Route path="/importar" element={<Pagina><Importar /></Pagina>} />
+                {usuario.perfil === 'gerente_rrhh' || usuario.data?.perfil === 'gerente_rrhh' ? <Route path="/importar" element={<Pagina><Importar /></Pagina>} /> : null}
                 <Route path="/equipo" element={<Pagina><Equipo /></Pagina>} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
