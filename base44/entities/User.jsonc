@@ -13,6 +13,27 @@
           }
         }
       }
+    },
+    "perfil": {
+      "type": "string",
+      "enum": [
+        "gerente_rrhh",
+        "jefe_personal",
+        "jefe_obra"
+      ],
+      "enumNames": [
+        "Gerente de RRHH",
+        "Jefe de personal",
+        "Jefe de obra"
+      ],
+      "description": "Cargo dentro de la app; los dos primeros tienen acceso total",
+      "rls": {
+        "write": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
     }
   },
   "required": []
