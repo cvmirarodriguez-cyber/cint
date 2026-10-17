@@ -184,7 +184,8 @@ export default function Asistente() {
       const subidos = await Promise.all(
         Array.from(lista).map(async (f) => {
           const { file_uri } = await base44.integrations.Core.UploadPrivateFile({ file: f });
-          const { signed_url } = await base44.integrations.Core.CreateFileSignedUrl({ file_uri });
+          // Una hora: alcanza para escribir la consulta con calma antes de enviar.
+          const { signed_url } = await base44.integrations.Core.CreateFileSignedUrl({ file_uri, expires_in: 3600 });
           return { nombre: f.name, uri: file_uri, url: signed_url };
         }),
       );
