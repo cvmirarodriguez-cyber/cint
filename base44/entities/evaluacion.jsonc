@@ -1,11 +1,11 @@
 {
-  "name": "Evaluacion",
   "type": "object",
+  "name": "Evaluacion",
   "properties": {
     "demo": {
       "type": "boolean",
-      "default": false,
-      "description": "Dato de demostraci\u00f3n; se borra desde Importar"
+      "description": "Dato de demostraci\u00f3n; se borra desde Importar",
+      "default": false
     },
     "trabajador_id": {
       "type": "string"
@@ -34,15 +34,15 @@
     },
     "desempeno": {
       "type": "integer",
+      "description": "Calidad y rendimiento del trabajo",
       "minimum": 1,
-      "maximum": 5,
-      "description": "Calidad y rendimiento del trabajo"
+      "maximum": 5
     },
     "responsabilidad": {
       "type": "integer",
+      "description": "Puntualidad, asistencia, compromiso",
       "minimum": 1,
-      "maximum": 5,
-      "description": "Puntualidad, asistencia, compromiso"
+      "maximum": 5
     },
     "alcohol_drogas": {
       "type": "string",
@@ -89,9 +89,41 @@
     "read": {
       "$or": [
         {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "$or": [
+                {
+                  "user_condition": {
+                    "data.perfil": "gerente_rrhh"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "soporte"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "jefe_personal"
+              }
+            }
+          ]
         },
         {
           "$and": [
@@ -110,9 +142,41 @@
     "create": {
       "$or": [
         {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "$or": [
+                {
+                  "user_condition": {
+                    "data.perfil": "gerente_rrhh"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "soporte"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "jefe_personal"
+              }
+            }
+          ]
         },
         {
           "user_condition": {
@@ -124,16 +188,52 @@
     "update": {
       "$or": [
         {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "$or": [
+                {
+                  "user_condition": {
+                    "data.perfil": "gerente_rrhh"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "soporte"
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "$and": [
             {
-              "user_condition": {
-                "data.acceso": true
-              }
+              "$or": [
+                {
+                  "$and": [
+                    {
+                      "user_condition": {
+                        "role": "admin"
+                      }
+                    },
+                    {
+                      "user_condition": {
+                        "data.perfil": "jefe_personal"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "user_condition": {
+                    "data.acceso": true
+                  }
+                }
+              ]
             },
             {
               "created_by": "{{user.email}}"
@@ -143,9 +243,27 @@
       ]
     },
     "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$and": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "$or": [
+            {
+              "user_condition": {
+                "data.perfil": "gerente_rrhh"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "soporte"
+              }
+            }
+          ]
+        }
+      ]
     }
   }
 }
