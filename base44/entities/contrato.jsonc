@@ -1,105 +1,429 @@
 {
-  "name": "Contrato",
   "type": "object",
+  "name": "Contrato",
   "properties": {
     "demo": {
       "type": "boolean",
-      "default": false,
-      "description": "Dato de demostraci\u00f3n; se borra desde Importar"
+      "description": "Dato de demostraci\u00f3n; se borra desde Importar",
+      "default": false
     },
     "trabajador_id": {
+      "type": "string",
       "rls": {
         "update": {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$or": [
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "$or": [
+                    {
+                      "user_condition": {
+                        "data.perfil": "gerente_rrhh"
+                      }
+                    },
+                    {
+                      "user_condition": {
+                        "data.perfil": "soporte"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            }
+          ]
         }
-      },
-      "type": "string"
+      }
     },
     "trabajador_nombre": {
+      "type": "string",
       "rls": {
         "update": {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$or": [
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "$or": [
+                    {
+                      "user_condition": {
+                        "data.perfil": "gerente_rrhh"
+                      }
+                    },
+                    {
+                      "user_condition": {
+                        "data.perfil": "soporte"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            }
+          ]
         }
-      },
-      "type": "string"
+      }
     },
     "trabajador_rut": {
+      "type": "string",
       "rls": {
         "update": {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$or": [
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "$or": [
+                    {
+                      "user_condition": {
+                        "data.perfil": "gerente_rrhh"
+                      }
+                    },
+                    {
+                      "user_condition": {
+                        "data.perfil": "soporte"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            }
+          ]
         }
-      },
-      "type": "string"
+      }
     },
     "cargo": {
+      "type": "string",
+      "description": "Cargo en esta obra",
       "rls": {
         "update": {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$or": [
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "$or": [
+                    {
+                      "user_condition": {
+                        "data.perfil": "gerente_rrhh"
+                      }
+                    },
+                    {
+                      "user_condition": {
+                        "data.perfil": "soporte"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            }
+          ]
         }
-      },
-      "type": "string",
-      "description": "Cargo en esta obra"
+      }
     },
     "obra_id": {
+      "type": "string",
       "rls": {
         "update": {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$or": [
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "$or": [
+                    {
+                      "user_condition": {
+                        "data.perfil": "gerente_rrhh"
+                      }
+                    },
+                    {
+                      "user_condition": {
+                        "data.perfil": "soporte"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            }
+          ]
         }
-      },
-      "type": "string"
+      }
     },
     "obra_nombre": {
+      "type": "string",
       "rls": {
         "update": {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$or": [
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "$or": [
+                    {
+                      "user_condition": {
+                        "data.perfil": "gerente_rrhh"
+                      }
+                    },
+                    {
+                      "user_condition": {
+                        "data.perfil": "soporte"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            }
+          ]
         }
-      },
-      "type": "string"
+      }
     },
     "jefe_terreno_email": {
+      "type": "string",
+      "description": "Qui\u00e9n debe evaluar",
       "rls": {
         "update": {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$or": [
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "$or": [
+                    {
+                      "user_condition": {
+                        "data.perfil": "gerente_rrhh"
+                      }
+                    },
+                    {
+                      "user_condition": {
+                        "data.perfil": "soporte"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            }
+          ]
         }
-      },
-      "type": "string",
-      "description": "Qui\u00e9n debe evaluar"
+      }
     },
     "fecha_inicio": {
+      "type": "string",
+      "format": "date",
       "rls": {
         "update": {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$or": [
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "$or": [
+                    {
+                      "user_condition": {
+                        "data.perfil": "gerente_rrhh"
+                      }
+                    },
+                    {
+                      "user_condition": {
+                        "data.perfil": "soporte"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            }
+          ]
         }
-      },
-      "type": "string",
-      "format": "date"
+      }
     },
     "fecha_termino": {
+      "type": "string",
+      "format": "date",
       "rls": {
         "update": {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$or": [
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "$or": [
+                    {
+                      "user_condition": {
+                        "data.perfil": "gerente_rrhh"
+                      }
+                    },
+                    {
+                      "user_condition": {
+                        "data.perfil": "soporte"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            }
+          ]
         }
-      },
-      "type": "string",
-      "format": "date"
+      }
     },
     "estado": {
       "type": "string",
@@ -117,6 +441,35 @@
     },
     "evaluacion_id": {
       "type": "string"
+    },
+    "jefe_personal_email": {
+      "type": "string",
+      "description": "Jefe de personal de obra de la obra",
+      "rls": {
+        "update": {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "$or": [
+                {
+                  "user_condition": {
+                    "data.perfil": "gerente_rrhh"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "soporte"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
     }
   },
   "required": [
@@ -127,9 +480,48 @@
     "read": {
       "$or": [
         {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "$or": [
+                {
+                  "user_condition": {
+                    "data.perfil": "gerente_rrhh"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "soporte"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "$and": [
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            },
+            {
+              "data.jefe_personal_email": "{{user.email}}"
+            }
+          ]
         },
         {
           "$and": [
@@ -146,16 +538,98 @@
       ]
     },
     "create": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "$or": [
+                {
+                  "user_condition": {
+                    "data.perfil": "gerente_rrhh"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "soporte"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "$and": [
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            },
+            {
+              "data.jefe_personal_email": "{{user.email}}"
+            }
+          ]
+        }
+      ]
     },
     "update": {
       "$or": [
         {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "$or": [
+                {
+                  "user_condition": {
+                    "data.perfil": "gerente_rrhh"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "soporte"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "$and": [
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            },
+            {
+              "data.jefe_personal_email": "{{user.email}}"
+            }
+          ]
         },
         {
           "$and": [
@@ -172,9 +646,27 @@
       ]
     },
     "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$and": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "$or": [
+            {
+              "user_condition": {
+                "data.perfil": "gerente_rrhh"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "soporte"
+              }
+            }
+          ]
+        }
+      ]
     }
   }
 }
