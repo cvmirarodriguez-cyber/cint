@@ -6,7 +6,7 @@ import { Escenario } from '@/pages/Login';
 export default function AccesoPendiente({ usuario }) {
   const [revisando, setRevisando] = useState(true);
 
-  // Si el jefe de personal lo invitó como jefe de obra, el acceso se activa solo.
+  // Si el jefe de personal de obra lo invitó como jefe de obra, el acceso se activa solo.
   useEffect(() => {
     base44.functions.invoke('reclamar-acceso', {})
       .then((r) => { if (r.data?.acceso) window.location.reload(); else setRevisando(false); })
@@ -37,7 +37,7 @@ export default function AccesoPendiente({ usuario }) {
           <div className="flex items-start gap-3">
             <Lock className="mt-0.5 h-5 w-5 shrink-0 text-hivis" />
             <p className="min-w-0 text-bone-300">
-              El correo <b className="break-all text-bone">{usuario.email}</b> no tiene una invitación. Cuadrilla es de uso interno: si deberías tener acceso, pídele al <b className="text-bone">jefe de personal</b> que te invite.
+              El correo <b className="break-all text-bone">{usuario.email}</b> no tiene una invitación. Cuadrilla es de uso interno: si deberías tener acceso, pídele al <b className="text-bone">gerente de RRHH</b> o al <b className="text-bone">jefe de personal de obra</b> que te invite.
             </p>
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
