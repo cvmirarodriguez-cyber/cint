@@ -130,7 +130,7 @@ export default function ObraDetalle() {
             <p className="eyebrow mb-2">{obra.codigo || 'Obra'} · {obra.ubicacion || 'Sin ubicación'}</p>
             <h1 className="display text-3xl sm:text-5xl">{obra.nombre}</h1>
             <p className="mt-3 text-sm text-bone-400">
-              Jefe de personal: <b className="text-bone">{obra.jefe_personal_nombre || obra.jefe_personal_email || 'Sin asignar'}</b>
+              Jefe de personal de obra: <b className="text-bone">{obra.jefe_personal_nombre || obra.jefe_personal_email || 'Sin asignar'}</b>
             </p>
             <p className="mt-1 text-sm text-bone-400">
               Jefe de obra: <b className="text-bone">{obra.jefe_terreno_nombre || '—'}</b>{obra.jefe_terreno_email && <span className="text-bone-500"> · {obra.jefe_terreno_email}</span>}
