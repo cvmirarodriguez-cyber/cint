@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+import writeExcelFile from 'write-excel-file/browser';
 import { cargoLabel, nota } from '@/lib/dominio';
 
 const RECON = { si: 'Sí', con_reservas: 'Con reservas', no: 'No' };
@@ -14,25 +14,27 @@ function nombreArchivo(prefijo) {
   return `${prefijo}_${f}`;
 }
 
-export function exportarExcel({ kpis, filtradas, porMes, peores, headcount, mesLabel, obraLabel }) {
-  const wb = XLSX.utils.book_new();
+// Convierte una lista de objetos en filas (encabezado + valores) para una hoja.
+const hoja = (sheet, objetos) => {
+  if (!objetos.length) return { sheet, data: [['Sin datos']] };
+  const cols = Object.keys(objetos[0]);
+  return { sheet, data: [cols, ...objetos.map((o) => cols.map((c) => (o[c] === '' || o[c] == null ? null : o[c])))] };
+};
 
-  // Resumen
+export async function exportarExcel({ kpis, filtradas, porMes, peores, headcount, mesLabel, obraLabel }) {
   const resumen = [
     ['Reporte de gestión — Cuadrilla'],
     ['Período', mesLabel],
     ['Obra', obraLabel],
     ['Generado', new Date().toLocaleString('es-CL')],
-    [],
+    [null],
     ['Métrica', 'Valor'],
     ['Evaluaciones', kpis.n],
     ['Promedio general', +kpis.promedio.toFixed(2)],
     ['Bajo desempeño (<3)', kpis.bajos],
     ['Alertas alcohol/drogas', kpis.alertas],
   ];
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(resumen), 'Resumen');
 
-  // Evaluaciones
   const evals = filtradas.map((e) => ({
     Trabajador: e.trabajador_nombre || '',
     RUT: e.trabajador_rut || '',
@@ -40,19 +42,13 @@ export function exportarExcel({ kpis, filtradas, porMes, peores, headcount, mesL
     Obra: e.obra_nombre || '',
     Desempeño: e.desempeno || '',
     Responsabilidad: e.responsabilidad || '',
-    'Promedio': +nota(e).toFixed(1),
+    Promedio: +nota(e).toFixed(1),
     'Alcohol/drogas': AD[e.alcohol_drogas] || e.alcohol_drogas || '',
-    'Recontratar': RECON[e.recontratar] || e.recontratar || '',
+    Recontratar: RECON[e.recontratar] || e.recontratar || '',
     Evaluador: e.evaluador_nombre || '',
     Fecha: fechaCorta(e.created_date),
   }));
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(evals.length ? evals : [{}]), 'Evaluaciones');
-
-  // Por mes
-  const mesRows = porMes.map((d) => ({ Mes: d.label, Evaluaciones: d.n, 'Promedio': d.prom }));
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(mesRows.length ? mesRows : [{}]), 'Por mes');
-
-  // Peores calificados
+  const mesRows = porMes.map((d) => ({ Mes: d.label, Evaluaciones: d.n, Promedio: d.prom }));
   const peoresRows = peores.map((t, i) => ({
     '#': i + 1,
     Trabajador: t.nombre,
@@ -62,28 +58,28 @@ export function exportarExcel({ kpis, filtradas, porMes, peores, headcount, mesL
     Promedio: +t.r.promedio.toFixed(1),
     'Alerta A/D': t.r.alerta ? 'Sí' : 'No',
   }));
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(peoresRows.length ? peoresRows : [{}]), 'Peores calificados');
+  const dot = headcount.map((h) => ({ Obra: h.nombre, Headcount: h.headcount, Vigentes: h.vigentes, Pendientes: h.pendientes }));
 
-  // Dotación
-  const dot = headcount.map((h) => ({
-    Obra: h.nombre,
-    Headcount: h.headcount,
-    Vigentes: h.vigentes,
-    Pendientes: h.pendientes,
-  }));
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dot.length ? dot : [{}]), 'Dotación');
-
-  XLSX.writeFile(wb, `${nombreArchivo('reporte')}.xlsx`);
+  await writeExcelFile([
+    { sheet: 'Resumen', data: resumen },
+    hoja('Evaluaciones', evals),
+    hoja('Por mes', mesRows),
+    hoja('Peores calificados', peoresRows),
+    hoja('Dotación', dot),
+  ]).toFile(`${nombreArchivo('reporte')}.xlsx`);
 }
 
+// Escapa texto antes de insertarlo en el HTML del PDF (los nombres vienen de datos cargados por usuarios).
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
 function tabla(html, titulo, cols, filas) {
-  const th = cols.map((c) => `<th>${c}</th>`).join('');
+  const th = cols.map((c) => `<th>${esc(c)}</th>`).join('');
   const trs = filas.length
-    ? filas.map((f) => `<tr>${f.map((c) => `<td>${c ?? ''}</td>`).join('')}</tr>`).join('')
+    ? filas.map((f) => `<tr>${f.map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')
     : `<tr><td colspan="${cols.length}" style="text-align:center;color:#888">Sin datos</td></tr>`;
   return `
     <section>
-      <h2>${titulo}</h2>
+      <h2>${esc(titulo)}</h2>
       <table><thead><tr>${th}</tr></thead><tbody>${trs}</tbody></table>
     </section>`;
 }
@@ -141,7 +137,7 @@ export function exportarPDF({ kpis, filtradas, porMes, peores, headcount, mesLab
     </style></head><body>
     <header>
       <h1>Reporte de gestión</h1>
-      <p>Período: ${mesLabel} &nbsp;·&nbsp; Obra: ${obraLabel} &nbsp;·&nbsp; Generado: ${new Date().toLocaleString('es-CL')}</p>
+      <p>Período: ${esc(mesLabel)} &nbsp;·&nbsp; Obra: ${esc(obraLabel)} &nbsp;·&nbsp; Generado: ${esc(new Date().toLocaleString('es-CL'))}</p>
     </header>
     ${evalTabla}
     ${mesTabla}
