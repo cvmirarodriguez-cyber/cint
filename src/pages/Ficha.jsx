@@ -1,10 +1,12 @@
+import { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { AlertOctagon, ArrowLeft, Building2, ClipboardCheck, MessageSquareQuote, Phone } from 'lucide-react';
+import { AlertOctagon, ArrowLeft, Building2, ClipboardCheck, FileText, Loader2, MessageSquareQuote, Paperclip, Phone } from 'lucide-react';
 import { useDatos } from '@/lib/datos';
 import { AD, NOTAS, RECONTRATAR, VEREDICTO, cargoLabel, fecha, nota, resumen } from '@/lib/dominio';
 import { formatearRut } from '@/lib/rut';
-import { Anillo, Avatar, Chip, Tilt, Vacio, colorNota, ease } from '@/components/ui';
+import { Anillo, Avatar, Chip, Tilt, Vacio, colorNota, ease, useToast } from '@/components/ui';
+import { TIPOS_CV, abrirDocumento, nuevoDocumento, subirPrivado } from '@/lib/documentos';
 
 function Barra({ etiqueta, valor }) {
   return (
@@ -16,6 +18,64 @@ function Barra({ etiqueta, valor }) {
       <div className="h-2 overflow-hidden rounded-full bg-white/[.06]">
         <motion.div className="h-full rounded-full" style={{ background: colorNota(valor) }} initial={{ width: 0 }} animate={{ width: `${valor ? (valor / 5) * 100 : 0}%` }} transition={{ duration: 0.9, ease, delay: 0.2 }} />
       </div>
+    </div>
+  );
+}
+
+// Currículums y documentos del trabajador: privados, se abren con un enlace temporal.
+function Documentos({ t }) {
+  const { E, usuario, recargar } = useDatos();
+  const avisar = useToast();
+  const [subiendo, setSubiendo] = useState(false);
+  const input = useRef(null);
+  const docs = [...(t.documentos || [])].reverse();
+
+  const adjuntar = async (e) => {
+    const f = e.target.files?.[0];
+    e.target.value = '';
+    if (!f) return;
+    setSubiendo(true);
+    try {
+      const uri = await subirPrivado(f);
+      await E.Trabajador.update(t.id, { documentos: [...(t.documentos || []), nuevoDocumento(f.name, uri, /cv|curr/i.test(f.name) ? 'cv' : 'otro', usuario)] });
+      await recargar();
+      avisar('Documento adjuntado');
+    } catch {
+      avisar('No se pudo subir el documento', 'bad');
+    } finally {
+      setSubiendo(false);
+    }
+  };
+
+  const ver = async (d) => {
+    try { await abrirDocumento(d.uri); } catch { avisar('No se pudo abrir el documento', 'bad'); }
+  };
+
+  return (
+    <div className="slab mt-4 p-5">
+      <div className="mb-3 flex items-center justify-between">
+        <p className="text-sm font-bold uppercase tracking-wider text-bone-400">Documentos</p>
+        <button onClick={() => input.current?.click()} disabled={subiendo} className="btn-ghost px-3 py-1.5 text-xs">
+          {subiendo ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Paperclip className="h-3.5 w-3.5" />} Adjuntar
+        </button>
+        <input ref={input} type="file" accept={TIPOS_CV} className="hidden" onChange={adjuntar} />
+      </div>
+      {t.experiencia && <p className="mb-3 border-l-2 border-obra/50 pl-3 text-sm text-bone-300">{t.experiencia}</p>}
+      {docs.length ? (
+        <ul className="space-y-1.5">
+          {docs.map((d, i) => (
+            <li key={`${d.uri}-${i}`}>
+              <button onClick={() => ver(d)} className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-white/[.04]">
+                <FileText className={`h-4 w-4 shrink-0 ${d.tipo === 'cv' ? 'text-obra' : 'text-bone-500'}`} />
+                <span className="min-w-0 flex-1 truncate text-sm">{d.nombre}</span>
+                <span className="shrink-0 text-xs text-bone-600">{d.tipo === 'cv' ? 'CV · ' : ''}{fecha(d.fecha)}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-sm text-bone-500">Sin currículum ni documentos.</p>
+      )}
     </div>
   );
 }
@@ -74,6 +134,7 @@ export default function Ficha() {
             </div>
           </Tilt>
           <Link to={`/evaluar?trabajador=${t.id}`} className="btn-primary mt-4 w-full"><ClipboardCheck className="h-4 w-4" /> Evaluar a {t.nombre.split(' ')[0]}</Link>
+          <Documentos t={t} />
         </div>
 
         {/* Historial */}
