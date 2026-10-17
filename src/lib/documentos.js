@@ -28,28 +28,14 @@ export async function abrirDocumento(uri) {
   }
 }
 
-const ESQUEMA_CV = {
-  type: 'object',
-  properties: {
-    nombre: { type: 'string', description: 'Nombre completo de la persona' },
-    rut: { type: 'string', description: 'RUT chileno, por ejemplo 12.345.678-9. Vacío si no aparece' },
-    cargo: { type: 'string', description: 'Cargo u oficio principal: supervisor, capataz, maestro primera, maestro segunda o jornal' },
-    especialidad: { type: 'string', description: 'Especialidad de construcción: enfierradura, moldaje, carpintería, albañilería, electricidad, etc.' },
-    telefono: { type: 'string' },
-    experiencia: { type: 'string', description: 'Resumen breve (máximo 3 frases) de su experiencia en obras: empresas, proyectos y años' },
-  },
-};
-
 // Sube el currículum y lo lee con IA. Si la lectura falla, el archivo igual queda subido
 // para que se completen los datos a mano.
 export async function leerCurriculum(file) {
   const uri = await subirPrivado(file);
   try {
-    const url = await enlaceTemporal(uri, 900);
-    const r = await Core.ExtractDataFromUploadedFile({ file_url: url, json_schema: ESQUEMA_CV });
-    if (r?.status && r.status !== 'success') throw new Error(r.details || r.status);
-    const datos = r?.output ?? r?.data ?? r ?? {};
-    return { uri, datos: (Array.isArray(datos) ? datos[0] : datos) ?? {}, leido: true };
+    // La lectura con IA solo está permitida desde el servidor (función leer-curriculum).
+    const r = await base44.functions.invoke('leer-curriculum', { file_uri: uri });
+    return { uri, datos: r.data?.datos ?? {}, leido: true };
   } catch {
     return { uri, datos: {}, leido: false };
   }
