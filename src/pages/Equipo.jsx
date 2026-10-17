@@ -77,7 +77,7 @@ export default function Equipo() {
   return (
     <div className="mx-auto max-w-3xl">
       <Encabezado eyebrow="Accesos" titulo="Equipo">
-        Cualquiera puede crear una cuenta, pero solo ve datos si lo invitaste como jefe de obra o si le das acceso aquí.
+        Cuadrilla es solo por invitación. Quien entre sin invitación no ve nada; aquí puedes darle acceso o quitárselo.
       </Encabezado>
 
       <section className="mb-8">
