@@ -86,26 +86,35 @@
     "responsabilidad"
   ],
   "rls": {
-    "create": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
-            "data.acceso": true
-          }
-        }
-      ]
-    },
     "read": {
       "$or": [
         {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "gerente_rrhh"
+              }
+            }
+          ]
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "jefe_personal"
+              }
+            }
+          ]
         },
         {
           "$and": [
@@ -121,19 +130,83 @@
         }
       ]
     },
-    "update": {
+    "create": {
       "$or": [
         {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "gerente_rrhh"
+              }
+            }
+          ]
         },
         {
           "$and": [
             {
               "user_condition": {
-                "data.acceso": true
+                "role": "admin"
               }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "jefe_personal"
+              }
+            }
+          ]
+        },
+        {
+          "user_condition": {
+            "data.acceso": true
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "gerente_rrhh"
+              }
+            }
+          ]
+        },
+        {
+          "$and": [
+            {
+              "$or": [
+                {
+                  "$and": [
+                    {
+                      "user_condition": {
+                        "role": "admin"
+                      }
+                    },
+                    {
+                      "user_condition": {
+                        "data.perfil": "jefe_personal"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "user_condition": {
+                    "data.acceso": true
+                  }
+                }
+              ]
             },
             {
               "created_by": "{{user.email}}"
@@ -143,9 +216,18 @@
       ]
     },
     "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$and": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.perfil": "gerente_rrhh"
+          }
+        }
+      ]
     }
   }
 }
