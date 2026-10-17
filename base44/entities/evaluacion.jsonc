@@ -1,0 +1,40 @@
+// Evaluación del jefe de terreno al término de contrato.
+{
+  "name": "Evaluacion",
+  "type": "object",
+  "properties": {
+    "demo": { "type": "boolean", "default": false, "description": "Dato de demostración; se borra desde Importar" },
+    "trabajador_id": { "type": "string" },
+    "trabajador_nombre": { "type": "string" },
+    "trabajador_rut": { "type": "string" },
+    "cargo": { "type": "string" },
+    "obra_id": { "type": "string" },
+    "obra_nombre": { "type": "string" },
+    "contrato_id": { "type": "string" },
+    "fecha_termino": { "type": "string", "format": "date" },
+    "desempeno": { "type": "integer", "minimum": 1, "maximum": 5, "description": "Calidad y rendimiento del trabajo" },
+    "responsabilidad": { "type": "integer", "minimum": 1, "maximum": 5, "description": "Puntualidad, asistencia, compromiso" },
+    "alcohol_drogas": {
+      "type": "string",
+      "enum": ["sin_observaciones", "sospecha", "confirmado"],
+      "enumNames": ["Sin observaciones", "Sospecha / reporte", "Incidente confirmado"],
+      "default": "sin_observaciones"
+    },
+    "recontratar": {
+      "type": "string",
+      "enum": ["si", "con_reservas", "no"],
+      "enumNames": ["Sí", "Con reservas", "No"],
+      "default": "si"
+    },
+    "comentario": { "type": "string", "maxLength": 500 },
+    "evaluador_nombre": { "type": "string" }
+  },
+  "required": ["trabajador_id", "desempeno", "responsabilidad"],
+  "rls": {
+    "read": { "$or": [ { "user_condition": { "role": "admin" } }, { "$and": [ { "user_condition": { "data.acceso": true } }, { "created_by": "{{user.email}}" } ] } ] },
+    "create": { "$or": [ { "user_condition": { "role": "admin" } }, { "user_condition": { "data.acceso": true } } ] },
+    "update": { "$or": [ { "user_condition": { "role": "admin" } }, { "$and": [ { "user_condition": { "data.acceso": true } }, { "created_by": "{{user.email}}" } ] } ] },
+    "delete": { "user_condition": { "role": "admin" } }
+  }
+
+}

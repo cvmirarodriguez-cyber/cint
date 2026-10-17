@@ -1,0 +1,32 @@
+// Paso de un trabajador por una obra. Al terminar, queda pendiente de evaluación.
+{
+  "name": "Contrato",
+  "type": "object",
+  "properties": {
+    "demo": { "type": "boolean", "default": false, "description": "Dato de demostración; se borra desde Importar" },
+    "trabajador_id": { "rls": { "update": { "user_condition": { "role": "admin" } } }, "type": "string" },
+    "trabajador_nombre": { "rls": { "update": { "user_condition": { "role": "admin" } } }, "type": "string" },
+    "trabajador_rut": { "rls": { "update": { "user_condition": { "role": "admin" } } }, "type": "string" },
+    "cargo": { "rls": { "update": { "user_condition": { "role": "admin" } } }, "type": "string", "description": "Cargo en esta obra" },
+    "obra_id": { "rls": { "update": { "user_condition": { "role": "admin" } } }, "type": "string" },
+    "obra_nombre": { "rls": { "update": { "user_condition": { "role": "admin" } } }, "type": "string" },
+    "jefe_terreno_email": { "rls": { "update": { "user_condition": { "role": "admin" } } }, "type": "string", "description": "Quién debe evaluar" },
+    "fecha_inicio": { "rls": { "update": { "user_condition": { "role": "admin" } } }, "type": "string", "format": "date" },
+    "fecha_termino": { "rls": { "update": { "user_condition": { "role": "admin" } } }, "type": "string", "format": "date" },
+    "estado": {
+      "type": "string",
+      "enum": ["vigente", "pendiente", "evaluado"],
+      "enumNames": ["Vigente", "Pendiente de evaluación", "Evaluado"],
+      "default": "vigente"
+    },
+    "evaluacion_id": { "type": "string" }
+  },
+  "required": ["trabajador_id", "obra_id"],
+  "rls": {
+    "read": { "$or": [ { "user_condition": { "role": "admin" } }, { "$and": [ { "user_condition": { "data.acceso": true } }, { "data.jefe_terreno_email": "{{user.email}}" } ] } ] },
+    "create": { "user_condition": { "role": "admin" } },
+    "update": { "$or": [ { "user_condition": { "role": "admin" } }, { "$and": [ { "user_condition": { "data.acceso": true } }, { "data.jefe_terreno_email": "{{user.email}}" } ] } ] },
+    "delete": { "user_condition": { "role": "admin" } }
+  }
+
+}

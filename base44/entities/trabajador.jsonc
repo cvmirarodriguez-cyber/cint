@@ -1,0 +1,27 @@
+// Personal directo de terreno (supervisor hacia abajo).
+{
+  "name": "Trabajador",
+  "type": "object",
+  "properties": {
+    "demo": { "type": "boolean", "default": false, "description": "Dato de demostración; se borra desde Importar" },
+    "nombre": { "type": "string", "description": "Nombre completo" },
+    "rut": { "type": "string", "description": "RUT normalizado sin puntos, con guión (ej: 12345678-9)" },
+    "cargo": {
+      "type": "string",
+      "enum": ["supervisor", "capataz", "maestro_primera", "maestro_segunda", "jornal"],
+      "enumNames": ["Supervisor de terreno", "Capataz", "Maestro primera", "Maestro segunda", "Jornal"],
+      "default": "jornal"
+    },
+    "especialidad": { "type": "string", "description": "Especialidad (enfierradura, carpintería, albañilería, etc.)" },
+    "telefono": { "type": "string" },
+    "notas": { "type": "string", "maxLength": 1000 }
+  },
+  "required": ["nombre", "rut"],
+  "rls": {
+    "read": { "user_condition": { "role": "admin" } },
+    "create": { "user_condition": { "role": "admin" } },
+    "update": { "user_condition": { "role": "admin" } },
+    "delete": { "user_condition": { "role": "admin" } }
+  }
+
+}
