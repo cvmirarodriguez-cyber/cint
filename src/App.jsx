@@ -19,6 +19,7 @@ import { esGerente } from '@/lib/dominio';
 import PanelJefe from '@/pages/PanelJefe';
 import MisEvaluaciones from '@/pages/MisEvaluaciones';
 import Recomendar from '@/pages/Recomendar';
+import Asistente from '@/pages/Asistente';
 
 function Pagina({ children }) {
   return (
@@ -82,6 +83,7 @@ export default function App() {
                 {esGerente(usuario) ? <Route path="/importar" element={<Pagina><Importar /></Pagina>} /> : null}
                 <Route path="/equipo" element={<Pagina><Equipo /></Pagina>} />
                 <Route path="/recomendar" element={<Pagina><Recomendar /></Pagina>} />
+                <Route path="/asistente" element={<Pagina><Asistente /></Pagina>} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             ) : (
