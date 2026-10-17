@@ -32,12 +32,13 @@ EVALUAR UN TÉRMINO DE CONTRATO (paso a paso)
 `;
 
 const GUIA_TOTAL = `
-MENÚ: Panel, Personal, Evaluar, Obras, Recomendar, Importar y Equipo.
+MENÚ: Panel, Personal, Evaluar, Obras, Asistente, Recomendar, Importar y Equipo (en celular: Panel, Personal, Evaluar, Obras y Asistente).
 - PANEL: saludo con la obra 3D, contadores (personal, evaluaciones, pendientes, alertas de alcohol/drogas), pendientes de evaluar, últimas evaluaciones, "Revisar antes de recontratar" y "Mejor evaluados".
 - PERSONAL: buscar por nombre o RUT y filtrar por cargo. "Agregar" crea un trabajador (nombre, RUT válido, cargo, especialidad, teléfono). Al abrir uno se ve su ficha: nota promedio, veredicto (Recomendado / Revisar antes / No recomendado), desempeño y responsabilidad, historial por obra con comentarios, y la sección Documentos (ver el currículum o "Adjuntar" otro documento; los archivos son privados).
 - EVALUAR: lista de términos pendientes de todas las obras; se puede evaluar a cualquiera.${GUIA_EVALUAR}
 - OBRAS: "Nueva obra" (nombre, código, ubicación, fechas). Al abrir una obra (tocar su tarjeta), el botón "Editar" permite designar al "Jefe de personal de obra a cargo" y al jefe de obra (correo y nombre). Al cambiar al jefe de personal, toda la cuadrilla y su historial pasan a él; al cambiar al jefe de obra, los contratos abiertos pasan al nuevo para que los evalúe.
   Dentro de una obra: "Sumar personal" (buscar y marcar trabajadores, fecha de inicio, "Agregar"), "Terminar" un contrato (queda pendiente de evaluación para el jefe de obra), "Terminar todos" y "Evaluar".
+- ASISTENTE: chat general con IA para el día a día. Acepta texto, archivos (planillas, currículums, PDF, fotos; se suben privados con el clip) y dictado por voz (botón micrófono). Consulta el personal, evaluaciones, contratos y obras para resumir, comparar, redactar correos o reportes y guiar en la app. Solo lee datos: no modifica nada. "Nueva conversación" empieza de cero.
 - RECOMENDAR: asistente con IA. Se le pide, por ejemplo, "1 capataz y 4 maestros primera de enfierradura para la obra X" y revisa evaluaciones, experiencia y disponibilidad para proponer a los mejores, advirtiendo a quién revisar antes. Tarda cerca de un minuto. "Nueva consulta" empieza de cero.
 - IMPORTAR (pestaña "Planilla Excel"): subir .xlsx o .csv, o pegar desde Excel. Reconoce columnas nombre (o nombres y apellidos), RUT, cargo, especialidad, teléfono y obra; si hay una hoja por obra con su nombre, usa esa obra; o se elige "Sumar a la cuadrilla de". Muestra vista previa (nuevo, ya existe, RUT inválido, repetido) y "Cargar". Los RUT existentes no se duplican pero sí se suman a la obra.
   Pestaña "Currículums": "Elegir archivos" (varios PDF, Word o fotos). La app lee cada uno con IA (nombre, RUT, oficio, experiencia), lo une al trabajador por RUT o nombre o lo crea; se pueden corregir nombre, RUT y cargo antes de "Guardar". Si no se pudo leer, se completan a mano. Opcional: sumarlos a una obra.
@@ -49,12 +50,13 @@ const GUIAS: Record<string, string> = {
   gerente_rrhh: `QUIEN PREGUNTA ES GERENTE DE RRHH: tiene acceso total.\n${GUIA_TOTAL}`,
   soporte: `QUIEN PREGUNTA ES DEL EQUIPO DE SOPORTE: tiene acceso total, igual que el gerente de RRHH.\n${GUIA_TOTAL}`,
   jefe_personal: `QUIEN PREGUNTA ES JEFE DE PERSONAL DE OBRA.
-MENÚ: Panel, Personal, Evaluar, Obras, Recomendar y Equipo. No tiene Importar (eso lo hace el gerente de RRHH).
+MENÚ: Panel, Personal, Evaluar, Obras, Asistente, Recomendar y Equipo. No tiene Importar (eso lo hace el gerente de RRHH).
 - PANEL: igual que el gerente, pero los pendientes son de sus obras.
 - PERSONAL: ve toda la base de personal y los historiales para elegir a los mejores. Puede "Agregar" trabajadores y ver documentos de la ficha.
 - OBRAS: solo ve las obras que le asignó el gerente de RRHH (si no tiene, aparece "Aún no tienes obras asignadas"; debe pedírselo al gerente). No crea obras.
   Al abrir su obra, en "Editar" designa al jefe de obra (correo y nombre); nombre, código y fechas los define el gerente. Dentro de la obra: "Sumar personal" para elegir trabajadores, "Terminar" o "Terminar todos" los contratos (quedan pendientes de evaluar) y "Evaluar".
 - EVALUAR: también puede evaluar los términos de sus obras.${GUIA_EVALUAR}
+- ASISTENTE: chat general con IA (texto, archivos y voz) que consulta personal, evaluaciones y sus obras para resumir, comparar o redactar; solo lee datos.
 - RECOMENDAR: asistente con IA que propone trabajadores bien evaluados para su obra (ej. "3 jornales y 2 maestros segunda de hormigón").
 - EQUIPO: puede invitar solo jefes de obra (quedan aprobados al crear su cuenta) y aprobar o quitar acceso a jefes de obra. No cambia cargos ni suspende cuentas (eso es del gerente de RRHH).
 `,
