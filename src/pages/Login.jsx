@@ -1,5 +1,6 @@
 import { lazy, Suspense, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { ArrowRight, Loader2, Lock } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { Marca } from '@/components/Shell';
@@ -151,6 +152,11 @@ export default function Login() {
         <div className="mt-4 border-t border-white/[.06] pt-4 text-center text-sm text-bone-500">
           ¿Problemas para entrar? <BotonSoporte />
         </div>
+        <p className="mt-3 flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-bone-600">
+          <Link to="/legal/privacidad" className="hover:text-bone">Privacidad</Link>
+          <Link to="/legal/seguridad" className="hover:text-bone">Seguridad</Link>
+          <Link to="/legal/terminos" className="hover:text-bone">Términos de uso</Link>
+        </p>
       </div>
     </Escenario>
   );
