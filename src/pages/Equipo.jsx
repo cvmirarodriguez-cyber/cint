@@ -9,7 +9,7 @@ import { Avatar, Chip, Encabezado, Segmento, Vacio, item, lista, useToast } from
 const OPCIONES = ['jefe_obra', 'jefe_personal', 'gerente_rrhh'].map((value) => ({ value, label: PERFILES[value].label }));
 
 const DESCRIPCION = {
-  gerente_rrhh: { icono: Crown, color: 'text-obra', texto: 'Maneja todos los datos. Crea las obras, designa al jefe de personal de cada una, invita a todo el equipo y define los cargos.' },
+  gerente_rrhh: { icono: Crown, color: 'text-obra', texto: 'Maneja todos los datos. Crea las obras, designa al jefe de personal de obra de cada una, invita a todo el equipo y define los cargos.' },
   jefe_personal: { icono: ShieldCheck, color: 'text-hivis', texto: 'Ve la base de personal y los historiales. En las obras que le asigna el gerente elige a los trabajadores y al jefe de obra, y marca los términos de contrato.' },
   jefe_obra: { icono: HardHat, color: 'text-bone-300', texto: 'Evalúa a los trabajadores de su obra al término de su contrato y ve sus propias evaluaciones. No ve la base de personal ni el historial.' },
 };
@@ -35,7 +35,7 @@ function Interruptor({ activo, onClick, disabled, etiqueta }) {
 export default function Equipo() {
   const avisar = useToast();
   const { usuario, esGerente } = useDatos();
-  // El jefe de personal solo invita y aprueba jefes de obra.
+  // El jefe de personal de obra solo invita y aprueba jefes de obra.
   const cargos = esGerente ? ['gerente_rrhh', 'jefe_personal', 'jefe_obra'] : ['jefe_obra'];
   const [usuarios, setUsuarios] = useState(null);
   const [cambiando, setCambiando] = useState(null);
@@ -124,7 +124,7 @@ export default function Equipo() {
                     className="rounded-lg border border-white/10 bg-ink-800 px-2 py-1.5 text-xs font-semibold text-bone"
                   >
                     <option value="gerente_rrhh">Gerente de RRHH</option>
-                    <option value="jefe_personal">Jefe de personal</option>
+                    <option value="jefe_personal">Jefe de personal de obra</option>
                   </select>
                 ) : (
                   <Chip tono={u.perfil === 'gerente_rrhh' ? 'obra' : u.role === 'admin' ? 'warn' : 'muted'}>{PERFILES[u.perfil]?.label}</Chip>
@@ -140,7 +140,7 @@ export default function Equipo() {
             ))}
           </motion.ul>
         )}
-        <p className="mt-2 text-xs text-bone-600">Gerente de RRHH y jefe de personal siempre tienen acceso total.</p>
+        <p className="mt-2 text-xs text-bone-600">El gerente de RRHH y los jefes de personal de obra no necesitan aprobación.</p>
       </section>
 
       <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-bone-400">Invitar</h2>
