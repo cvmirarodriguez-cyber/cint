@@ -46,7 +46,7 @@
     },
     "jefe_personal_email": {
       "type": "string",
-      "description": "Jefe de personal a cargo (lo asigna el gerente)",
+      "description": "Jefe de personal de obra a cargo (lo asigna el gerente)",
       "rls": {
         "write": {
           "$and": [
