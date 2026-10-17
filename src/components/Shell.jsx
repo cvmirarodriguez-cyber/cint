@@ -29,7 +29,7 @@ export default function Shell({ children }) {
         { to: '/evaluar', label: 'Evaluar', icono: ClipboardCheck, badge: pendientes.length },
         { to: '/obras', label: 'Obras', icono: Building2 },
         { to: '/asistente', label: 'Asistente', icono: Bot },
-        { to: '/recomendar', label: 'Recomendar', icono: Sparkles },
+        { to: '/recomendar', label: 'Recomendar', icono: Sparkles, soloDesktop: true },
         ...(esGerente ? [{ to: '/importar', label: 'Importar', icono: Upload, soloDesktop: true }] : []),
         { to: '/equipo', label: 'Equipo', icono: Users, soloDesktop: true },
       ]
