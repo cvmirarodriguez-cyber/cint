@@ -20,14 +20,14 @@ export function Marca({ className = '' }) {
 }
 
 export default function Shell({ children }) {
-  const { usuario, esAdmin, pendientes } = useDatos();
+  const { usuario, esAdmin, esGerente, pendientes } = useDatos();
   const nav = esAdmin
     ? [
         { to: '/', label: 'Panel', icono: LayoutGrid, end: true },
         { to: '/trabajadores', label: 'Personal', icono: HardHat },
         { to: '/evaluar', label: 'Evaluar', icono: ClipboardCheck, badge: pendientes.length },
         { to: '/obras', label: 'Obras', icono: Building2 },
-        { to: '/importar', label: 'Importar', icono: Upload, soloDesktop: true },
+        ...(esGerente ? [{ to: '/importar', label: 'Importar', icono: Upload, soloDesktop: true }] : []),
         { to: '/equipo', label: 'Equipo', icono: Users, soloDesktop: true },
       ]
     : [
