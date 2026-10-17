@@ -36,7 +36,16 @@ export default function App() {
   const location = useLocation();
 
   useEffect(() => {
-    base44.auth.me().then(setUsuario).catch(() => setUsuario(null));
+    base44.auth.me()
+      .then(async (u) => {
+        // Un invitado como gerente o jefe de personal recibe su cargo la primera vez que entra.
+        if (u?.role === 'admin' && !(u.perfil || u.data?.perfil)) {
+          const r = await base44.functions.invoke('reclamar-acceso', {}).catch(() => null);
+          if (r?.data?.perfil) u = { ...u, perfil: r.data.perfil };
+        }
+        setUsuario(u);
+      })
+      .catch(() => setUsuario(null));
   }, []);
 
   if (usuario === undefined) {
