@@ -38,7 +38,7 @@ export default function App() {
   useEffect(() => {
     base44.auth.me()
       .then(async (u) => {
-        // Un invitado como gerente o jefe de personal recibe su cargo la primera vez que entra.
+        // Un invitado como gerente o jefe de personal de obra recibe su cargo la primera vez que entra.
         if (u?.role === 'admin' && !(u.perfil || u.data?.perfil)) {
           const r = await base44.functions.invoke('reclamar-acceso', {}).catch(() => null);
           if (r?.data?.perfil) u = { ...u, perfil: r.data.perfil };
@@ -58,7 +58,7 @@ export default function App() {
     );
   }
   if (!usuario) return <Login />;
-  // La app es pública: una cuenta nueva no ve datos hasta que el jefe de personal la aprueba.
+  // La app es pública: una cuenta nueva no ve datos hasta que el jefe de personal de obra la aprueba.
   if (usuario.role !== 'admin' && !(usuario.acceso || usuario.data?.acceso)) return <AccesoPendiente usuario={usuario} />;
   if (usuario.role === 'admin' && !(usuario.perfil || usuario.data?.perfil)) return <AccesoPendiente usuario={usuario} />;
 
