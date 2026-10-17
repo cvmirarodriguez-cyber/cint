@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Crown, HardHat, Mail, ShieldCheck, UserCheck } from 'lucide-react';
+import { Crown, HardHat, Mail, PauseCircle, PlayCircle, ShieldCheck, Trash2, UserCheck } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useDatos } from '@/lib/datos';
 import { PERFILES, fecha } from '@/lib/dominio';
@@ -72,6 +72,36 @@ export default function Equipo() {
     }
   };
 
+  const suspender = async (u) => {
+    const accion = u.suspendido ? 'reactivar' : 'suspender';
+    if (!u.suspendido && !window.confirm(`¿Suspender a ${u.full_name || u.email}? No podrá entrar ni ver datos hasta que lo reactives. Su historial se conserva.`)) return;
+    setCambiando(u.id);
+    try {
+      await gestionar({ accion: 'suspender', userId: u.id, suspender: !u.suspendido });
+      await cargar();
+      avisar(accion === 'suspender' ? `${u.full_name || u.email} quedó suspendido` : `${u.full_name || u.email} fue reactivado`);
+    } catch {
+      avisar('No se pudo cambiar la cuenta', 'bad');
+    } finally {
+      setCambiando(null);
+    }
+  };
+
+  const eliminar = async (u) => {
+    const nombre = u.full_name || u.email;
+    if (!window.confirm(`¿Eliminar la cuenta de ${nombre}?\n\nPerderá el acceso y su invitación. Sus evaluaciones y el historial de obras se conservan. Para volver a entrar habría que invitarlo de nuevo.`)) return;
+    setCambiando(u.id);
+    try {
+      const r = await gestionar({ accion: 'eliminar', userId: u.id });
+      await cargar();
+      avisar(r?.eliminado ? `Cuenta de ${nombre} eliminada` : r?.aviso || 'Cuenta desactivada');
+    } catch {
+      avisar('No se pudo eliminar la cuenta', 'bad');
+    } finally {
+      setCambiando(null);
+    }
+  };
+
   const invitar = async (e) => {
     e.preventDefault();
     setEnviando(true);
@@ -109,13 +139,13 @@ export default function Equipo() {
         ) : (
           <motion.ul variants={lista} initial="hidden" animate="show" className="slab divide-y divide-white/[.05] overflow-hidden">
             {[...usuarios].sort((a, b) => a.acceso - b.acceso).map((u) => (
-              <motion.li key={u.id} variants={item} className={`flex items-center gap-3 px-4 py-3.5 ${u.acceso ? '' : 'bg-hivis/[.04]'}`}>
+              <motion.li key={u.id} variants={item} className={`flex flex-wrap items-center gap-3 px-4 py-3.5 sm:flex-nowrap ${u.suspendido ? 'bg-alerta/[.05] opacity-75' : u.acceso ? '' : 'bg-hivis/[.04]'}`}>
                 <Avatar nombre={u.full_name || u.email} size={38} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold">{u.full_name || u.email}</p>
                   <p className="truncate text-xs text-bone-500">{u.email} · desde {fecha(u.created_date)}</p>
                 </div>
-                {esGerente && u.role === 'admin' && u.id !== usuario.id ? (
+                {esGerente && u.role === 'admin' && u.id !== usuario.id && !u.suspendido && u.perfil !== 'soporte' ? (
                   <select
                     aria-label={`Cargo de ${u.email}`}
                     value={u.perfil}
@@ -127,13 +157,23 @@ export default function Equipo() {
                     <option value="jefe_personal">Jefe de personal de obra</option>
                   </select>
                 ) : (
-                  <Chip tono={u.perfil === 'gerente_rrhh' ? 'obra' : u.role === 'admin' ? 'warn' : 'muted'}>{PERFILES[u.perfil]?.label}</Chip>
+                  <Chip tono={u.perfil === 'gerente_rrhh' || u.perfil === 'soporte' ? 'obra' : u.role === 'admin' ? 'warn' : 'muted'}>{PERFILES[u.perfil]?.label}</Chip>
                 )}
-                {!u.acceso && <Chip tono="warn" className="hidden sm:inline-flex">Pendiente</Chip>}
+                {u.suspendido ? <Chip tono="bad">Suspendido</Chip> : !u.acceso && <Chip tono="warn" className="hidden sm:inline-flex">Pendiente</Chip>}
+                {esGerente && u.id !== usuario.id && (u.role !== 'admin' || u.perfil === 'jefe_personal') && (
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => suspender(u)} disabled={cambiando === u.id} className="rounded-lg p-2 text-bone-400 transition-colors hover:bg-white/5 hover:text-bone disabled:opacity-40" aria-label={u.suspendido ? `Reactivar a ${u.email}` : `Suspender a ${u.email}`} title={u.suspendido ? 'Reactivar' : 'Suspender'}>
+                      {u.suspendido ? <PlayCircle className="h-4 w-4 text-ok" /> : <PauseCircle className="h-4 w-4" />}
+                    </button>
+                    <button onClick={() => eliminar(u)} disabled={cambiando === u.id} className="rounded-lg p-2 text-bone-400 transition-colors hover:bg-alerta/10 hover:text-alerta disabled:opacity-40" aria-label={`Eliminar cuenta de ${u.email}`} title="Eliminar cuenta">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
                 <Interruptor
                   activo={u.acceso}
                   etiqueta={`Acceso de ${u.email}`}
-                  disabled={u.role === 'admin' || u.id === usuario.id || cambiando === u.id}
+                  disabled={u.role === 'admin' || u.suspendido || u.id === usuario.id || cambiando === u.id}
                   onClick={() => alternar(u)}
                 />
               </motion.li>
