@@ -1,0 +1,180 @@
+{
+  "type": "object",
+  "name": "Contrato",
+  "properties": {
+    "demo": {
+      "type": "boolean",
+      "description": "Dato de demostraci\u00f3n; se borra desde Importar",
+      "default": false
+    },
+    "trabajador_id": {
+      "type": "string",
+      "rls": {
+        "update": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
+    },
+    "trabajador_nombre": {
+      "type": "string",
+      "rls": {
+        "update": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
+    },
+    "trabajador_rut": {
+      "type": "string",
+      "rls": {
+        "update": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
+    },
+    "cargo": {
+      "type": "string",
+      "description": "Cargo en esta obra",
+      "rls": {
+        "update": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
+    },
+    "obra_id": {
+      "type": "string",
+      "rls": {
+        "update": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
+    },
+    "obra_nombre": {
+      "type": "string",
+      "rls": {
+        "update": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
+    },
+    "jefe_terreno_email": {
+      "type": "string",
+      "description": "Qui\u00e9n debe evaluar",
+      "rls": {
+        "update": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
+    },
+    "fecha_inicio": {
+      "type": "string",
+      "format": "date",
+      "rls": {
+        "update": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
+    },
+    "fecha_termino": {
+      "type": "string",
+      "format": "date",
+      "rls": {
+        "update": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
+    },
+    "estado": {
+      "type": "string",
+      "enum": [
+        "vigente",
+        "pendiente",
+        "evaluado"
+      ],
+      "enumNames": [
+        "Vigente",
+        "Pendiente de evaluaci\u00f3n",
+        "Evaluado"
+      ],
+      "default": "vigente"
+    },
+    "evaluacion_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "trabajador_id",
+    "obra_id"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "data.acceso": true
+              }
+            },
+            {
+              "data.jefe_terreno_email": "{{user.email}}"
+            }
+          ]
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "data.acceso": true
+              }
+            },
+            {
+              "data.jefe_terreno_email": "{{user.email}}"
+            }
+          ]
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

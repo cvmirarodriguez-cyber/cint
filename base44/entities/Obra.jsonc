@@ -1,0 +1,89 @@
+{
+  "type": "object",
+  "name": "Obra",
+  "properties": {
+    "demo": {
+      "type": "boolean",
+      "description": "Dato de demostraci\u00f3n; se borra desde Importar",
+      "default": false
+    },
+    "nombre": {
+      "type": "string"
+    },
+    "codigo": {
+      "type": "string",
+      "description": "C\u00f3digo interno de la obra"
+    },
+    "ubicacion": {
+      "type": "string"
+    },
+    "jefe_terreno_nombre": {
+      "type": "string"
+    },
+    "jefe_terreno_email": {
+      "type": "string",
+      "format": "email"
+    },
+    "fecha_inicio": {
+      "type": "string",
+      "format": "date"
+    },
+    "fecha_termino": {
+      "type": "string",
+      "format": "date"
+    },
+    "estado": {
+      "type": "string",
+      "enum": [
+        "en_curso",
+        "terminada"
+      ],
+      "enumNames": [
+        "En curso",
+        "Terminada"
+      ],
+      "default": "en_curso"
+    }
+  },
+  "required": [
+    "nombre"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "data.acceso": true
+              }
+            },
+            {
+              "data.jefe_terreno_email": "{{user.email}}"
+            }
+          ]
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

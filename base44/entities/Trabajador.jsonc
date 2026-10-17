@@ -1,0 +1,74 @@
+{
+  "type": "object",
+  "name": "Trabajador",
+  "properties": {
+    "demo": {
+      "type": "boolean",
+      "description": "Dato de demostraci\u00f3n; se borra desde Importar",
+      "default": false
+    },
+    "nombre": {
+      "type": "string",
+      "description": "Nombre completo"
+    },
+    "rut": {
+      "type": "string",
+      "description": "RUT normalizado sin puntos, con gui\u00f3n (ej: 12345678-9)"
+    },
+    "cargo": {
+      "type": "string",
+      "enum": [
+        "supervisor",
+        "capataz",
+        "maestro_primera",
+        "maestro_segunda",
+        "jornal"
+      ],
+      "enumNames": [
+        "Supervisor de terreno",
+        "Capataz",
+        "Maestro primera",
+        "Maestro segunda",
+        "Jornal"
+      ],
+      "default": "jornal"
+    },
+    "especialidad": {
+      "type": "string",
+      "description": "Especialidad (enfierradura, carpinter\u00eda, alba\u00f1iler\u00eda, etc.)"
+    },
+    "telefono": {
+      "type": "string"
+    },
+    "notas": {
+      "type": "string",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "nombre",
+    "rut"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

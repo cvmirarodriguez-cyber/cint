@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2, Lock } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { Marca } from '@/components/Shell';
 import { ease } from '@/components/ui';
@@ -43,7 +43,7 @@ export function Escenario({ children }) {
   );
 }
 
-const TITULOS = { entrar: 'Ingresar', registro: 'Crear cuenta', codigo: 'Verifica tu correo' };
+const TITULOS = { entrar: 'Ingresar', registro: 'Activar invitación', codigo: 'Verifica tu correo' };
 
 export default function Login() {
   const [modo, setModo] = useState('entrar');
@@ -118,7 +118,7 @@ export default function Login() {
             <motion.div key={modo} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.2, ease }} className="space-y-3">
               {modo === 'codigo' ? (
                 <>
-                  <p className="text-sm text-bone-300">Te enviamos un código a <b className="break-all text-bone">{email}</b>. Escríbelo para activar tu cuenta.</p>
+                  <p className="text-sm text-bone-300">Usa el mismo correo de tu invitación. Te enviamos un código a <b className="break-all text-bone">{email}</b>. Escríbelo para activar tu cuenta.</p>
                   <input className="field text-center font-mono text-2xl tracking-[.4em]" inputMode="numeric" autoComplete="one-time-code" placeholder="••••••" value={codigo} onChange={(e) => setCodigo(e.target.value)} required autoFocus aria-label="Código de verificación" />
                 </>
               ) : (
@@ -137,10 +137,13 @@ export default function Login() {
 
         <p className="mt-4 text-center text-sm text-bone-500">
           {modo === 'entrar' ? (
-            <>¿Primera vez? <button type="button" onClick={() => cambiar('registro')} className="font-semibold text-obra-300 hover:underline">Crear cuenta</button></>
+            <>¿Te invitaron por correo? <button type="button" onClick={() => cambiar('registro')} className="font-semibold text-obra-300 hover:underline">Activa tu acceso</button></>
           ) : (
             <button type="button" onClick={() => cambiar('entrar')} className="font-semibold text-obra-300 hover:underline">Ya tengo cuenta</button>
           )}
+        </p>
+        <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-bone-600">
+          <Lock className="h-3.5 w-3.5" /> Uso interno · acceso solo por invitación
         </p>
       </div>
     </Escenario>

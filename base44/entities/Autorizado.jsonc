@@ -1,0 +1,39 @@
+{
+  "type": "object",
+  "name": "Autorizado",
+  "properties": {
+    "email": {
+      "type": "string",
+      "description": "Correo invitado, en min\u00fasculas",
+      "format": "email"
+    },
+    "invitado_por": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "email"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
