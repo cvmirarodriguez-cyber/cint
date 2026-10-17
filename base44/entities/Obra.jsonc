@@ -43,23 +43,87 @@
         "Terminada"
       ],
       "default": "en_curso"
+    },
+    "jefe_personal_email": {
+      "type": "string",
+      "description": "Jefe de personal a cargo (lo asigna el gerente)",
+      "rls": {
+        "write": {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "gerente_rrhh"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "jefe_personal_nombre": {
+      "type": "string",
+      "rls": {
+        "write": {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "gerente_rrhh"
+              }
+            }
+          ]
+        }
+      }
     }
   },
   "required": [
     "nombre"
   ],
   "rls": {
-    "create": {
-      "user_condition": {
-        "role": "admin"
-      }
-    },
     "read": {
       "$or": [
         {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "gerente_rrhh"
+              }
+            }
+          ]
+        },
+        {
+          "$and": [
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            },
+            {
+              "data.jefe_personal_email": "{{user.email}}"
+            }
+          ]
         },
         {
           "$and": [
@@ -75,15 +139,72 @@
         }
       ]
     },
+    "create": {
+      "$and": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.perfil": "gerente_rrhh"
+          }
+        }
+      ]
+    },
     "update": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "gerente_rrhh"
+              }
+            }
+          ]
+        },
+        {
+          "$and": [
+            {
+              "$and": [
+                {
+                  "user_condition": {
+                    "role": "admin"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "jefe_personal"
+                  }
+                }
+              ]
+            },
+            {
+              "data.jefe_personal_email": "{{user.email}}"
+            }
+          ]
+        }
+      ]
     },
     "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$and": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.perfil": "gerente_rrhh"
+          }
+        }
+      ]
     }
   }
 }
