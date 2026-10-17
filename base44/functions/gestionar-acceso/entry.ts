@@ -1,48 +1,96 @@
 import { createClientFromRequest } from "npm:@base44/sdk";
 
-// Solo el jefe de personal de obra (admin) lista usuarios y aprueba o revoca su acceso.
+// Gestión de cuentas del equipo.
+// - Gerente de RRHH y Soporte: todo (cargos, suspender, eliminar).
+// - Jefe de personal de obra: listar y aprobar/revocar jefes de obra.
+// Nadie puede actuar sobre sí mismo, y la cuenta de Soporte solo la toca Soporte.
+const TOTAL = ["gerente_rrhh", "soporte"];
+const perfilDe = (u: any) => u?.perfil ?? u?.data?.perfil ?? null;
+
 export default async function (req: Request): Promise<Response> {
   const base44 = createClientFromRequest(req);
   const yo = await base44.auth.me().catch(() => null);
-  const miPerfil = yo?.perfil ?? yo?.data?.perfil;
-  if (!yo || yo.role !== "admin" || !["gerente_rrhh", "jefe_personal"].includes(miPerfil)) {
+  const miPerfil = perfilDe(yo);
+  if (!yo || yo.role !== "admin" || ![...TOTAL, "jefe_personal"].includes(miPerfil)) {
     return Response.json({ error: "Solo el gerente o un jefe de personal de obra pueden gestionar accesos" }, { status: 403 });
   }
+  const total = TOTAL.includes(miPerfil);
+  const Users = base44.asServiceRole.entities.User;
 
-  const { accion, userId, acceso, perfil } = await req.json();
+  const { accion, userId, acceso, perfil, suspender } = await req.json();
 
   if (accion === "listar") {
-    const usuarios = await base44.asServiceRole.entities.User.list("-created_date", 500);
+    const usuarios = await Users.list("-created_date", 500);
     return Response.json({
       usuarios: usuarios.map((u: any) => ({
         id: u.id,
         email: u.email,
         full_name: u.full_name,
         role: u.role,
-        acceso: u.role === "admin" || u.acceso === true || u.data?.acceso === true,
-        perfil: u.perfil ?? u.data?.perfil ?? (u.role === "admin" ? "jefe_personal" : "jefe_obra"),
+        acceso: !u.suspendido && (u.role === "admin" || u.acceso === true || u.data?.acceso === true),
+        perfil: perfilDe(u) ?? u.perfil_previo ?? (u.role === "admin" ? "jefe_personal" : "jefe_obra"),
+        suspendido: u.suspendido === true || u.data?.suspendido === true,
         created_date: u.created_date,
       })),
     });
   }
 
-  if (accion === "cambiar" && userId) {
-    if (userId === yo.id) return Response.json({ error: "No puedes cambiar tu propio acceso" }, { status: 400 });
+  if (!userId) return Response.json({ error: "Falta el usuario" }, { status: 400 });
+  if (userId === yo.id) return Response.json({ error: "No puedes cambiar tu propia cuenta" }, { status: 400 });
+  const otro: any = await Users.get(userId).catch(() => null);
+  if (!otro) return Response.json({ error: "Usuario no encontrado" }, { status: 404 });
+  const perfilOtro = perfilDe(otro) ?? otro.perfil_previo;
+  if (perfilOtro === "soporte" && miPerfil !== "soporte") {
+    return Response.json({ error: "La cuenta de Soporte no se puede modificar" }, { status: 403 });
+  }
+
+  if (accion === "cambiar") {
     // El jefe de personal de obra solo aprueba o revoca jefes de obra.
-    if (miPerfil !== "gerente_rrhh") {
-      const otro = await base44.asServiceRole.entities.User.get(userId);
-      if (otro?.role === "admin") return Response.json({ error: "Solo el gerente de RRHH gestiona a otros jefes de personal de obra" }, { status: 403 });
-    }
-    await base44.asServiceRole.entities.User.update(userId, { acceso: !!acceso });
+    if (!total && otro.role === "admin") return Response.json({ error: "Solo el gerente de RRHH gestiona a los jefes de personal de obra" }, { status: 403 });
+    await Users.update(userId, { acceso: !!acceso });
     return Response.json({ ok: true });
   }
 
-  // Cambia el cargo entre los perfiles de acceso total (no cambia el rol de Base44).
-  if (accion === "perfil" && userId) {
-    if (miPerfil !== "gerente_rrhh") return Response.json({ error: "Solo el gerente de RRHH cambia cargos" }, { status: 403 });
+  // Desde aquí, solo gerente de RRHH o Soporte.
+  if (!total) return Response.json({ error: "Solo el gerente de RRHH puede hacer esto" }, { status: 403 });
+
+  if (accion === "perfil") {
     if (!["gerente_rrhh", "jefe_personal"].includes(perfil)) return Response.json({ error: "Perfil no válido" }, { status: 400 });
-    await base44.asServiceRole.entities.User.update(userId, { perfil });
+    await Users.update(userId, { perfil });
     return Response.json({ ok: true });
+  }
+
+  // Solo se suspende o elimina a jefes de personal de obra y jefes de obra.
+  const suspendible = otro.role !== "admin" || perfilOtro === "jefe_personal";
+  if ((accion === "suspender" || accion === "eliminar") && !suspendible) {
+    return Response.json({ error: "Solo se puede suspender o eliminar a jefes de personal de obra y jefes de obra" }, { status: 403 });
+  }
+
+  if (accion === "suspender") {
+    if (suspender) {
+      // Sin cargo ni acceso, las reglas del servidor no le muestran ningún dato.
+      await Users.update(userId, { suspendido: true, acceso: false, perfil_previo: perfilDe(otro) ?? otro.perfil_previo ?? null, perfil: null });
+    } else {
+      const restaurar: any = { suspendido: false, acceso: true };
+      if (otro.role === "admin") restaurar.perfil = otro.perfil_previo || "jefe_personal";
+      await Users.update(userId, restaurar);
+    }
+    return Response.json({ ok: true });
+  }
+
+  if (accion === "eliminar") {
+    // Primero se le quita todo acceso; luego se borra la cuenta y su invitación.
+    await Users.update(userId, { suspendido: true, acceso: false, perfil: null });
+    // Con los permisos de quien elimina (gerente o Soporte), que son los que pueden borrar invitaciones.
+    const invitaciones = await base44.entities.Autorizado.filter({ email: String(otro.email).toLowerCase() });
+    for (const inv of invitaciones) await base44.entities.Autorizado.delete(inv.id);
+    try {
+      await Users.delete(userId);
+    } catch (_e) {
+      return Response.json({ ok: true, eliminado: false, aviso: "La cuenta quedó suspendida y sin invitación, pero Base44 no permitió borrarla del todo." });
+    }
+    const sigue = await Users.get(userId).catch(() => null);
+    return Response.json({ ok: true, eliminado: !sigue, aviso: sigue ? "La cuenta quedó suspendida y sin invitación; Base44 la mantiene registrada." : null });
   }
 
   return Response.json({ error: "Acción no válida" }, { status: 400 });
