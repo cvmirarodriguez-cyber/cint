@@ -15,6 +15,9 @@ const RAPIDAS = {
   jefe_obra: ['¿Cómo evalúo a un trabajador?', '¿Qué significa cada nota?', '¿Dónde veo mis evaluaciones?'],
 };
 
+// Si la respuesta trae pasos numerados en un solo párrafo, pone cada paso en su línea.
+const separarPasos = (t) => String(t || '').replace(/([.:;!?])\s+(\d{1,2}[.)])\s/g, '$1\n$2 ');
+
 const bienvenida = (usuario) => ({
   rol: 'asistente',
   texto: usuario
@@ -60,7 +63,7 @@ export default function SoporteChat({ abierto, onClose, usuario = null }) {
     try {
       // El servidor obtiene el cargo de la sesión; la pantalla ayuda a contextualizar la respuesta.
       const r = await base44.functions.invoke('soporte-chat', { mensajes: nuevos.slice(1), pantalla: window.location.pathname });
-      setMensajes((m) => [...m, { rol: 'asistente', texto: r.data?.respuesta || 'No pude responder.' }]);
+      setMensajes((m) => [...m, { rol: 'asistente', texto: separarPasos(r.data?.respuesta) || 'No pude responder.' }]);
       if (r.data?.derivar) setDerivar(true);
     } catch {
       setMensajes((m) => [...m, { rol: 'asistente', texto: 'No pude responder en este momento. Te conecto con soporte.' }]);
