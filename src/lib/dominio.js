@@ -63,7 +63,14 @@ export const VEREDICTO = {
   sin_historial: { label: 'Sin historial', tono: 'muted' },
 };
 
-export const ROL = { admin: 'Jefe de personal', user: 'Jefe de obra' };
+export const PERFILES = {
+  gerente_rrhh: { label: 'Gerente de RRHH', rol: 'admin' },
+  jefe_personal: { label: 'Jefe de personal', rol: 'admin' },
+  jefe_obra: { label: 'Jefe de obra', rol: 'user' },
+};
+// Cargo que se muestra: el perfil guardado o, si no hay, el que corresponde a su rol.
+export const perfilDe = (u) => u?.perfil ?? u?.data?.perfil ?? (u?.role === 'admin' ? 'jefe_personal' : 'jefe_obra');
+export const etiquetaPerfil = (u) => PERFILES[perfilDe(u)]?.label ?? 'Jefe de obra';
 
 export function fecha(iso) {
   if (!iso) return '—';
