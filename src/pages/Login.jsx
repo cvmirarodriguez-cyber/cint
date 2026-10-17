@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { Marca } from '@/components/Shell';
 import { ease } from '@/components/ui';
 import { BotonSoporte } from '@/components/SoporteChat';
+import TemaToggle from '@/components/TemaToggle';
 
 const Obra3D = lazy(() => import('@/components/Obra3D'));
 
@@ -22,6 +23,7 @@ export function Escenario({ children }) {
 
       <div className="relative z-10 mx-auto flex min-h-dvh max-w-7xl flex-col px-5 py-6 sm:px-8 lg:flex-row lg:items-center lg:justify-end">
         <Marca className="lg:absolute lg:left-8 lg:top-6" />
+        <div className="absolute right-5 top-5 sm:right-8 sm:top-6"><TemaToggle /></div>
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}

@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./index.html', './src/**/*.{js,jsx}'],
+  content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
       fontFamily: {
@@ -8,15 +8,34 @@ export default {
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       colors: {
-        ink: { DEFAULT: '#0c0d0f', 900: '#0c0d0f', 800: '#121417', 700: '#181b1f', 600: '#20242a', 500: '#2b3038' },
-        bone: { DEFAULT: '#ECE9E2', 200: '#d9d5cc', 400: '#a7a49d', 500: '#8a8882', 600: '#6a6965' },
-        obra: { DEFAULT: '#FF5F1F', 300: '#FF8A55', 600: '#E04A0E' },
-        hivis: '#FFC21A',
-        ok: '#5BD68F',
-        alerta: '#FF4141',
+        ink: {
+          DEFAULT: 'rgb(var(--ink) / <alpha-value>)',
+          900: 'rgb(var(--ink-900) / <alpha-value>)',
+          800: 'rgb(var(--ink-800) / <alpha-value>)',
+          700: 'rgb(var(--ink-700) / <alpha-value>)',
+          600: 'rgb(var(--ink-600) / <alpha-value>)',
+          500: 'rgb(var(--ink-500) / <alpha-value>)',
+        },
+        bone: {
+          DEFAULT: 'rgb(var(--bone) / <alpha-value>)',
+          200: 'rgb(var(--bone-200) / <alpha-value>)',
+          400: 'rgb(var(--bone-400) / <alpha-value>)',
+          500: 'rgb(var(--bone-500) / <alpha-value>)',
+          600: 'rgb(var(--bone-600) / <alpha-value>)',
+        },
+        obra: {
+          DEFAULT: 'rgb(var(--obra) / <alpha-value>)',
+          300: 'rgb(var(--obra-300) / <alpha-value>)',
+          600: 'rgb(var(--obra-600) / <alpha-value>)',
+        },
+        hivis: 'rgb(var(--hivis) / <alpha-value>)',
+        ok: 'rgb(var(--ok) / <alpha-value>)',
+        alerta: 'rgb(var(--alerta) / <alpha-value>)',
+        // white se intercambia automáticamente: claro en modo oscuro, oscuro en modo claro
+        white: 'rgb(var(--overlay) / <alpha-value>)',
       },
       boxShadow: {
-        slab: '0 1px 0 0 rgba(255,255,255,.06) inset, 0 -1px 0 0 rgba(0,0,0,.5) inset, 0 20px 40px -20px rgba(0,0,0,.8), 0 2px 6px rgba(0,0,0,.4)',
+        slab: 'var(--shadow-slab)',
         glow: '0 0 0 1px rgba(255,95,31,.45), 0 10px 40px -10px rgba(255,95,31,.55)',
       },
       keyframes: {

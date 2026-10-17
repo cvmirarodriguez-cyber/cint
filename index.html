@@ -11,6 +11,15 @@
     <title>Cuadrilla · Historial de terreno</title>
   </head>
   <body>
+    <script>
+      // Evita parpadeo: aplica el tema antes de que React cargue
+      (function () {
+        try {
+          var t = localStorage.getItem('cuadrilla-tema');
+          if (t === 'light') document.documentElement.classList.add('light');
+        } catch (e) {}
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
