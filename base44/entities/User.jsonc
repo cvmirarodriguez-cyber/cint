@@ -4,7 +4,7 @@
   "properties": {
     "acceso": {
       "type": "boolean",
-      "description": "Aprobado por el jefe de personal para ver y registrar evaluaciones",
+      "description": "Aprobado por el jefe de personal de obra para ver y registrar evaluaciones",
       "default": false,
       "rls": {
         "write": {
@@ -23,7 +23,7 @@
       ],
       "enumNames": [
         "Gerente de RRHH",
-        "Jefe de personal",
+        "Jefe de personal de obra",
         "Jefe de obra"
       ],
       "description": "Cargo dentro de la app; los dos primeros tienen acceso total",
