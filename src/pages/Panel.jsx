@@ -7,6 +7,7 @@ import { cargoLabel, fecha, nota, resumen } from '@/lib/dominio';
 import { Anillo, Avatar, Chip, Contador, Tilt, Vacio, colorNota, ease, item, lista } from '@/components/ui';
 
 const Obra3D = lazy(() => import('@/components/Obra3D'));
+import ErrorBoundary3D from '@/components/ErrorBoundary3D';
 
 function Kpi({ icono: Icono, etiqueta, valor, tono, delay }) {
   return (
@@ -40,9 +41,11 @@ export default function Panel() {
     <div>
       {/* Hero con la obra 3D */}
       <section className="slab blueprint relative mb-6 min-h-[340px] overflow-hidden rounded-3xl">
-        <Suspense fallback={null}>
-          <Obra3D className="absolute inset-x-0 bottom-0 h-[230px] sm:inset-y-0 sm:left-auto sm:right-[-6%] sm:h-auto sm:w-[62%]" camara={[12.5, 6, 14.5]} />
-        </Suspense>
+        <ErrorBoundary3D>
+          <Suspense fallback={null}>
+            <Obra3D className="absolute inset-x-0 bottom-0 h-[230px] sm:inset-y-0 sm:left-auto sm:right-[-6%] sm:h-auto sm:w-[62%]" camara={[12.5, 6, 14.5]} />
+          </Suspense>
+        </ErrorBoundary3D>
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink-700 from-40% via-ink-700/50 via-60% to-transparent sm:bg-gradient-to-r sm:from-25% sm:via-45% sm:via-ink-700/60 sm:to-70%" />
         <div className="relative z-10 max-w-lg p-6 pb-[210px] sm:p-10">
           <p className="eyebrow mb-3">{new Date().toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
