@@ -70,6 +70,11 @@ export default function Shell({ children }) {
             <span className="px-3 text-xs font-semibold uppercase tracking-wider text-bone-500">Tema</span>
             <TemaToggle />
           </div>
+          <p className="mb-3 flex flex-wrap gap-x-3 px-3 text-[11px] text-bone-600">
+            <NavLink to="/legal/privacidad" className="hover:text-bone">Privacidad</NavLink>
+            <NavLink to="/legal/seguridad" className="hover:text-bone">Seguridad</NavLink>
+            <NavLink to="/legal/terminos" className="hover:text-bone">Términos</NavLink>
+          </p>
           <div className="hazard mb-4 h-1.5 rounded-full opacity-80" />
           <div className="flex items-center gap-3 px-1">
             <Avatar nombre={usuario.full_name || usuario.email} size={38} />
