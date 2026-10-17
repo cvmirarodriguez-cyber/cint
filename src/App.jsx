@@ -15,8 +15,10 @@ import ObraDetalle from '@/pages/ObraDetalle';
 import Importar from '@/pages/Importar';
 import Equipo from '@/pages/Equipo';
 import AccesoPendiente from '@/pages/AccesoPendiente';
+import { esGerente } from '@/lib/dominio';
 import PanelJefe from '@/pages/PanelJefe';
 import MisEvaluaciones from '@/pages/MisEvaluaciones';
+import Recomendar from '@/pages/Recomendar';
 
 function Pagina({ children }) {
   return (
@@ -59,6 +61,7 @@ export default function App() {
   }
   if (!usuario) return <Login />;
   // La app es pública: una cuenta nueva no ve datos hasta que el jefe de personal de obra la aprueba.
+  if (usuario.suspendido || usuario.data?.suspendido) return <AccesoPendiente usuario={usuario} suspendido />;
   if (usuario.role !== 'admin' && !(usuario.acceso || usuario.data?.acceso)) return <AccesoPendiente usuario={usuario} />;
   if (usuario.role === 'admin' && !(usuario.perfil || usuario.data?.perfil)) return <AccesoPendiente usuario={usuario} />;
 
@@ -76,8 +79,9 @@ export default function App() {
                 <Route path="/evaluar" element={<Pagina><Evaluar /></Pagina>} />
                 <Route path="/obras" element={<Pagina><Obras /></Pagina>} />
                 <Route path="/obras/:id" element={<Pagina><ObraDetalle /></Pagina>} />
-                {usuario.perfil === 'gerente_rrhh' || usuario.data?.perfil === 'gerente_rrhh' ? <Route path="/importar" element={<Pagina><Importar /></Pagina>} /> : null}
+                {esGerente(usuario) ? <Route path="/importar" element={<Pagina><Importar /></Pagina>} /> : null}
                 <Route path="/equipo" element={<Pagina><Equipo /></Pagina>} />
+                <Route path="/recomendar" element={<Pagina><Recomendar /></Pagina>} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             ) : (
