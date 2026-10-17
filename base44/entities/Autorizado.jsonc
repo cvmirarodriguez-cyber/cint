@@ -9,6 +9,21 @@
     },
     "invitado_por": {
       "type": "string"
+    },
+    "perfil": {
+      "type": "string",
+      "enum": [
+        "gerente_rrhh",
+        "jefe_personal",
+        "jefe_obra"
+      ],
+      "enumNames": [
+        "Gerente de RRHH",
+        "Jefe de personal",
+        "Jefe de obra"
+      ],
+      "default": "jefe_obra",
+      "description": "Perfil con el que fue invitado"
     }
   },
   "required": [

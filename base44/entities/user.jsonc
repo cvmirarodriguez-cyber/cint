@@ -1,0 +1,19 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "acceso": {
+      "type": "boolean",
+      "default": false,
+      "description": "Aprobado por el jefe de personal para ver y registrar evaluaciones",
+      "rls": {
+        "write": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
+    }
+  },
+  "required": []
+}
