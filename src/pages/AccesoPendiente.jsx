@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { Loader2, Lock, LogOut, RefreshCw } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { Escenario } from '@/pages/Login';
+import { BotonSoporte } from '@/components/SoporteChat';
 
-export default function AccesoPendiente({ usuario }) {
-  const [revisando, setRevisando] = useState(true);
+export default function AccesoPendiente({ usuario, suspendido = false }) {
+  const [revisando, setRevisando] = useState(!suspendido);
 
   // Si el jefe de personal de obra lo invitó como jefe de obra, el acceso se activa solo.
   useEffect(() => {
+    if (suspendido) return;
     base44.functions.invoke('reclamar-acceso', {})
       .then((r) => {
         // Solo recarga si la invitación realmente resolvió lo que falta (cargo para admin, acceso para jefe de obra).
@@ -16,7 +18,7 @@ export default function AccesoPendiente({ usuario }) {
         else setRevisando(false);
       })
       .catch(() => setRevisando(false));
-  }, []);
+  }, [suspendido]);
 
   if (revisando) {
     return (
@@ -24,6 +26,22 @@ export default function AccesoPendiente({ usuario }) {
         <p className="eyebrow mb-4 text-obra-300">Un momento</p>
         <h1 className="display text-[40px] sm:text-5xl">Revisando<br />tu <span className="text-obra">invitación</span>.</h1>
         <Loader2 className="mt-8 h-8 w-8 animate-spin text-obra" />
+      </Escenario>
+    );
+  }
+
+  if (suspendido) {
+    return (
+      <Escenario>
+        <p className="eyebrow mb-4 text-alerta">Cuenta suspendida</p>
+        <h1 className="display text-[40px] sm:text-5xl">Acceso<br /><span className="text-obra">en pausa</span>.</h1>
+        <div className="slab mt-8 overflow-hidden">
+          <div className="hazard-red h-2" />
+          <div className="p-5 sm:p-6">
+            <p className="text-bone-300">La cuenta <b className="break-all text-bone">{usuario.email}</b> fue suspendida por el gerente de RRHH. Si crees que es un error, comunícate con él.</p>
+            <button onClick={() => base44.auth.logout('/')} className="btn-ghost mt-6"><LogOut className="h-4 w-4" /> Salir</button>
+          </div>
+        </div>
       </Escenario>
     );
   }
@@ -49,6 +67,7 @@ export default function AccesoPendiente({ usuario }) {
             <button onClick={() => window.location.reload()} className="btn-primary flex-1"><RefreshCw className="h-4 w-4" /> Ya me invitaron</button>
             <button onClick={() => base44.auth.logout('/')} className="btn-ghost"><LogOut className="h-4 w-4" /> Salir</button>
           </div>
+          <p className="mt-5 text-sm text-bone-500">¿Necesitas ayuda? <BotonSoporte /></p>
         </div>
       </div>
     </Escenario>
