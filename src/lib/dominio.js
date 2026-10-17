@@ -71,6 +71,10 @@ export const PERFILES = {
 // Cargo que se muestra: el perfil guardado o, si no hay, el que corresponde a su rol.
 export const perfilDe = (u) => u?.perfil ?? u?.data?.perfil ?? (u?.role === 'admin' ? 'jefe_personal' : 'jefe_obra');
 export const etiquetaPerfil = (u) => PERFILES[perfilDe(u)]?.label ?? 'Jefe de obra';
+// El servidor exige un cargo guardado: un admin sin cargo todavía no ve datos.
+export const cargoGuardado = (u) => u?.perfil ?? u?.data?.perfil ?? null;
+export const esGerente = (u) => u?.role === 'admin' && cargoGuardado(u) === 'gerente_rrhh';
+export const esJefePersonal = (u) => u?.role === 'admin' && cargoGuardado(u) === 'jefe_personal';
 
 export function fecha(iso) {
   if (!iso) return '—';
