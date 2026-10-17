@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Edges, Grid } from '@react-three/drei';
+import { Grid } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Escena: el plano (líneas naranjas) se va convirtiendo en obra gruesa, piso a piso.
@@ -50,12 +50,12 @@ function PiezaPlano({ pos, size, delay }) {
   const ref = useRef();
   useFrame(({ clock }) => {
     const t = reduce ? 1 : THREE.MathUtils.clamp((clock.elapsedTime - delay) / 0.9, 0, 1);
-    if (ref.current) ref.current.material.opacity = 0.55 * t;
+    if (ref.current) ref.current.opacity = 0.55 * t;
   });
   return (
-    <mesh position={pos} material={mat.fantasma}>
+    <mesh position={pos}>
       <boxGeometry args={size} />
-      <Edges ref={ref} color="#FF5F1F" transparent opacity={0} />
+      <meshBasicMaterial ref={ref} color="#FF5F1F" wireframe transparent opacity={0} depthWrite={false} />
     </mesh>
   );
 }
