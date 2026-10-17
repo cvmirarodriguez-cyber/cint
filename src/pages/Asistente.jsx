@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUp, Loader2, Mic, MicOff, Paperclip, RotateCcw, Sparkles, X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useDatos } from '@/lib/datos';
+import { perfilDe, etiquetaPerfil } from '@/lib/dominio';
 import { Encabezado, ease, useToast } from '@/components/ui';
 
 const AGENTE = 'asistente';
@@ -111,7 +112,7 @@ function Burbuja({ mensaje }) {
 }
 
 export default function Asistente() {
-  const { esGerente } = useDatos();
+  const { usuario, esGerente, esJefePersonal } = useDatos();
   const avisar = useToast();
   const [conv, setConv] = useState(null);
   const [mensajes, setMensajes] = useState([]);
@@ -132,16 +133,26 @@ export default function Asistente() {
         '¿Qué trabajadores tienen mejor desempeño histórico en hormigón?',
         'Compara los trabajadores de este Excel con los que ya tengo cargados',
       ]
-    : [
-        '¿Cómo evalúo a un trabajador que faltó mucho?',
-        'Redacta un comentario profesional para alguien con desempeño 3',
-        '¿Qué significa cada nota de 1 a 5?',
-        'Ayúdame a redactar un reporte de mi obra para el gerente',
-      ];
+    : esJefePersonal
+      ? [
+          '¿Qué términos de contrato tengo pendientes de evaluar en mis obras?',
+          'Recomiéndame capataces disponibles para una obra de hormigón',
+          'Redacta un correo para postular a 3 trabajadores a una nueva obra',
+          'Resumen del historial de evaluaciones de Juan Pérez',
+        ]
+      : [
+          '¿Cómo evalúo a un trabajador que faltó mucho?',
+          'Redacta un comentario profesional para alguien con desempeño 3',
+          '¿Qué significa cada nota de 1 a 5?',
+          'Muéstrame el historial de un trabajador que voy a evaluar',
+        ];
 
   const nueva = async () => {
     desuscribir.current?.();
-    const c = await base44.agents.createConversation({ agent_name: AGENTE, metadata: { origen: 'asistente' } });
+    const c = await base44.agents.createConversation({
+      agent_name: AGENTE,
+      metadata: { origen: 'asistente', perfil: perfilDe(usuario), etiqueta: etiquetaPerfil(usuario) },
+    });
     setConv(c);
     setMensajes([]);
     desuscribir.current = base44.agents.subscribeToConversation(c.id, (act) => setMensajes(act.messages || []));
