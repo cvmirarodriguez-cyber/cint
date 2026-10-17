@@ -8,7 +8,7 @@ export default async function (req: Request): Promise<Response> {
     return Response.json({ error: "Solo el jefe de personal puede gestionar accesos" }, { status: 403 });
   }
 
-  const { accion, userId, acceso } = await req.json();
+  const { accion, userId, acceso, perfil } = await req.json();
 
   if (accion === "listar") {
     const usuarios = await base44.asServiceRole.entities.User.list("-created_date", 500);
@@ -19,6 +19,7 @@ export default async function (req: Request): Promise<Response> {
         full_name: u.full_name,
         role: u.role,
         acceso: u.role === "admin" || u.acceso === true || u.data?.acceso === true,
+        perfil: u.perfil ?? u.data?.perfil ?? (u.role === "admin" ? "jefe_personal" : "jefe_obra"),
         created_date: u.created_date,
       })),
     });
@@ -27,6 +28,13 @@ export default async function (req: Request): Promise<Response> {
   if (accion === "cambiar" && userId) {
     if (userId === yo.id) return Response.json({ error: "No puedes cambiar tu propio acceso" }, { status: 400 });
     await base44.asServiceRole.entities.User.update(userId, { acceso: !!acceso });
+    return Response.json({ ok: true });
+  }
+
+  // Cambia el cargo entre los perfiles de acceso total (no cambia el rol de Base44).
+  if (accion === "perfil" && userId) {
+    if (!["gerente_rrhh", "jefe_personal"].includes(perfil)) return Response.json({ error: "Perfil no válido" }, { status: 400 });
+    await base44.asServiceRole.entities.User.update(userId, { perfil });
     return Response.json({ ok: true });
   }
 
