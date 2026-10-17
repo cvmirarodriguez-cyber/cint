@@ -20,6 +20,7 @@ import PanelJefe from '@/pages/PanelJefe';
 import MisEvaluaciones from '@/pages/MisEvaluaciones';
 import Recomendar from '@/pages/Recomendar';
 import Asistente from '@/pages/Asistente';
+import Legal from '@/pages/Legal';
 import Reportes from '@/pages/Reportes';
 import MisObras from '@/pages/MisObras';
 
@@ -52,6 +53,15 @@ export default function App() {
       })
       .catch(() => setUsuario(null));
   }, []);
+
+  // Políticas públicas: se abren sin sesión (enlace de la entrada y de las tiendas de apps).
+  if (location.pathname.startsWith('/legal')) {
+    return (
+      <Routes>
+        <Route path="/legal/:doc?" element={<Legal />} />
+      </Routes>
+    );
+  }
 
   if (usuario === undefined) {
     return (
