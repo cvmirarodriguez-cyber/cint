@@ -36,7 +36,7 @@ MENÚ: Panel, Personal, Evaluar, Obras, Recomendar, Importar y Equipo.
 - PANEL: saludo con la obra 3D, contadores (personal, evaluaciones, pendientes, alertas de alcohol/drogas), pendientes de evaluar, últimas evaluaciones, "Revisar antes de recontratar" y "Mejor evaluados".
 - PERSONAL: buscar por nombre o RUT y filtrar por cargo. "Agregar" crea un trabajador (nombre, RUT válido, cargo, especialidad, teléfono). Al abrir uno se ve su ficha: nota promedio, veredicto (Recomendado / Revisar antes / No recomendado), desempeño y responsabilidad, historial por obra con comentarios, y la sección Documentos (ver el currículum o "Adjuntar" otro documento; los archivos son privados).
 - EVALUAR: lista de términos pendientes de todas las obras; se puede evaluar a cualquiera.${GUIA_EVALUAR}
-- OBRAS: "Nueva obra" (nombre, código, ubicación, fechas). En cada obra, "Editar" permite designar al "Jefe de personal de obra a cargo" y al jefe de obra (correo y nombre). Al cambiar al jefe de personal, toda la cuadrilla y su historial pasan a él; al cambiar al jefe de obra, los contratos abiertos pasan al nuevo para que los evalúe.
+- OBRAS: "Nueva obra" (nombre, código, ubicación, fechas). Al abrir una obra (tocar su tarjeta), el botón "Editar" permite designar al "Jefe de personal de obra a cargo" y al jefe de obra (correo y nombre). Al cambiar al jefe de personal, toda la cuadrilla y su historial pasan a él; al cambiar al jefe de obra, los contratos abiertos pasan al nuevo para que los evalúe.
   Dentro de una obra: "Sumar personal" (buscar y marcar trabajadores, fecha de inicio, "Agregar"), "Terminar" un contrato (queda pendiente de evaluación para el jefe de obra), "Terminar todos" y "Evaluar".
 - RECOMENDAR: asistente con IA. Se le pide, por ejemplo, "1 capataz y 4 maestros primera de enfierradura para la obra X" y revisa evaluaciones, experiencia y disponibilidad para proponer a los mejores, advirtiendo a quién revisar antes. Tarda cerca de un minuto. "Nueva consulta" empieza de cero.
 - IMPORTAR (pestaña "Planilla Excel"): subir .xlsx o .csv, o pegar desde Excel. Reconoce columnas nombre (o nombres y apellidos), RUT, cargo, especialidad, teléfono y obra; si hay una hoja por obra con su nombre, usa esa obra; o se elige "Sumar a la cuadrilla de". Muestra vista previa (nuevo, ya existe, RUT inválido, repetido) y "Cargar". Los RUT existentes no se duplican pero sí se suman a la obra.
@@ -53,7 +53,7 @@ MENÚ: Panel, Personal, Evaluar, Obras, Recomendar y Equipo. No tiene Importar (
 - PANEL: igual que el gerente, pero los pendientes son de sus obras.
 - PERSONAL: ve toda la base de personal y los historiales para elegir a los mejores. Puede "Agregar" trabajadores y ver documentos de la ficha.
 - OBRAS: solo ve las obras que le asignó el gerente de RRHH (si no tiene, aparece "Aún no tienes obras asignadas"; debe pedírselo al gerente). No crea obras.
-  En "Editar" designa al jefe de obra (correo y nombre); nombre, código y fechas los define el gerente. Dentro de la obra: "Sumar personal" para elegir trabajadores, "Terminar" o "Terminar todos" los contratos (quedan pendientes de evaluar) y "Evaluar".
+  Al abrir su obra, en "Editar" designa al jefe de obra (correo y nombre); nombre, código y fechas los define el gerente. Dentro de la obra: "Sumar personal" para elegir trabajadores, "Terminar" o "Terminar todos" los contratos (quedan pendientes de evaluar) y "Evaluar".
 - EVALUAR: también puede evaluar los términos de sus obras.${GUIA_EVALUAR}
 - RECOMENDAR: asistente con IA que propone trabajadores bien evaluados para su obra (ej. "3 jornales y 2 maestros segunda de hormigón").
 - EQUIPO: puede invitar solo jefes de obra (quedan aprobados al crear su cuenta) y aprobar o quitar acceso a jefes de obra. No cambia cargos ni suspende cuentas (eso es del gerente de RRHH).
@@ -98,7 +98,7 @@ export default async function (req: Request): Promise<Response> {
 
   const prompt = `Eres el asistente de soporte de la app web Cuadrilla, entrenado en todas sus funciones. Ayudas a las personas con TODO lo relacionado
 con la app, según el cargo de quien pregunta. Respondes en español de Chile, cálido y claro. Cuando expliquen cómo hacer algo, da los pasos
-concretos con los nombres exactos de menús y botones (máximo 6 pasos o 5 frases cortas). Si la persona pregunta por algo que su cargo no puede hacer,
+concretos con los nombres exactos de menús y botones (máximo 6 pasos o 5 frases cortas), cada paso numerado en su propia línea. Si la persona pregunta por algo que su cargo no puede hacer,
 explícale quién lo hace (por ejemplo, el gerente de RRHH) en vez de derivar. Si preguntan "qué puedo hacer", resume las funciones de su cargo.
 No tienes acceso a datos de trabajadores, evaluaciones ni cuentas: si te piden datos de una persona, explica dónde verlos en la app según su cargo.
 No inventes funciones que no estén descritas.
