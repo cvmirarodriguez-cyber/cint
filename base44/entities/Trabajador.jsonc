@@ -43,6 +43,41 @@
     "notas": {
       "type": "string",
       "maxLength": 1000
+    },
+    "experiencia": {
+      "type": "string",
+      "maxLength": 2000,
+      "description": "Resumen de experiencia (sacado del curr\u00edculum)"
+    },
+    "documentos": {
+      "type": "array",
+      "description": "Curr\u00edculums y documentos del trabajador (archivos privados)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "type": "string"
+          },
+          "uri": {
+            "type": "string",
+            "description": "Archivo privado; se abre con enlace temporal"
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "cv",
+              "otro"
+            ]
+          },
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "subido_por": {
+            "type": "string"
+          }
+        }
+      }
     }
   },
   "required": [
