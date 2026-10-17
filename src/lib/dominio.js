@@ -65,7 +65,7 @@ export const VEREDICTO = {
 
 export const PERFILES = {
   gerente_rrhh: { label: 'Gerente de RRHH', rol: 'admin' },
-  jefe_personal: { label: 'Jefe de personal', rol: 'admin' },
+  jefe_personal: { label: 'Jefe de personal de obra', rol: 'admin' },
   jefe_obra: { label: 'Jefe de obra', rol: 'user' },
 };
 // Cargo que se muestra: el perfil guardado o, si no hay, el que corresponde a su rol.
