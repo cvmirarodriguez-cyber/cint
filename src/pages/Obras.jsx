@@ -8,26 +8,36 @@ import { fecha } from '@/lib/dominio';
 import { Capa, Chip, Encabezado, Tilt, Vacio, ease, item, lista, useToast } from '@/components/ui';
 
 export function FormObra({ abierto, onClose, obra }) {
-  const { E, recargar, contratos } = useDatos();
+  const { E, recargar, contratos, esGerente } = useDatos();
   const avisar = useToast();
-  const [f, setF] = useState(obra ?? { nombre: '', codigo: '', ubicacion: '', jefe_terreno_nombre: '', jefe_terreno_email: '', fecha_inicio: '', fecha_termino: '' });
+  const [f, setF] = useState(obra ?? { nombre: '', codigo: '', ubicacion: '', jefe_personal_email: '', jefe_personal_nombre: '', jefe_terreno_nombre: '', jefe_terreno_email: '', fecha_inicio: '', fecha_termino: '' });
   const [guardando, setGuardando] = useState(false);
   const [jefes, setJefes] = useState([]);
+  const [personal, setPersonal] = useState([]);
 
-  // Sugiere los jefes de obra con acceso aprobado.
+  // Jefes de obra aprobados (los elige el jefe de personal) y jefes de personal (los asigna el gerente).
   useEffect(() => {
     if (!abierto) return;
     base44.functions.invoke('gestionar-acceso', { accion: 'listar' })
-      .then((r) => setJefes((r.data?.usuarios || []).filter((u) => u.role !== 'admin' && u.acceso)))
+      .then((r) => {
+        const us = r.data?.usuarios || [];
+        setJefes(us.filter((u) => u.role !== 'admin' && u.acceso));
+        setPersonal(us.filter((u) => u.role === 'admin' && u.perfil === 'jefe_personal'));
+      })
       .catch(() => {});
   }, [abierto]);
+
+  const elegirPersonal = (email) => {
+    const j = personal.find((x) => x.email === email);
+    setF((s) => ({ ...s, jefe_personal_email: email, jefe_personal_nombre: j?.full_name || '' }));
+  };
 
   const elegirJefe = (email) => {
     const j = jefes.find((x) => x.email.toLowerCase() === email.toLowerCase());
     setF((s) => ({ ...s, jefe_terreno_email: email, jefe_terreno_nombre: j?.full_name || s.jefe_terreno_nombre }));
   };
   const campo = (k, props = {}) => (
-    <input id={`ob-${k}`} className="field" value={f[k] || ''} onChange={(e) => setF({ ...f, [k]: e.target.value })} {...props} />
+    <input id={`ob-${k}`} className="field disabled:opacity-60" value={f[k] || ''} onChange={(e) => setF({ ...f, [k]: e.target.value })} {...props} />
   );
 
   const guardar = async (e) => {
@@ -36,12 +46,18 @@ export function FormObra({ abierto, onClose, obra }) {
     try {
       const { id, created_date, updated_date, created_by, created_by_id, ...datos } = f;
       datos.jefe_terreno_email = (datos.jefe_terreno_email || '').trim().toLowerCase();
+      // Solo el gerente asigna jefe de personal; el servidor rechaza ese campo a los demás.
+      if (!esGerente) { delete datos.jefe_personal_email; delete datos.jefe_personal_nombre; }
       if (obra) {
         await E.Obra.update(obra.id, datos);
-        // Si cambió el jefe, los contratos abiertos pasan a él para que los evalúe.
+        const deLaObra = contratos.filter((c) => c.obra_id === obra.id);
+        // Si cambió el jefe de obra, los contratos abiertos pasan a él para que los evalúe.
         if (datos.jefe_terreno_email !== (obra.jefe_terreno_email || '')) {
-          const abiertos = contratos.filter((c) => c.obra_id === obra.id && c.estado !== 'evaluado');
-          await Promise.all(abiertos.map((c) => E.Contrato.update(c.id, { jefe_terreno_email: datos.jefe_terreno_email })));
+          await Promise.all(deLaObra.filter((c) => c.estado !== 'evaluado').map((c) => E.Contrato.update(c.id, { jefe_terreno_email: datos.jefe_terreno_email })));
+        }
+        // Si el gerente cambió al jefe de personal, toda la cuadrilla (incluido su historial) pasa a él.
+        if (esGerente && (datos.jefe_personal_email || '') !== (obra.jefe_personal_email || '')) {
+          await Promise.all(deLaObra.map((c) => E.Contrato.update(c.id, { jefe_personal_email: datos.jefe_personal_email || '' })));
         }
       } else {
         await E.Obra.create({ ...datos, nombre: datos.nombre.trim(), estado: 'en_curso' });
@@ -67,10 +83,23 @@ export function FormObra({ abierto, onClose, obra }) {
               <h2 className="display text-2xl">{obra ? 'Editar obra' : 'Nueva obra'}</h2>
               <button type="button" onClick={onClose} className="rounded-lg p-2 text-bone-500 hover:bg-white/5" aria-label="Cerrar"><X className="h-5 w-5" /></button>
             </div>
-            <div><label className="label" htmlFor="ob-nombre">Nombre</label>{campo('nombre', { required: true, placeholder: 'Edificio Los Aromos' })}</div>
+            <div><label className="label" htmlFor="ob-nombre">Nombre</label>{campo('nombre', { required: true, placeholder: 'Edificio Los Aromos', disabled: !esGerente })}</div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div><label className="label" htmlFor="ob-codigo">Código</label>{campo('codigo', { placeholder: 'OB-2026-14' })}</div>
-              <div><label className="label" htmlFor="ob-ubicacion">Ubicación</label>{campo('ubicacion', { placeholder: 'Comuna' })}</div>
+              <div><label className="label" htmlFor="ob-codigo">Código</label>{campo('codigo', { placeholder: 'OB-2026-14', disabled: !esGerente })}</div>
+              <div><label className="label" htmlFor="ob-ubicacion">Ubicación</label>{campo('ubicacion', { placeholder: 'Comuna', disabled: !esGerente })}</div>
+            </div>
+            <div className="rounded-xl border border-obra/25 bg-obra/[.05] p-4">
+              <label className="label" htmlFor="ob-jefe_personal_email">Jefe de personal a cargo</label>
+              {esGerente ? (
+                <select id="ob-jefe_personal_email" className="field" value={f.jefe_personal_email || ''} onChange={(e) => elegirPersonal(e.target.value)}>
+                  <option value="">Sin asignar</option>
+                  {personal.map((p) => <option key={p.id} value={p.email}>{p.full_name || p.email}</option>)}
+                  {f.jefe_personal_email && !personal.some((p) => p.email === f.jefe_personal_email) && <option value={f.jefe_personal_email}>{f.jefe_personal_nombre || f.jefe_personal_email}</option>}
+                </select>
+              ) : (
+                <p className="font-semibold">{f.jefe_personal_nombre || f.jefe_personal_email || 'Sin asignar'}</p>
+              )}
+              <p className="mt-2 text-xs text-bone-500">{esGerente ? 'Lo designa el gerente de RRHH. Esa persona arma la cuadrilla y elige al jefe de obra.' : 'Asignado por el gerente de RRHH.'}</p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
@@ -82,8 +111,8 @@ export function FormObra({ abierto, onClose, obra }) {
             </div>
             <p className="-mt-2 text-xs text-bone-500">Solo ese correo podrá ver y evaluar los términos de contrato de esta obra.</p>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div><label className="label" htmlFor="ob-fecha_inicio">Inicio</label>{campo('fecha_inicio', { type: 'date' })}</div>
-              <div><label className="label" htmlFor="ob-fecha_termino">Término estimado</label>{campo('fecha_termino', { type: 'date' })}</div>
+              <div><label className="label" htmlFor="ob-fecha_inicio">Inicio</label>{campo('fecha_inicio', { type: 'date', disabled: !esGerente })}</div>
+              <div><label className="label" htmlFor="ob-fecha_termino">Término estimado</label>{campo('fecha_termino', { type: 'date', disabled: !esGerente })}</div>
             </div>
             <button className="btn-primary w-full" disabled={guardando || !f.nombre?.trim()}>Guardar</button>
           </motion.form>
@@ -95,17 +124,25 @@ export function FormObra({ abierto, onClose, obra }) {
 }
 
 export default function Obras() {
-  const { obras, contratos, cargando } = useDatos();
+  const { obras, contratos, cargando, esGerente } = useDatos();
   const [nueva, setNueva] = useState(false);
 
   return (
     <div>
-      <Encabezado eyebrow={`${obras.length} obras`} titulo="Obras" accion={<button onClick={() => setNueva(true)} className="btn-primary"><Plus className="h-4 w-4" /> Nueva obra</button>}>
-        Arma la cuadrilla de cada obra y marca los términos de contrato para que el jefe de obra los evalúe.
+      <Encabezado
+        eyebrow={`${obras.length} ${esGerente ? 'obras' : 'obras a tu cargo'}`}
+        titulo="Obras"
+        accion={esGerente && <button onClick={() => setNueva(true)} className="btn-primary"><Plus className="h-4 w-4" /> Nueva obra</button>}
+      >
+        {esGerente
+          ? 'Crea las obras y designa al jefe de personal a cargo de cada una.'
+          : 'Las obras que te asignó el gerente de RRHH. Arma su cuadrilla, elige al jefe de obra y marca los términos de contrato.'}
       </Encabezado>
 
       {!cargando && !obras.length ? (
-        <Vacio icono={Building2} titulo="Aún no hay obras">Crea la primera para asignar su cuadrilla.</Vacio>
+        <Vacio icono={Building2} titulo={esGerente ? 'Aún no hay obras' : 'Aún no tienes obras asignadas'}>
+          {esGerente ? 'Crea la primera y asígnale un jefe de personal.' : 'Cuando el gerente de RRHH te asigne una obra, aparecerá aquí.'}
+        </Vacio>
       ) : (
         <motion.ul variants={lista} initial="hidden" animate="show" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {obras.map((o) => {
@@ -136,6 +173,9 @@ export default function Obras() {
                           <p className="truncate text-lg font-bold">{o.nombre}</p>
                           <p className="mt-0.5 flex items-center gap-1 truncate text-sm text-bone-500">
                             {o.ubicacion && <><MapPin className="h-3.5 w-3.5" />{o.ubicacion} · </>}{o.codigo || fecha(o.fecha_inicio)}
+                          </p>
+                          <p className={`mt-2 truncate text-xs ${o.jefe_personal_email ? 'text-bone-400' : 'font-semibold text-hivis'}`}>
+                            {o.jefe_personal_email ? <>Jefe de personal: <b className="text-bone-200">{o.jefe_personal_nombre || o.jefe_personal_email}</b></> : 'Sin jefe de personal asignado'}
                           </p>
                         </div>
                         <ArrowUpRight className="h-5 w-5 shrink-0 text-bone-600 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-obra" />
