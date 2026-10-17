@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { ClipboardCheck, ClipboardList, HardHat, LayoutGrid, LogOut, Building2, Upload, Users } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useDatos } from '@/lib/datos';
-import { ROL } from '@/lib/dominio';
+import { etiquetaPerfil } from '@/lib/dominio';
 import { Avatar } from '@/components/ui';
 
 export function Marca({ className = '' }) {
@@ -64,7 +64,7 @@ export default function Shell({ children }) {
             <Avatar nombre={usuario.full_name || usuario.email} size={38} />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">{usuario.full_name || usuario.email}</p>
-              <p className="truncate text-xs text-bone-500">{ROL[usuario.role] ?? usuario.role}</p>
+              <p className="truncate text-xs text-bone-500">{etiquetaPerfil(usuario)}</p>
             </div>
             <button onClick={() => base44.auth.logout('/')} className="rounded-lg p-2 text-bone-500 transition-colors hover:bg-white/5 hover:text-bone" aria-label="Cerrar sesión">
               <LogOut className="h-4 w-4" />
