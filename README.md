@@ -4,7 +4,7 @@ Historial de desempeño del personal directo de terreno (supervisor, capataz, ma
 Al término de cada contrato, el jefe de terreno evalúa al trabajador: desempeño, responsabilidad,
 alcohol/drogas, si lo recontrataría y un comentario breve.
 
-- App: https://cuadrilla-06b300d5.base44.app (pública: cualquiera crea cuenta, pero no ve datos sin aprobación)
+- App: https://cuadrilla.base44.app (pública: cualquiera crea cuenta, pero no ve datos sin aprobación)
 - Dashboard Base44: https://app.base44.com/apps/6ad36e2f40f3daf306b300d5/editor/workspace/overview
 
 ## Roles
