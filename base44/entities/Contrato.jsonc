@@ -363,7 +363,7 @@
     },
     "jefe_personal_email": {
       "type": "string",
-      "description": "Jefe de personal de la obra",
+      "description": "Jefe de personal de obra de la obra",
       "rls": {
         "update": {
           "$and": [
