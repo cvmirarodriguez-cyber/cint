@@ -1,6 +1,5 @@
 import { useMemo, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Grid } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Escena: el plano (líneas naranjas) se va convirtiendo en obra gruesa, piso a piso.
@@ -305,7 +304,7 @@ export default function Obra3D({ className = '', camara = [17, 9.5, 20] }) {
       >
         <fog attach="fog" args={['#0c0d0f', 24, 55]} />
         <hemisphereLight args={['#ffe9d6', '#1a1c20', 1.1]} />
-        <directionalLight position={[8, 14, 6]} intensity={3.2} color="#ffd9b8" castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-10} shadow-camera-right={10} shadow-camera-top={12} shadow-camera-bottom={-4} />
+        <directionalLight position={[8, 14, 6]} intensity={3.2} color="#ffd9b8" castShadow />
         <pointLight position={[-6, 3, 4]} intensity={30} color="#FF5F1F" distance={18} />
         <Rig>
           <Edificio />
@@ -315,18 +314,7 @@ export default function Obra3D({ className = '', camara = [17, 9.5, 20] }) {
             <planeGeometry args={[60, 60]} />
             <shadowMaterial opacity={0.45} />
           </mesh>
-          <Grid
-            position={[0, 0, 0]}
-            infiniteGrid
-            cellSize={0.5}
-            cellThickness={0.5}
-            cellColor="#2b2f35"
-            sectionSize={2.5}
-            sectionThickness={1}
-            sectionColor="#5a3420"
-            fadeDistance={34}
-            fadeStrength={1.6}
-          />
+          <gridHelper args={[60, 60, '#5a3420', '#2b2f35']} position={[0, 0, 0]} />
         </Rig>
       </Canvas>
     </div>
