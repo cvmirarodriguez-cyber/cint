@@ -9,9 +9,9 @@ import { Avatar, Chip, Encabezado, Segmento, Vacio, item, lista, useToast } from
 const OPCIONES = ['jefe_obra', 'jefe_personal', 'gerente_rrhh'].map((value) => ({ value, label: PERFILES[value].label }));
 
 const DESCRIPCION = {
-  gerente_rrhh: { icono: Crown, color: 'text-obra', texto: 'Máxima autoridad de la app: maneja todos los datos, historiales y alertas, invita y aprueba a todo el equipo y define quién es gerente o jefe de personal.' },
-  jefe_personal: { icono: ShieldCheck, color: 'text-hivis', texto: 'Acceso a todo: base de personal, historiales, alertas, obras, términos de contrato, importación y accesos.' },
-  jefe_obra: { icono: HardHat, color: 'text-bone-300', texto: 'Solo evalúa a los trabajadores de sus obras cuando termina su contrato, y ve sus propias evaluaciones. No ve la base de personal ni el historial.' },
+  gerente_rrhh: { icono: Crown, color: 'text-obra', texto: 'Maneja todos los datos. Crea las obras, designa al jefe de personal de cada una, invita a todo el equipo y define los cargos.' },
+  jefe_personal: { icono: ShieldCheck, color: 'text-hivis', texto: 'Ve la base de personal y los historiales. En las obras que le asigna el gerente elige a los trabajadores y al jefe de obra, y marca los términos de contrato.' },
+  jefe_obra: { icono: HardHat, color: 'text-bone-300', texto: 'Evalúa a los trabajadores de su obra al término de su contrato y ve sus propias evaluaciones. No ve la base de personal ni el historial.' },
 };
 
 const gestionar = (datos) => base44.functions.invoke('gestionar-acceso', datos).then((r) => r.data);
@@ -34,7 +34,9 @@ function Interruptor({ activo, onClick, disabled, etiqueta }) {
 
 export default function Equipo() {
   const avisar = useToast();
-  const { usuario } = useDatos();
+  const { usuario, esGerente } = useDatos();
+  // El jefe de personal solo invita y aprueba jefes de obra.
+  const cargos = esGerente ? ['gerente_rrhh', 'jefe_personal', 'jefe_obra'] : ['jefe_obra'];
   const [usuarios, setUsuarios] = useState(null);
   const [cambiando, setCambiando] = useState(null);
   const [email, setEmail] = useState('');
@@ -113,7 +115,7 @@ export default function Equipo() {
                   <p className="truncate font-semibold">{u.full_name || u.email}</p>
                   <p className="truncate text-xs text-bone-500">{u.email} · desde {fecha(u.created_date)}</p>
                 </div>
-                {u.role === 'admin' && u.id !== usuario.id ? (
+                {esGerente && u.role === 'admin' && u.id !== usuario.id ? (
                   <select
                     aria-label={`Cargo de ${u.email}`}
                     value={u.perfil}
@@ -142,8 +144,8 @@ export default function Equipo() {
       </section>
 
       <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-bone-400">Invitar</h2>
-      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        {['gerente_rrhh', 'jefe_personal', 'jefe_obra'].map((k) => {
+      <div className={`mb-4 grid grid-cols-1 gap-3 ${cargos.length > 1 ? 'sm:grid-cols-3' : ''}`}>
+        {cargos.map((k) => {
           const { icono: Icono, color, texto } = DESCRIPCION[k];
           return (
             <div key={k} className={`slab p-5 ${perfil === k ? 'ring-1 ring-obra/50' : ''}`}>
@@ -165,7 +167,7 @@ export default function Equipo() {
         </div>
         <div>
           <p className="label">Cargo</p>
-          <Segmento nombre="Cargo" opciones={OPCIONES} valor={perfil} onChange={setPerfil} />
+          <Segmento nombre="Cargo" opciones={OPCIONES.filter((o) => cargos.includes(o.value))} valor={perfil} onChange={setPerfil} />
         </div>
         <button className="btn-primary w-full" disabled={enviando || !email}>Enviar invitación</button>
       </form>
