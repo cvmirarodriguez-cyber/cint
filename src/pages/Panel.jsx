@@ -102,7 +102,7 @@ export default function Panel() {
               ))}
             </motion.ul>
           ) : (
-            <Vacio icono={ClipboardCheck} titulo="Todo al día">Cuando el jefe de personal marque un término de contrato, aparecerá aquí para evaluarlo.</Vacio>
+            <Vacio icono={ClipboardCheck} titulo="Todo al día">Cuando el jefe de personal de obra marque un término de contrato, aparecerá aquí para evaluarlo.</Vacio>
           )}
 
           <h2 className="mb-3 mt-8 text-sm font-bold uppercase tracking-wider text-bone-400">Últimas evaluaciones</h2>
