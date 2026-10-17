@@ -62,7 +62,7 @@ export default function PanelJefe() {
       </h2>
       {!cargando && !grupos.length ? (
         <Vacio icono={PartyPopper} titulo="Todo al día">
-          Cuando el jefe de personal marque el término de contrato de alguien de tu obra, aparecerá aquí.
+          Cuando el jefe de personal de obra marque el término de contrato de alguien de tu obra, aparecerá aquí.
         </Vacio>
       ) : (
         <div className="space-y-6">
