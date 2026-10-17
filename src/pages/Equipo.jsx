@@ -58,8 +58,11 @@ export default function Equipo() {
     e.preventDefault();
     setEnviando(true);
     try {
-      await base44.users.inviteUser(email.trim(), rol);
-      avisar('Invitación enviada. Apruébalo aquí cuando cree su cuenta.');
+      const correo = email.trim().toLowerCase();
+      await base44.users.inviteUser(correo, rol);
+      // El jefe de obra invitado queda aprobado solo al crear su cuenta.
+      if (rol === 'user') await base44.entities.Autorizado.create({ email: correo, invitado_por: usuario.email });
+      avisar(rol === 'user' ? 'Invitación enviada. Tendrá acceso apenas cree su cuenta.' : 'Invitación enviada.');
       setEmail('');
       cargar();
     } catch {
@@ -74,7 +77,7 @@ export default function Equipo() {
   return (
     <div className="mx-auto max-w-3xl">
       <Encabezado eyebrow="Accesos" titulo="Equipo">
-        Cualquiera puede crear una cuenta, pero solo ve el historial cuando tú le das acceso aquí.
+        Cualquiera puede crear una cuenta, pero solo ve datos si lo invitaste como jefe de obra o si le das acceso aquí.
       </Encabezado>
 
       <section className="mb-8">

@@ -1,8 +1,28 @@
-import { Clock, LogOut, RefreshCw } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Clock, Loader2, LogOut, RefreshCw } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { Escenario } from '@/pages/Login';
 
 export default function AccesoPendiente({ usuario }) {
+  const [revisando, setRevisando] = useState(true);
+
+  // Si el jefe de personal lo invitó como jefe de obra, el acceso se activa solo.
+  useEffect(() => {
+    base44.functions.invoke('reclamar-acceso', {})
+      .then((r) => { if (r.data?.acceso) window.location.reload(); else setRevisando(false); })
+      .catch(() => setRevisando(false));
+  }, []);
+
+  if (revisando) {
+    return (
+      <Escenario>
+        <p className="eyebrow mb-4 text-obra-300">Un momento</p>
+        <h1 className="display text-[40px] sm:text-5xl">Revisando<br />tu <span className="text-obra">invitación</span>.</h1>
+        <Loader2 className="mt-8 h-8 w-8 animate-spin text-obra" />
+      </Escenario>
+    );
+  }
+
   return (
     <Escenario>
       <p className="eyebrow mb-4 text-hivis">Cuenta creada</p>
