@@ -15,7 +15,7 @@ export function FormObra({ abierto, onClose, obra }) {
   const [jefes, setJefes] = useState([]);
   const [personal, setPersonal] = useState([]);
 
-  // Jefes de obra aprobados (los elige el jefe de personal) y jefes de personal (los asigna el gerente).
+  // Jefes de obra aprobados (los elige el jefe de personal de obra) y jefes de personal de obra (los asigna el gerente).
   useEffect(() => {
     if (!abierto) return;
     base44.functions.invoke('gestionar-acceso', { accion: 'listar' })
@@ -46,7 +46,7 @@ export function FormObra({ abierto, onClose, obra }) {
     try {
       const { id, created_date, updated_date, created_by, created_by_id, ...datos } = f;
       datos.jefe_terreno_email = (datos.jefe_terreno_email || '').trim().toLowerCase();
-      // Solo el gerente asigna jefe de personal; el servidor rechaza ese campo a los demás.
+      // Solo el gerente asigna jefe de personal de obra; el servidor rechaza ese campo a los demás.
       if (!esGerente) { delete datos.jefe_personal_email; delete datos.jefe_personal_nombre; }
       if (obra) {
         await E.Obra.update(obra.id, datos);
@@ -55,7 +55,7 @@ export function FormObra({ abierto, onClose, obra }) {
         if (datos.jefe_terreno_email !== (obra.jefe_terreno_email || '')) {
           await Promise.all(deLaObra.filter((c) => c.estado !== 'evaluado').map((c) => E.Contrato.update(c.id, { jefe_terreno_email: datos.jefe_terreno_email })));
         }
-        // Si el gerente cambió al jefe de personal, toda la cuadrilla (incluido su historial) pasa a él.
+        // Si el gerente cambió al jefe de personal de obra, toda la cuadrilla (incluido su historial) pasa a él.
         if (esGerente && (datos.jefe_personal_email || '') !== (obra.jefe_personal_email || '')) {
           await Promise.all(deLaObra.map((c) => E.Contrato.update(c.id, { jefe_personal_email: datos.jefe_personal_email || '' })));
         }
@@ -89,7 +89,7 @@ export function FormObra({ abierto, onClose, obra }) {
               <div><label className="label" htmlFor="ob-ubicacion">Ubicación</label>{campo('ubicacion', { placeholder: 'Comuna', disabled: !esGerente })}</div>
             </div>
             <div className="rounded-xl border border-obra/25 bg-obra/[.05] p-4">
-              <label className="label" htmlFor="ob-jefe_personal_email">Jefe de personal a cargo</label>
+              <label className="label" htmlFor="ob-jefe_personal_email">Jefe de personal de obra a cargo</label>
               {esGerente ? (
                 <select id="ob-jefe_personal_email" className="field" value={f.jefe_personal_email || ''} onChange={(e) => elegirPersonal(e.target.value)}>
                   <option value="">Sin asignar</option>
@@ -135,13 +135,13 @@ export default function Obras() {
         accion={esGerente && <button onClick={() => setNueva(true)} className="btn-primary"><Plus className="h-4 w-4" /> Nueva obra</button>}
       >
         {esGerente
-          ? 'Crea las obras y designa al jefe de personal a cargo de cada una.'
+          ? 'Crea las obras y designa al jefe de personal de obra a cargo de cada una.'
           : 'Las obras que te asignó el gerente de RRHH. Arma su cuadrilla, elige al jefe de obra y marca los términos de contrato.'}
       </Encabezado>
 
       {!cargando && !obras.length ? (
         <Vacio icono={Building2} titulo={esGerente ? 'Aún no hay obras' : 'Aún no tienes obras asignadas'}>
-          {esGerente ? 'Crea la primera y asígnale un jefe de personal.' : 'Cuando el gerente de RRHH te asigne una obra, aparecerá aquí.'}
+          {esGerente ? 'Crea la primera y asígnale un jefe de personal de obra.' : 'Cuando el gerente de RRHH te asigne una obra, aparecerá aquí.'}
         </Vacio>
       ) : (
         <motion.ul variants={lista} initial="hidden" animate="show" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -175,7 +175,7 @@ export default function Obras() {
                             {o.ubicacion && <><MapPin className="h-3.5 w-3.5" />{o.ubicacion} · </>}{o.codigo || fecha(o.fecha_inicio)}
                           </p>
                           <p className={`mt-2 truncate text-xs ${o.jefe_personal_email ? 'text-bone-400' : 'font-semibold text-hivis'}`}>
-                            {o.jefe_personal_email ? <>Jefe de personal: <b className="text-bone-200">{o.jefe_personal_nombre || o.jefe_personal_email}</b></> : 'Sin jefe de personal asignado'}
+                            {o.jefe_personal_email ? <>Jefe de personal de obra: <b className="text-bone-200">{o.jefe_personal_nombre || o.jefe_personal_email}</b></> : 'Sin jefe de personal de obra asignado'}
                           </p>
                         </div>
                         <ArrowUpRight className="h-5 w-5 shrink-0 text-bone-600 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-obra" />
