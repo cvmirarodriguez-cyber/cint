@@ -19,7 +19,7 @@
       ],
       "enumNames": [
         "Gerente de RRHH",
-        "Jefe de personal",
+        "Jefe de personal de obra",
         "Jefe de obra"
       ],
       "default": "jefe_obra",
