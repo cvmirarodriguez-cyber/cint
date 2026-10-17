@@ -36,6 +36,7 @@ export default function Shell({ children }) {
       ]
     : [
         { to: '/', label: 'Por evaluar', icono: ClipboardCheck, end: true, badge: pendientes.length },
+        { to: '/mis-obras', label: 'Mis obras', icono: Building2 },
         { to: '/mis-evaluaciones', label: 'Mis evaluaciones', icono: ClipboardList },
       ];
   const navMovil = nav.filter((n) => !n.soloDesktop);

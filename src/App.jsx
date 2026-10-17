@@ -21,6 +21,7 @@ import MisEvaluaciones from '@/pages/MisEvaluaciones';
 import Recomendar from '@/pages/Recomendar';
 import Asistente from '@/pages/Asistente';
 import Reportes from '@/pages/Reportes';
+import MisObras from '@/pages/MisObras';
 
 function Pagina({ children }) {
   return (
@@ -92,6 +93,7 @@ export default function App() {
               // Jefe de obra: solo evalúa a su gente y ve sus propias evaluaciones.
               <Routes location={location} key={location.pathname}>
                 <Route path="/" element={<Pagina><PanelJefe /></Pagina>} />
+                <Route path="/mis-obras" element={<Pagina><MisObras /></Pagina>} />
                 <Route path="/evaluar" element={<Pagina><Evaluar /></Pagina>} />
                 <Route path="/mis-evaluaciones" element={<Pagina><MisEvaluaciones /></Pagina>} />
                 <Route path="*" element={<Navigate to="/" replace />} />
