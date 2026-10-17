@@ -6,6 +6,9 @@ export default async function (req: Request): Promise<Response> {
   const yo = await base44.auth.me().catch(() => null);
   if (!yo) return Response.json({ error: "Sin sesión" }, { status: 401 });
 
+  // Una cuenta suspendida no se reactiva con su invitación: solo el gerente la reactiva.
+  if (yo.suspendido === true || yo.data?.suspendido === true) return Response.json({ acceso: false, perfil: null, suspendido: true });
+
   const perfilActual = yo.perfil ?? yo.data?.perfil;
   const accesoActual = yo.role === "admin" || yo.acceso === true || yo.data?.acceso === true;
   if (accesoActual && perfilActual) return Response.json({ acceso: true, perfil: perfilActual });
