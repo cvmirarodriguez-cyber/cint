@@ -12,19 +12,38 @@ const PISOS_PLANO = 2;
 
 const reduce = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-const mat = {
-  hormigon: new THREE.MeshStandardMaterial({ color: '#9a9ca0', roughness: 0.92, metalness: 0.02 }),
-  losa: new THREE.MeshStandardMaterial({ color: '#6d7076', roughness: 0.9 }),
-  acero: new THREE.MeshStandardMaterial({ color: '#FF5F1F', roughness: 0.45, metalness: 0.35, emissive: '#FF5F1F', emissiveIntensity: 0.12 }),
-  hivis: new THREE.MeshStandardMaterial({ color: '#FFC21A', roughness: 0.5, metalness: 0.2 }),
-  oscuro: new THREE.MeshStandardMaterial({ color: '#33373d', roughness: 0.8 }),
-  fantasma: new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }),
+// Materiales declarados como JSX (R3F los gestiona: crea, adjunta y descarta),
+// en vez de instancias compartidas que se pasan como prop material={...}.
+const MATS = {
+  hormigon: { color: '#9a9ca0', roughness: 0.92, metalness: 0.02 },
+  losa: { color: '#6d7076', roughness: 0.9 },
+  acero: { color: '#FF5F1F', roughness: 0.45, metalness: 0.35, emissive: '#FF5F1F', emissiveIntensity: 0.12 },
+  hivis: { color: '#FFC21A', roughness: 0.5, metalness: 0.2 },
+  oscuro: { color: '#33373d', roughness: 0.8 },
 };
+const TUNEL_MATS = {
+  dovela: { color: '#8d9095', roughness: 0.95, side: THREE.DoubleSide },
+  interior: { color: '#2a2d32', roughness: 1, side: THREE.DoubleSide },
+  riel: { color: '#b9bcc2', roughness: 0.3, metalness: 0.9 },
+  lampara: { color: '#fff1cc', emissive: '#ffd27a', emissiveIntensity: 2.2 },
+  carro: { color: '#e4e6ea', roughness: 0.35, metalness: 0.45 },
+  franja: { color: '#FF5F1F', roughness: 0.4, emissive: '#FF5F1F', emissiveIntensity: 0.25 },
+  ventana: { color: '#ffe9b8', emissive: '#ffd98a', emissiveIntensity: 1.6 },
+  faro: { color: '#ffffff', emissive: '#ffffff', emissiveIntensity: 3 },
+  oscuro: { color: '#33373d', roughness: 0.8 },
+};
+
+function Mat({ tipo }) {
+  return <meshStandardMaterial {...MATS[tipo]} />;
+}
+function TunelMat({ tipo }) {
+  return <meshStandardMaterial {...TUNEL_MATS[tipo]} />;
+}
 
 const easeOutBack = (t) => 1 + 2.2 * Math.pow(t - 1, 3) + 1.2 * Math.pow(t - 1, 2);
 
 // Pieza que "crece" desde su base cuando le llega su turno.
-function Pieza({ pos, size, material, delay, eje = 'y' }) {
+function Pieza({ pos, size, tipo, delay, eje = 'y' }) {
   const ref = useRef();
   useFrame(({ clock }) => {
     const t = reduce ? 1 : THREE.MathUtils.clamp((clock.elapsedTime - delay) / 0.7, 0, 1);
@@ -40,8 +59,9 @@ function Pieza({ pos, size, material, delay, eje = 'y' }) {
     }
   });
   return (
-    <mesh ref={ref} position={pos} material={material} castShadow receiveShadow>
+    <mesh ref={ref} position={pos} castShadow receiveShadow>
       <boxGeometry args={size} />
+      <Mat tipo={tipo} />
     </mesh>
   );
 }
@@ -70,15 +90,15 @@ function Edificio() {
       const plano = p >= PISOS_CONSTRUIDOS;
       const d = 0.4 + p * 0.55;
       const add = (o) => out.push({ ...o, plano, key: out.length });
-      XS.forEach((x, i) => ZS.forEach((z, j) => add({ pos: [x, y0 + PISO / 2, z], size: [0.28, PISO, 0.28], m: mat.hormigon, delay: d + (i + j) * 0.04 })));
+      XS.forEach((x, i) => ZS.forEach((z, j) => add({ pos: [x, y0 + PISO / 2, z], size: [0.28, PISO, 0.28], tipo: 'hormigon', delay: d + (i + j) * 0.04 })));
       // Losa + vigas perimetrales
-      add({ pos: [0, y0 + PISO - 0.06, 0], size: [ancho, 0.12, fondo], m: mat.losa, delay: d + 0.3, eje: 'xz' });
-      ZS.forEach((z) => add({ pos: [0, y0 + PISO - 0.2, z], size: [ancho - 0.2, 0.2, 0.22], m: p % 2 ? mat.acero : mat.oscuro, delay: d + 0.22, eje: 'xz' }));
+      add({ pos: [0, y0 + PISO - 0.06, 0], size: [ancho, 0.12, fondo], tipo: 'losa', delay: d + 0.3, eje: 'xz' });
+      ZS.forEach((z) => add({ pos: [0, y0 + PISO - 0.2, z], size: [ancho - 0.2, 0.2, 0.22], tipo: p % 2 ? 'acero' : 'oscuro', delay: d + 0.22, eje: 'xz' }));
     }
     // Moldaje en el último piso construido
     const yTop = PISOS_CONSTRUIDOS * PISO;
-    out.push({ key: 'm1', pos: [-2, yTop + 0.35, 0], size: [1.2, 0.7, 0.08], m: mat.hivis, delay: 3.6 });
-    out.push({ key: 'm2', pos: [2.2, yTop + 0.25, 1.4], size: [0.9, 0.5, 0.9], m: mat.oscuro, delay: 3.8 });
+    out.push({ key: 'm1', pos: [-2, yTop + 0.35, 0], size: [1.2, 0.7, 0.08], tipo: 'hivis', delay: 3.6 });
+    out.push({ key: 'm2', pos: [2.2, yTop + 0.25, 1.4], size: [0.9, 0.5, 0.9], tipo: 'oscuro', delay: 3.8 });
     return out;
   }, []);
 
@@ -88,7 +108,7 @@ function Edificio() {
         p.plano ? (
           <PiezaPlano key={p.key} pos={p.pos} size={p.size} delay={p.delay} />
         ) : (
-          <Pieza key={p.key} pos={p.pos} size={p.size} material={p.m} delay={p.delay} eje={p.eje} />
+          <Pieza key={p.key} pos={p.pos} size={p.size} tipo={p.tipo} delay={p.delay} eje={p.eje} />
         ),
       )}
     </group>
@@ -108,31 +128,38 @@ function Grua() {
     <group position={[4.5, 0, -3.4]}>
       {/* Torre reticulada */}
       {[0, 1, 2, 3].map((i) => (
-        <mesh key={i} material={mat.hivis} position={[i % 2 ? 0.22 : -0.22, alto / 2, i < 2 ? 0.22 : -0.22]} castShadow>
+        <mesh key={i} position={[i % 2 ? 0.22 : -0.22, alto / 2, i < 2 ? 0.22 : -0.22]} castShadow>
           <boxGeometry args={[0.06, alto, 0.06]} />
+          <Mat tipo="hivis" />
         </mesh>
       ))}
       {Array.from({ length: 14 }).map((_, i) => (
-        <mesh key={`r${i}`} material={mat.hivis} position={[0, 0.4 + i * 0.72, 0]} rotation={[0, 0, i % 2 ? 0.55 : -0.55]}>
+        <mesh key={`r${i}`} position={[0, 0.4 + i * 0.72, 0]} rotation={[0, 0, i % 2 ? 0.55 : -0.55]}>
           <boxGeometry args={[0.04, 0.6, 0.48]} />
+          <Mat tipo="hivis" />
         </mesh>
       ))}
       <group ref={pluma} position={[0, alto, 0]}>
-        <mesh material={mat.hivis} position={[-2.6, 0.1, 0]} castShadow>
+        <mesh position={[-2.6, 0.1, 0]} castShadow>
           <boxGeometry args={[9, 0.22, 0.3]} />
+          <Mat tipo="hivis" />
         </mesh>
-        <mesh material={mat.oscuro} position={[1.4, -0.05, 0]}>
+        <mesh position={[1.4, -0.05, 0]}>
           <boxGeometry args={[0.9, 0.5, 0.5]} />
+          <Mat tipo="oscuro" />
         </mesh>
-        <mesh material={mat.oscuro} position={[0, 0.9, 0]}>
+        <mesh position={[0, 0.9, 0]}>
           <boxGeometry args={[0.12, 1.6, 0.12]} />
+          <Mat tipo="oscuro" />
         </mesh>
         <group ref={cable} position={[-5.4, 0, 0]}>
-          <mesh material={mat.oscuro} position={[0, -1.6, 0]}>
+          <mesh position={[0, -1.6, 0]}>
             <boxGeometry args={[0.02, 3.2, 0.02]} />
+            <Mat tipo="oscuro" />
           </mesh>
-          <mesh material={mat.acero} position={[0, -3.35, 0]} castShadow>
+          <mesh position={[0, -3.35, 0]} castShadow>
             <boxGeometry args={[1.1, 0.14, 0.18]} />
+            <Mat tipo="acero" />
           </mesh>
         </group>
       </group>
@@ -143,17 +170,6 @@ function Grua() {
 // Túnel de metro en corte junto a la obra, con un tren que lo recorre en loop.
 // Corre de lado a lado frente a la cámara, más allá de la grúa; la mitad abierta mira a la cámara.
 const TUNEL = { x: 7.2, largo: 34, radio: 1.55 };
-const tunelMat = {
-  dovela: new THREE.MeshStandardMaterial({ color: '#8d9095', roughness: 0.95, side: THREE.DoubleSide }),
-  interior: new THREE.MeshStandardMaterial({ color: '#2a2d32', roughness: 1, side: THREE.DoubleSide }),
-  riel: new THREE.MeshStandardMaterial({ color: '#b9bcc2', roughness: 0.3, metalness: 0.9 }),
-  lampara: new THREE.MeshStandardMaterial({ color: '#fff1cc', emissive: '#ffd27a', emissiveIntensity: 2.2 }),
-  carro: new THREE.MeshStandardMaterial({ color: '#e4e6ea', roughness: 0.35, metalness: 0.45 }),
-  franja: new THREE.MeshStandardMaterial({ color: '#FF5F1F', roughness: 0.4, emissive: '#FF5F1F', emissiveIntensity: 0.25 }),
-  ventana: new THREE.MeshStandardMaterial({ color: '#ffe9b8', emissive: '#ffd98a', emissiveIntensity: 1.6 }),
-  faro: new THREE.MeshStandardMaterial({ color: '#ffffff', emissive: '#ffffff', emissiveIntensity: 3 }),
-  oscuro: new THREE.MeshStandardMaterial({ color: '#33373d', roughness: 0.8 }),
-};
 
 // Anillo de dovelas que aparece con un leve rebote, de derecha a izquierda.
 function Anillo({ x, delay }) {
@@ -166,8 +182,9 @@ function Anillo({ x, delay }) {
     ref.current.scale.set(1, s, s);
   });
   return (
-    <mesh ref={ref} position={[x, 0, 0]} rotation={[0, Math.PI / 2, 0]} material={tunelMat.dovela} castShadow>
+    <mesh ref={ref} position={[x, 0, 0]} rotation={[0, Math.PI / 2, 0]} castShadow>
       <torusGeometry args={[TUNEL.radio, 0.09, 8, 28, Math.PI]} />
+      <TunelMat tipo="dovela" />
     </mesh>
   );
 }
@@ -175,19 +192,22 @@ function Anillo({ x, delay }) {
 function Carro({ largo, frente }) {
   return (
     <group>
-      <mesh material={tunelMat.carro} position={[0, 0.62, 0]} castShadow>
+      <mesh position={[0, 0.62, 0]} castShadow>
         <boxGeometry args={[largo, 0.9, 0.92]} />
+        <TunelMat tipo="carro" />
       </mesh>
-      <mesh material={tunelMat.ventana} position={[0, 0.78, 0]}>
+      <mesh position={[0, 0.78, 0]}>
         <boxGeometry args={[largo - 0.3, 0.24, 0.94]} />
+        <TunelMat tipo="ventana" />
       </mesh>
-      <mesh material={tunelMat.franja} position={[0, 0.42, 0]}>
+      <mesh position={[0, 0.42, 0]}>
         <boxGeometry args={[largo + 0.01, 0.1, 0.95]} />
+        <TunelMat tipo="franja" />
       </mesh>
       {frente && (
         <>
-          <mesh material={tunelMat.faro} position={[-largo / 2 - 0.01, 0.5, 0.28]}><boxGeometry args={[0.04, 0.08, 0.14]} /></mesh>
-          <mesh material={tunelMat.faro} position={[-largo / 2 - 0.01, 0.5, -0.28]}><boxGeometry args={[0.04, 0.08, 0.14]} /></mesh>
+          <mesh position={[-largo / 2 - 0.01, 0.5, 0.28]}><boxGeometry args={[0.04, 0.08, 0.14]} /><TunelMat tipo="faro" /></mesh>
+          <mesh position={[-largo / 2 - 0.01, 0.5, -0.28]}><boxGeometry args={[0.04, 0.08, 0.14]} /><TunelMat tipo="faro" /></mesh>
         </>
       )}
     </group>
@@ -235,21 +255,25 @@ function Metro() {
   return (
     <group position={[TUNEL.x, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
       {/* Mitad trasera del túnel cerrada; la delantera queda en corte para ver el tren */}
-      <mesh material={tunelMat.interior} rotation={[0, 0, Math.PI / 2]} receiveShadow>
+      <mesh rotation={[0, 0, Math.PI / 2]} receiveShadow>
         <cylinderGeometry args={[TUNEL.radio - 0.04, TUNEL.radio - 0.04, TUNEL.largo, 28, 1, true, Math.PI / 2, Math.PI / 2]} />
+        <TunelMat tipo="interior" />
       </mesh>
-      <mesh material={tunelMat.oscuro} position={[0, 0.04, 0]} receiveShadow>
+      <mesh position={[0, 0.04, 0]} receiveShadow>
         <boxGeometry args={[TUNEL.largo, 0.08, TUNEL.radio * 2]} />
+        <TunelMat tipo="oscuro" />
       </mesh>
       {[-0.36, 0.36].map((z) => (
-        <mesh key={z} material={tunelMat.riel} position={[0, 0.12, z]}>
+        <mesh key={z} position={[0, 0.12, z]}>
           <boxGeometry args={[TUNEL.largo, 0.05, 0.06]} />
+          <TunelMat tipo="riel" />
         </mesh>
       ))}
       {anillos.map((x, i) => <Anillo key={x} x={x} delay={1.2 + i * 0.06} />)}
       {anillos.filter((_, i) => i % 3 === 0).map((x) => (
-        <mesh key={`l${x}`} material={tunelMat.lampara} position={[x, 1.22, -0.88]}>
+        <mesh key={`l${x}`} position={[x, 1.22, -0.88]}>
           <boxGeometry args={[0.5, 0.05, 0.08]} />
+          <TunelMat tipo="lampara" />
         </mesh>
       ))}
       <Tren />
