@@ -11,7 +11,7 @@ export default function MisEvaluaciones() {
   return (
     <div className="mx-auto max-w-3xl">
       <Encabezado eyebrow={`${evaluaciones.length} evaluaciones`} titulo="Mis evaluaciones">
-        Lo que registraste al término de cada contrato. El historial completo de cada trabajador lo administra el jefe de personal.
+        Lo que registraste al término de cada contrato. El historial completo de cada trabajador lo administra RRHH.
       </Encabezado>
       {!cargando && !evaluaciones.length ? (
         <Vacio icono={ClipboardCheck} titulo="Aún no evalúas a nadie" />
