@@ -8,13 +8,19 @@ import { Capa, ease } from '@/components/ui';
 const BIENVENIDA = { rol: 'asistente', texto: 'Hola, soy el asistente de soporte de Cuadrilla. ¿En qué te ayudo? Por ejemplo: cómo entrar con tu invitación, qué hace cada cargo o cómo evaluar.' };
 const RAPIDAS = ['No puedo entrar', 'Me invitaron, ¿cómo activo mi acceso?', '¿Qué puede hacer un jefe de obra?'];
 
-export function BotonSoporte({ className = '' }) {
+export function BotonSoporte({ className = '', soloIcono = false }) {
   const [abierto, setAbierto] = useState(false);
   return (
     <>
-      <button type="button" onClick={() => setAbierto(true)} className={`inline-flex items-center gap-1.5 font-semibold text-obra-300 hover:underline ${className}`}>
-        <LifeBuoy className="h-4 w-4" /> Solicitar soporte
-      </button>
+      {soloIcono ? (
+        <button type="button" onClick={() => setAbierto(true)} className={`rounded-lg p-2 text-bone-500 ${className}`} aria-label="Solicitar soporte">
+          <LifeBuoy className="h-5 w-5" />
+        </button>
+      ) : (
+        <button type="button" onClick={() => setAbierto(true)} className={`inline-flex items-center gap-1.5 font-semibold text-obra-300 hover:underline ${className}`}>
+          <LifeBuoy className="h-4 w-4" /> Solicitar soporte
+        </button>
+      )}
       <SoporteChat abierto={abierto} onClose={() => setAbierto(false)} />
     </>
   );
