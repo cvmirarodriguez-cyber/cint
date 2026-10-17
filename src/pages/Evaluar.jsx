@@ -124,7 +124,7 @@ function Formulario() {
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.4, ease }}>
             <h1 className="display mt-8 text-3xl sm:text-4xl">Evaluación guardada</h1>
-            <p className="mt-3 text-bone-400">{esAdmin ? `El historial de ${listo.nombre} quedó actualizado.` : `Gracias. La evaluación de ${listo.nombre} quedó registrada para el jefe de personal.`}</p>
+            <p className="mt-3 text-bone-400">{esAdmin ? `El historial de ${listo.nombre} quedó actualizado.` : `Gracias. La evaluación de ${listo.nombre} quedó registrada para el jefe de personal de obra.`}</p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               {pendientes.length > 0 && <Link to={`/evaluar?contrato=${pendientes[0].id}`} className="btn-primary">Siguiente pendiente ({pendientes.length})</Link>}
               {esAdmin && <Link to={`/trabajadores/${listo.id}`} className="btn-ghost">Ver ficha</Link>}
@@ -158,7 +158,7 @@ function Formulario() {
             ))}
           </ul>
         ) : (
-          <Vacio icono={ClipboardCheck} titulo="No tienes evaluaciones pendientes">Cuando el jefe de personal marque un término de contrato en tu obra, aparecerá aquí.</Vacio>
+          <Vacio icono={ClipboardCheck} titulo="No tienes evaluaciones pendientes">Cuando el jefe de personal de obra marque un término de contrato en tu obra, aparecerá aquí.</Vacio>
         )}
       </div>
     );
@@ -238,7 +238,7 @@ function Formulario() {
           <p className="mt-3 h-5 text-sm font-semibold" style={{ color: colorNota(f.responsabilidad || null) }}>{NOTAS[f.responsabilidad]}</p>
         </Paso>
 
-        <Paso n={5} titulo="Alcohol y drogas" ayuda="Confidencial: solo la ve el jefe de personal.">
+        <Paso n={5} titulo="Alcohol y drogas" ayuda="Confidencial: solo la ven el gerente de RRHH y el jefe de personal de obra.">
           <Segmento nombre="Alcohol y drogas" opciones={opciones(AD)} valor={f.alcohol_drogas} onChange={set('alcohol_drogas')} />
           <AnimatePresence>
             {f.alcohol_drogas !== 'sin_observaciones' && (
