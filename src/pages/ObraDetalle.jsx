@@ -30,7 +30,7 @@ function AgregarCuadrilla({ obra, onClose }) {
     try {
       await E.Contrato.bulkCreate(trabajadores.filter((t) => sel.has(t.id)).map((t) => ({
         trabajador_id: t.id, trabajador_nombre: t.nombre, trabajador_rut: t.rut, cargo: t.cargo,
-        obra_id: obra.id, obra_nombre: obra.nombre, jefe_terreno_email: obra.jefe_terreno_email || '',
+        obra_id: obra.id, obra_nombre: obra.nombre, jefe_terreno_email: obra.jefe_terreno_email || '', jefe_personal_email: obra.jefe_personal_email || '',
         fecha_inicio: inicio, estado: 'vigente',
       })));
       await recargar();
@@ -130,6 +130,9 @@ export default function ObraDetalle() {
             <p className="eyebrow mb-2">{obra.codigo || 'Obra'} · {obra.ubicacion || 'Sin ubicación'}</p>
             <h1 className="display text-3xl sm:text-5xl">{obra.nombre}</h1>
             <p className="mt-3 text-sm text-bone-400">
+              Jefe de personal: <b className="text-bone">{obra.jefe_personal_nombre || obra.jefe_personal_email || 'Sin asignar'}</b>
+            </p>
+            <p className="mt-1 text-sm text-bone-400">
               Jefe de obra: <b className="text-bone">{obra.jefe_terreno_nombre || '—'}</b>{obra.jefe_terreno_email && <span className="text-bone-500"> · {obra.jefe_terreno_email}</span>}
             </p>
             <p className="mt-1 text-sm text-bone-500">{fecha(obra.fecha_inicio)} → {fecha(obra.fecha_termino)}</p>
