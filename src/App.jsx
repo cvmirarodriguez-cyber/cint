@@ -20,6 +20,7 @@ import PanelJefe from '@/pages/PanelJefe';
 import MisEvaluaciones from '@/pages/MisEvaluaciones';
 import Recomendar from '@/pages/Recomendar';
 import Asistente from '@/pages/Asistente';
+import Reportes from '@/pages/Reportes';
 
 function Pagina({ children }) {
   return (
@@ -81,6 +82,7 @@ export default function App() {
                 <Route path="/obras" element={<Pagina><Obras /></Pagina>} />
                 <Route path="/obras/:id" element={<Pagina><ObraDetalle /></Pagina>} />
                 {esGerente(usuario) ? <Route path="/importar" element={<Pagina><Importar /></Pagina>} /> : null}
+                {esGerente(usuario) ? <Route path="/reportes" element={<Pagina><Reportes /></Pagina>} /> : null}
                 <Route path="/equipo" element={<Pagina><Equipo /></Pagina>} />
                 <Route path="/recomendar" element={<Pagina><Recomendar /></Pagina>} />
                 <Route path="/asistente" element={<Pagina><Asistente /></Pagina>} />
