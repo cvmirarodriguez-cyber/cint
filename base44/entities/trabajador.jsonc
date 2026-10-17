@@ -1,11 +1,11 @@
 {
-  "name": "Trabajador",
   "type": "object",
+  "name": "Trabajador",
   "properties": {
     "demo": {
       "type": "boolean",
-      "default": false,
-      "description": "Dato de demostraci\u00f3n; se borra desde Importar"
+      "description": "Dato de demostraci\u00f3n; se borra desde Importar",
+      "default": false
     },
     "nombre": {
       "type": "string",
@@ -43,6 +43,41 @@
     "notas": {
       "type": "string",
       "maxLength": 1000
+    },
+    "experiencia": {
+      "type": "string",
+      "maxLength": 2000,
+      "description": "Resumen de experiencia (sacado del curr\u00edculum)"
+    },
+    "documentos": {
+      "type": "array",
+      "description": "Curr\u00edculums y documentos del trabajador (archivos privados)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "type": "string"
+          },
+          "uri": {
+            "type": "string",
+            "description": "Archivo privado; se abre con enlace temporal"
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "cv",
+              "otro"
+            ]
+          },
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "subido_por": {
+            "type": "string"
+          }
+        }
+      }
     }
   },
   "required": [
@@ -51,24 +86,150 @@
   ],
   "rls": {
     "read": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "$or": [
+                {
+                  "user_condition": {
+                    "data.perfil": "gerente_rrhh"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "soporte"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "jefe_personal"
+              }
+            }
+          ]
+        }
+      ]
     },
     "create": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "$or": [
+                {
+                  "user_condition": {
+                    "data.perfil": "gerente_rrhh"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "soporte"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "jefe_personal"
+              }
+            }
+          ]
+        }
+      ]
     },
     "update": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "$or": [
+                {
+                  "user_condition": {
+                    "data.perfil": "gerente_rrhh"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "soporte"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "jefe_personal"
+              }
+            }
+          ]
+        }
+      ]
     },
     "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$and": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "$or": [
+            {
+              "user_condition": {
+                "data.perfil": "gerente_rrhh"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "soporte"
+              }
+            }
+          ]
+        }
+      ]
     }
   }
 }
