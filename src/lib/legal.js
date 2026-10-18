@@ -1,15 +1,15 @@
 // Contenido de las políticas de Cuadrilla (web y app móvil).
-// Responsable: Dragados, operación en Chile (casa matriz en España). Completar razón social, RUT,
-// domicilio y correo de la filial chilena cuando estén confirmados; las líneas vacías no se muestran.
+// Responsable: Dragados S.A. Agencia en Chile (casa matriz Dragados S.A., España; Grupo ACS).
+// Falta el correo oficial; las líneas vacías no se muestran.
 export const RESPONSABLE = {
-  nombre: 'Dragados, en su operación en Chile (casa matriz en España)',
-  razonSocial: '',
-  rut: '',
-  domicilio: '',
+  nombre: 'Dragados S.A. Agencia en Chile',
+  razonSocial: 'Dragados S.A. Agencia en Chile',
+  rut: '59.073.330-K',
+  domicilio: 'Av. Vitacura 2939, Oficina 2201, Las Condes, Santiago, Región Metropolitana',
   correo: '',
 };
 
-export const VIGENCIA = { version: '1.1', fecha: '17 de octubre de 2026' };
+export const VIGENCIA = { version: '1.2', fecha: '17 de octubre de 2026' };
 
 export const DOCUMENTOS = {
   privacidad: {
@@ -26,7 +26,7 @@ export const DOCUMENTOS = {
       {
         titulo: '2. Responsable y proveedores',
         parrafos: [
-          'El responsable del tratamiento es {RESPONSABLE}. Cuadrilla usa los datos del personal de la operación chilena y los trata conforme a la legislación de Chile.',
+          'El responsable del tratamiento es {RESPONSABLE}, agencia en Chile de la sociedad española Dragados S.A., filial del Grupo ACS. Cuadrilla usa los datos del personal de la operación chilena y los trata conforme a la legislación de Chile.',
           'La App funciona sobre Base44, plataforma de Wix.com Ltd., que actúa como proveedor (encargado) de alojamiento, base de datos, autenticación, almacenamiento de archivos y servicios de inteligencia artificial. El inicio de sesión con Google es opcional y lo provee Google LLC. Estos proveedores tratan los datos solo para prestar el servicio y bajo sus propias obligaciones de seguridad y confidencialidad.',
         ],
       },
@@ -79,7 +79,7 @@ export const DOCUMENTOS = {
         titulo: '8. Transferencia internacional',
         parrafos: [
           'Los proveedores de la plataforma pueden almacenar o procesar los datos en servidores ubicados fuera de Chile. En esos casos se exigen garantías de seguridad y confidencialidad equivalentes a las exigidas por la ley chilena.',
-          'Si los datos se comparten con la casa matriz de Dragados en España, por ejemplo para reportes corporativos del Grupo, se hará solo en la medida necesaria y con las mismas garantías. En España rige además el Reglamento General de Protección de Datos (RGPD) de la Unión Europea.',
+          'Si los datos se comparten con la casa matriz, Dragados S.A. en España, por ejemplo para reportes corporativos del Grupo, se hará solo en la medida necesaria y con las mismas garantías. En España rige además el Reglamento General de Protección de Datos (RGPD) de la Unión Europea.',
         ],
       },
       {
