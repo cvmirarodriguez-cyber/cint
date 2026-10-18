@@ -1,15 +1,15 @@
 // Contenido de las políticas de Cuadrilla (web y app móvil).
-// Datos del responsable: completar razón social, RUT, domicilio y correo cuando estén definidos;
-// las líneas vacías no se muestran.
+// Responsable: Dragados, operación en Chile (casa matriz en España). Completar razón social, RUT,
+// domicilio y correo de la filial chilena cuando estén confirmados; las líneas vacías no se muestran.
 export const RESPONSABLE = {
-  nombre: 'la empresa constructora que utiliza Cuadrilla para gestionar su personal de terreno',
+  nombre: 'Dragados, en su operación en Chile (casa matriz en España)',
   razonSocial: '',
   rut: '',
   domicilio: '',
   correo: '',
 };
 
-export const VIGENCIA = { version: '1.0', fecha: '17 de octubre de 2026' };
+export const VIGENCIA = { version: '1.1', fecha: '17 de octubre de 2026' };
 
 export const DOCUMENTOS = {
   privacidad: {
@@ -26,7 +26,7 @@ export const DOCUMENTOS = {
       {
         titulo: '2. Responsable y proveedores',
         parrafos: [
-          'El responsable del tratamiento es {RESPONSABLE}.',
+          'El responsable del tratamiento es {RESPONSABLE}. Cuadrilla usa los datos del personal de la operación chilena y los trata conforme a la legislación de Chile.',
           'La App funciona sobre Base44, plataforma de Wix.com Ltd., que actúa como proveedor (encargado) de alojamiento, base de datos, autenticación, almacenamiento de archivos y servicios de inteligencia artificial. El inicio de sesión con Google es opcional y lo provee Google LLC. Estos proveedores tratan los datos solo para prestar el servicio y bajo sus propias obligaciones de seguridad y confidencialidad.',
         ],
       },
@@ -77,7 +77,10 @@ export const DOCUMENTOS = {
       },
       {
         titulo: '8. Transferencia internacional',
-        parrafos: ['Los proveedores de la plataforma pueden almacenar o procesar los datos en servidores ubicados fuera de Chile. En esos casos se exigen garantías de seguridad y confidencialidad equivalentes a las exigidas por la ley chilena.'],
+        parrafos: [
+          'Los proveedores de la plataforma pueden almacenar o procesar los datos en servidores ubicados fuera de Chile. En esos casos se exigen garantías de seguridad y confidencialidad equivalentes a las exigidas por la ley chilena.',
+          'Si los datos se comparten con la casa matriz de Dragados en España, por ejemplo para reportes corporativos del Grupo, se hará solo en la medida necesaria y con las mismas garantías. En España rige además el Reglamento General de Protección de Datos (RGPD) de la Unión Europea.',
+        ],
       },
       {
         titulo: '9. Cuánto tiempo los guardamos',
@@ -232,7 +235,7 @@ export const DOCUMENTOS = {
       },
       {
         titulo: '9. Propiedad',
-        parrafos: ['La información registrada pertenece a la empresa responsable. El diseño y el software de la App están protegidos por la ley.'],
+        parrafos: ['La información registrada pertenece a {RESPONSABLE}. El diseño y el software de la App están protegidos por la ley.'],
       },
       {
         titulo: '10. Ley aplicable',
@@ -244,5 +247,5 @@ export const DOCUMENTOS = {
 
 export const CONTACTO = [
   'Soporte de Cuadrilla: chat "Solicitar soporte" en la App o WhatsApp +56 9 5674 5654.',
-  'Área de RRHH de la empresa responsable.',
+  'Área de RRHH de Dragados en Chile.',
 ];
