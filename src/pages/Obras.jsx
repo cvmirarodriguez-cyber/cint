@@ -15,7 +15,7 @@ export function FormObra({ abierto, onClose, obra }) {
   const [jefes, setJefes] = useState([]);
   const [personal, setPersonal] = useState([]);
 
-  // Jefes de obra aprobados (los elige el jefe de personal de obra) y jefes de personal de obra (los asigna el gerente).
+  // Jefes de terreno aprobados (los elige el jefe de personal de obra) y jefes de personal de obra (los asigna el gerente).
   useEffect(() => {
     if (!abierto) return;
     base44.functions.invoke('gestionar-acceso', { accion: 'listar' })
@@ -51,7 +51,7 @@ export function FormObra({ abierto, onClose, obra }) {
       if (obra) {
         await E.Obra.update(obra.id, datos);
         const deLaObra = contratos.filter((c) => c.obra_id === obra.id);
-        // Si cambió el jefe de obra, los contratos abiertos pasan a él para que los evalúe.
+        // Si cambió el jefe de terreno, los contratos abiertos pasan a él para que los evalúe.
         if (datos.jefe_terreno_email !== (obra.jefe_terreno_email || '')) {
           await Promise.all(deLaObra.filter((c) => c.estado !== 'evaluado').map((c) => E.Contrato.update(c.id, { jefe_terreno_email: datos.jefe_terreno_email })));
         }
@@ -99,15 +99,15 @@ export function FormObra({ abierto, onClose, obra }) {
               ) : (
                 <p className="font-semibold">{f.jefe_personal_nombre || f.jefe_personal_email || 'Sin asignar'}</p>
               )}
-              <p className="mt-2 text-xs text-bone-500">{esGerente ? 'Lo designa el gerente de RRHH. Esa persona arma la cuadrilla y elige al jefe de obra.' : 'Asignado por el gerente de RRHH.'}</p>
+              <p className="mt-2 text-xs text-bone-500">{esGerente ? 'Lo designa el gerente de RRHH. Esa persona arma la cuadrilla y elige al jefe de terreno.' : 'Asignado por el gerente de RRHH.'}</p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="label" htmlFor="ob-jefe_terreno_email">Correo del jefe de obra</label>
+                <label className="label" htmlFor="ob-jefe_terreno_email">Correo del jefe de terreno</label>
                 <input id="ob-jefe_terreno_email" className="field" type="email" list="ob-jefes" placeholder="jefe@empresa.cl" value={f.jefe_terreno_email || ''} onChange={(e) => elegirJefe(e.target.value)} />
                 <datalist id="ob-jefes">{jefes.map((j) => <option key={j.id} value={j.email}>{j.full_name}</option>)}</datalist>
               </div>
-              <div><label className="label" htmlFor="ob-jefe_terreno_nombre">Nombre del jefe de obra</label>{campo('jefe_terreno_nombre')}</div>
+              <div><label className="label" htmlFor="ob-jefe_terreno_nombre">Nombre del jefe de terreno</label>{campo('jefe_terreno_nombre')}</div>
             </div>
             <p className="-mt-2 text-xs text-bone-500">Solo ese correo podrá ver y evaluar los términos de contrato de esta obra.</p>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -136,7 +136,7 @@ export default function Obras() {
       >
         {esGerente
           ? 'Crea las obras y designa al jefe de personal de obra a cargo de cada una.'
-          : 'Las obras que te asignó el gerente de RRHH. Arma su cuadrilla, elige al jefe de obra y marca los términos de contrato.'}
+          : 'Las obras que te asignó el gerente de RRHH. Arma su cuadrilla, elige al jefe de terreno y marca los términos de contrato.'}
       </Encabezado>
 
       {!cargando && !obras.length ? (
