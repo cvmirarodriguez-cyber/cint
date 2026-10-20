@@ -1,10 +1,10 @@
 import { createClientFromRequest } from "npm:@base44/sdk";
 
 // Gestión de cuentas del equipo.
-// - Gerente de RRHH y Soporte: todo (cargos, suspender, eliminar).
-// - Jefe de personal de obra: listar y aprobar/revocar jefes de obra.
+// - Gerente de RRHH, Gerente general y Soporte: todo (cargos, suspender, eliminar).
+// - Jefe de personal de obra: listar y aprobar/revocar jefes de terreno.
 // Nadie puede actuar sobre sí mismo, y la cuenta de Soporte solo la toca Soporte.
-const TOTAL = ["gerente_rrhh", "soporte"];
+const TOTAL = ["gerente_rrhh", "gerente_general", "soporte"];
 const perfilDe = (u: any) => u?.perfil ?? u?.data?.perfil ?? null;
 // Cargo real aunque esté suspendido (el cargo "suspendido" no da acceso a nada).
 const cargoReal = (u: any) => { const p = perfilDe(u); return p && p !== "suspendido" ? p : (u?.perfil_previo ?? null); };
@@ -47,7 +47,7 @@ export default async function (req: Request): Promise<Response> {
   }
 
   if (accion === "cambiar") {
-    // El jefe de personal de obra solo aprueba o revoca jefes de obra.
+    // El jefe de personal de obra solo aprueba o revoca jefes de terreno.
     if (!total && otro.role === "admin") return Response.json({ error: "Solo el gerente de RRHH gestiona a los jefes de personal de obra" }, { status: 403 });
     await Users.update(userId, { acceso: !!acceso });
     return Response.json({ ok: true });
@@ -57,15 +57,15 @@ export default async function (req: Request): Promise<Response> {
   if (!total) return Response.json({ error: "Solo el gerente de RRHH puede hacer esto" }, { status: 403 });
 
   if (accion === "perfil") {
-    if (!["gerente_rrhh", "jefe_personal"].includes(perfil)) return Response.json({ error: "Perfil no válido" }, { status: 400 });
+    if (!["gerente_rrhh", "gerente_general", "jefe_personal"].includes(perfil)) return Response.json({ error: "Perfil no válido" }, { status: 400 });
     await Users.update(userId, { perfil });
     return Response.json({ ok: true });
   }
 
-  // Solo se suspende o elimina a jefes de personal de obra y jefes de obra.
+  // Solo se suspende o elimina a jefes de personal de obra y jefes de terreno.
   const suspendible = otro.role !== "admin" || perfilOtro === "jefe_personal";
   if ((accion === "suspender" || accion === "eliminar") && !suspendible) {
-    return Response.json({ error: "Solo se puede suspender o eliminar a jefes de personal de obra y jefes de obra" }, { status: 403 });
+    return Response.json({ error: "Solo se puede suspender o eliminar a jefes de personal de obra y jefes de terreno" }, { status: 403 });
   }
 
   if (accion === "suspender") {
