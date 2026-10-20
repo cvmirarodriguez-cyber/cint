@@ -148,6 +148,13 @@ html.light {
   .btn-primary:hover { @apply bg-obra-300; }
   .btn-ghost { @apply btn border border-white/10 bg-white/[.03] text-bone hover:bg-white/[.07]; }
 
+  /* Entrada de cada sección: solo opacidad y desplazamiento (baratos para la GPU). */
+  .pagina-entra { animation: pagina-entra .35s cubic-bezier(.22,1,.36,1); }
+  @keyframes pagina-entra {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: none; }
+  }
+
   .chip {
     @apply inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold leading-none whitespace-nowrap;
   }
