@@ -14,13 +14,15 @@
       "type": "string",
       "enum": [
         "gerente_rrhh",
+        "gerente_general",
         "jefe_personal",
         "jefe_obra"
       ],
       "enumNames": [
         "Gerente de RRHH",
+        "Gerente general",
         "Jefe de personal de obra",
-        "Jefe de obra"
+        "Jefe de terreno"
       ],
       "default": "jefe_obra",
       "description": "Perfil con el que fue invitado"
@@ -49,6 +51,11 @@
                 {
                   "user_condition": {
                     "data.perfil": "gerente_rrhh"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "gerente_general"
                   }
                 },
                 {
@@ -99,6 +106,11 @@
             },
             {
               "user_condition": {
+                "data.perfil": "gerente_general"
+              }
+            },
+            {
+              "user_condition": {
                 "data.perfil": "soporte"
               }
             }
@@ -118,6 +130,11 @@
             {
               "user_condition": {
                 "data.perfil": "gerente_rrhh"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "gerente_general"
               }
             },
             {
