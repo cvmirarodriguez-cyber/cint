@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Crown, HardHat, Mail, PauseCircle, PlayCircle, ShieldCheck, Trash2, UserCheck } from 'lucide-react';
+import { Briefcase, Crown, HardHat, Mail, PauseCircle, PlayCircle, ShieldCheck, Trash2, UserCheck } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useDatos } from '@/lib/datos';
 import { PERFILES, fecha } from '@/lib/dominio';
 import { Avatar, Chip, Encabezado, Segmento, Vacio, item, lista, useToast } from '@/components/ui';
 
-const OPCIONES = ['jefe_obra', 'jefe_personal', 'gerente_rrhh'].map((value) => ({ value, label: PERFILES[value].label }));
+const OPCIONES = ['jefe_obra', 'jefe_personal', 'gerente_rrhh', 'gerente_general'].map((value) => ({ value, label: PERFILES[value].label }));
 
 const DESCRIPCION = {
   gerente_rrhh: { icono: Crown, color: 'text-obra', texto: 'Maneja todos los datos. Crea las obras, designa al jefe de personal de obra de cada una, invita a todo el equipo y define los cargos.' },
-  jefe_personal: { icono: ShieldCheck, color: 'text-hivis', texto: 'Ve la base de personal y los historiales. En las obras que le asigna el gerente elige a los trabajadores y al jefe de obra, y marca los términos de contrato.' },
+  gerente_general: { icono: Briefcase, color: 'text-obra', texto: 'Tiene los mismos permisos que el gerente de RRHH: ve y maneja todos los datos, las obras, el equipo y los cargos.' },
+  jefe_personal: { icono: ShieldCheck, color: 'text-hivis', texto: 'Ve la base de personal y los historiales. En las obras que le asigna el gerente elige a los trabajadores y al jefe de terreno, y marca los términos de contrato.' },
   jefe_obra: { icono: HardHat, color: 'text-bone-300', texto: 'Evalúa a los trabajadores de su obra al término de su contrato y ve sus propias evaluaciones. No ve la base de personal ni el historial.' },
 };
 
@@ -35,8 +36,8 @@ function Interruptor({ activo, onClick, disabled, etiqueta }) {
 export default function Equipo() {
   const avisar = useToast();
   const { usuario, esGerente } = useDatos();
-  // El jefe de personal de obra solo invita y aprueba jefes de obra.
-  const cargos = esGerente ? ['gerente_rrhh', 'jefe_personal', 'jefe_obra'] : ['jefe_obra'];
+  // El jefe de personal de obra solo invita y aprueba jefes de terreno.
+  const cargos = esGerente ? ['gerente_general', 'gerente_rrhh', 'jefe_personal', 'jefe_obra'] : ['jefe_obra'];
   const [usuarios, setUsuarios] = useState(null);
   const [cambiando, setCambiando] = useState(null);
   const [email, setEmail] = useState('');
@@ -108,7 +109,7 @@ export default function Equipo() {
     try {
       const correo = email.trim().toLowerCase();
       await base44.users.inviteUser(correo, PERFILES[perfil].rol);
-      // Al crear su cuenta recibe su cargo (y, si es jefe de obra, su acceso) automáticamente.
+      // Al crear su cuenta recibe su cargo (y, si es jefe de terreno, su acceso) automáticamente.
       await base44.entities.Autorizado.create({ email: correo, perfil, invitado_por: usuario.email });
       avisar(`Invitación enviada como ${PERFILES[perfil].label}.`);
       setEmail('');
@@ -153,11 +154,12 @@ export default function Equipo() {
                     onChange={(e) => cambiarPerfil(u, e.target.value)}
                     className="rounded-lg border border-white/10 bg-ink-800 px-2 py-1.5 text-xs font-semibold text-bone"
                   >
+                    <option value="gerente_general">Gerente general</option>
                     <option value="gerente_rrhh">Gerente de RRHH</option>
                     <option value="jefe_personal">Jefe de personal de obra</option>
                   </select>
                 ) : (
-                  <Chip tono={u.perfil === 'gerente_rrhh' || u.perfil === 'soporte' ? 'obra' : u.role === 'admin' ? 'warn' : 'muted'}>{PERFILES[u.perfil]?.label}</Chip>
+                  <Chip tono={['gerente_rrhh', 'gerente_general', 'soporte'].includes(u.perfil) ? 'obra' : u.role === 'admin' ? 'warn' : 'muted'}>{PERFILES[u.perfil]?.label}</Chip>
                 )}
                 {u.suspendido ? <Chip tono="bad">Suspendido</Chip> : !u.acceso && <Chip tono="warn" className="hidden sm:inline-flex">Pendiente</Chip>}
                 {esGerente && u.id !== usuario.id && (u.role !== 'admin' || u.perfil === 'jefe_personal') && (
@@ -184,7 +186,7 @@ export default function Equipo() {
       </section>
 
       <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-bone-400">Invitar</h2>
-      <div className={`mb-4 grid grid-cols-1 gap-3 ${cargos.length > 1 ? 'sm:grid-cols-3' : ''}`}>
+      <div className={`mb-4 grid grid-cols-1 gap-3 ${cargos.length > 1 ? 'sm:grid-cols-2 lg:grid-cols-4' : ''}`}>
         {cargos.map((k) => {
           const { icono: Icono, color, texto } = DESCRIPCION[k];
           return (
