@@ -7,12 +7,12 @@ import { BotonSoporte } from '@/components/SoporteChat';
 export default function AccesoPendiente({ usuario, suspendido = false }) {
   const [revisando, setRevisando] = useState(!suspendido);
 
-  // Si el jefe de personal de obra lo invitó como jefe de obra, el acceso se activa solo.
+  // Si el jefe de personal de obra lo invitó como jefe de terreno, el acceso se activa solo.
   useEffect(() => {
     if (suspendido) return;
     base44.functions.invoke('reclamar-acceso', {})
       .then((r) => {
-        // Solo recarga si la invitación realmente resolvió lo que falta (cargo para admin, acceso para jefe de obra).
+        // Solo recarga si la invitación realmente resolvió lo que falta (cargo para admin, acceso para jefe de terreno).
         const listo = usuario.role === 'admin' ? !!r.data?.perfil : !!r.data?.acceso;
         if (listo) window.location.reload();
         else setRevisando(false);
