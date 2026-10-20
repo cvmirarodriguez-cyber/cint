@@ -5,7 +5,7 @@ import { AD, NOTAS, RECONTRATAR, cargoLabel, fecha, nota } from '@/lib/dominio';
 import { formatearRut } from '@/lib/rut';
 import { Chip, Encabezado, Vacio, colorNota, item, lista } from '@/components/ui';
 
-// El jefe de obra solo ve lo que él mismo evaluó (el servidor filtra el resto).
+// El jefe de terreno solo ve lo que él mismo evaluó (el servidor filtra el resto).
 export default function MisEvaluaciones() {
   const { evaluaciones, cargando } = useDatos();
   return (
