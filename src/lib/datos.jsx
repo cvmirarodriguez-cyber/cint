@@ -10,7 +10,7 @@ export function DatosProvider({ usuario, children }) {
   const [estado, setEstado] = useState({ cargando: true, trabajadores: [], obras: [], contratos: [], evaluaciones: [] });
 
   const recargar = useCallback(async () => {
-    // El jefe de obra no tiene acceso a la base completa de personal: el servidor le devolvería vacío.
+    // El jefe de terreno no tiene acceso a la base completa de personal: el servidor le devolvería vacío.
     const [trabajadores, obras, contratos, evaluaciones] = await Promise.all([
       usuario?.role === 'admin' ? E.Trabajador.list('nombre', 5000) : Promise.resolve([]),
       E.Obra.list('-created_date', 1000),
