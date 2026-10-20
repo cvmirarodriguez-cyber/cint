@@ -259,10 +259,17 @@ function Formulario() {
         </Paso>
       </div>
 
-      <div className="sticky bottom-24 z-30 mt-6 md:bottom-6">
-        <button className="btn-primary w-full py-4 text-base" disabled={!completo || guardando}>
+      {/* Barra fija y opaca: no deja ver el formulario por detrás aunque el botón esté desactivado. */}
+      <div className="sticky bottom-24 z-30 mt-6 rounded-2xl border border-white/10 bg-ink-800 p-2 shadow-[0_-12px_30px_-12px_rgba(0,0,0,.6)] md:bottom-6">
+        <button
+          className="btn-primary w-full py-4 text-base disabled:bg-ink-600 disabled:text-bone-500 disabled:opacity-100 disabled:shadow-none"
+          disabled={!completo || guardando}
+        >
           {guardando ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Check className="h-5 w-5" /> Guardar evaluación</>}
         </button>
+        <p className="mt-1.5 text-center text-xs text-bone-500">
+          {guardando ? 'Guardando…' : completo ? 'Lista para guardar.' : !t ? 'Elige al trabajador para continuar.' : 'Califica desempeño y responsabilidad para guardar.'}
+        </p>
       </div>
     </form>
   );
