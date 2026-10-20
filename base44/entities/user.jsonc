@@ -18,6 +18,7 @@
       "type": "string",
       "enum": [
         "gerente_rrhh",
+        "gerente_general",
         "jefe_personal",
         "jefe_obra",
         "soporte",
@@ -25,12 +26,13 @@
       ],
       "enumNames": [
         "Gerente de RRHH",
+        "Gerente general",
         "Jefe de personal de obra",
-        "Jefe de obra",
+        "Jefe de terreno",
         "Soporte",
         "Suspendido"
       ],
-      "description": "Cargo dentro de la app; los dos primeros tienen acceso total",
+      "description": "Cargo dentro de la app; gerente de RRHH, gerente general y soporte tienen acceso total",
       "rls": {
         "write": {
           "$and": [
