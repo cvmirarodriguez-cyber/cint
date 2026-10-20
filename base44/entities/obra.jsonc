@@ -64,6 +64,11 @@
                 },
                 {
                   "user_condition": {
+                    "data.perfil": "gerente_general"
+                  }
+                },
+                {
+                  "user_condition": {
                     "data.perfil": "soporte"
                   }
                 }
@@ -88,6 +93,11 @@
                 {
                   "user_condition": {
                     "data.perfil": "gerente_rrhh"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "gerente_general"
                   }
                 },
                 {
@@ -120,6 +130,11 @@
                 {
                   "user_condition": {
                     "data.perfil": "gerente_rrhh"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "gerente_general"
                   }
                 },
                 {
@@ -182,6 +197,11 @@
             },
             {
               "user_condition": {
+                "data.perfil": "gerente_general"
+              }
+            },
+            {
+              "user_condition": {
                 "data.perfil": "soporte"
               }
             }
@@ -203,6 +223,11 @@
                 {
                   "user_condition": {
                     "data.perfil": "gerente_rrhh"
+                  }
+                },
+                {
+                  "user_condition": {
+                    "data.perfil": "gerente_general"
                   }
                 },
                 {
@@ -249,6 +274,11 @@
             {
               "user_condition": {
                 "data.perfil": "gerente_rrhh"
+              }
+            },
+            {
+              "user_condition": {
+                "data.perfil": "gerente_general"
               }
             },
             {
