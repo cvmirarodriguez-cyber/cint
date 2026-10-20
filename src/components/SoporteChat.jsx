@@ -8,10 +8,11 @@ import { Capa, ease } from '@/components/ui';
 
 // Preguntas rápidas según el cargo de quien abre el soporte.
 const RAPIDAS = {
-  anonimo: ['No puedo entrar', 'Me invitaron, ¿cómo activo mi acceso?', '¿Qué puede hacer un jefe de obra?'],
+  anonimo: ['No puedo entrar', 'Me invitaron, ¿cómo activo mi acceso?', '¿Qué puede hacer un jefe de terreno?'],
   gerente_rrhh: ['¿Cómo asigno un jefe de personal a una obra?', '¿Cómo cargo currículums?', '¿Cómo suspendo una cuenta?'],
+  gerente_general: ['¿Cómo asigno un jefe de personal a una obra?', '¿Cómo veo los reportes?', '¿Cómo invito a alguien?'],
   soporte: ['¿Cómo asigno un jefe de personal a una obra?', '¿Cómo cargo una planilla Excel?', '¿Qué puede hacer cada cargo?'],
-  jefe_personal: ['¿Cómo armo la cuadrilla de mi obra?', '¿Cómo designo al jefe de obra?', '¿Cómo pido recomendaciones?'],
+  jefe_personal: ['¿Cómo armo la cuadrilla de mi obra?', '¿Cómo designo al jefe de terreno?', '¿Cómo pido recomendaciones?'],
   jefe_obra: ['¿Cómo evalúo a un trabajador?', '¿Qué significa cada nota?', '¿Dónde veo mis evaluaciones?'],
 };
 
