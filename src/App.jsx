@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { DatosProvider } from '@/lib/datos';
-import { ToastProvider, ease } from '@/components/ui';
+import { ToastProvider } from '@/components/ui';
 import Shell from '@/components/Shell';
 import Login from '@/pages/Login';
 import Panel from '@/pages/Panel';
@@ -24,17 +23,10 @@ import Legal from '@/pages/Legal';
 import Reportes from '@/pages/Reportes';
 import MisObras from '@/pages/MisObras';
 
+// Entrada de cada sección con una animación CSS. No espera a que la página anterior termine de
+// salir (antes AnimatePresence mode="wait" podía quedarse trabado y dejar la sección en blanco).
 function Pagina({ children }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 14, filter: 'blur(4px)' }}
-      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      exit={{ opacity: 0, y: -6, transition: { duration: 0.12 } }}
-      transition={{ duration: 0.4, ease }}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className="pagina-entra">{children}</div>;
 }
 
 export default function App() {
@@ -83,7 +75,6 @@ export default function App() {
     <ToastProvider>
       <DatosProvider usuario={usuario}>
         <Shell>
-          <AnimatePresence mode="wait" initial={false}>
             {admin ? (
               <Routes location={location} key={location.pathname}>
                 <Route path="/" element={<Pagina><Panel /></Pagina>} />
@@ -100,7 +91,7 @@ export default function App() {
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             ) : (
-              // Jefe de obra: solo evalúa a su gente y ve sus propias evaluaciones.
+              // Jefe de terreno: solo evalúa a su gente y ve sus propias evaluaciones.
               <Routes location={location} key={location.pathname}>
                 <Route path="/" element={<Pagina><PanelJefe /></Pagina>} />
                 <Route path="/mis-obras" element={<Pagina><MisObras /></Pagina>} />
@@ -109,7 +100,6 @@ export default function App() {
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             )}
-          </AnimatePresence>
         </Shell>
       </DatosProvider>
     </ToastProvider>
