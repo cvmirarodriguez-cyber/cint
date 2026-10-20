@@ -33,7 +33,7 @@ export const DOCUMENTOS = {
       {
         titulo: '3. Datos que tratamos',
         lista: [
-          'Usuarios de la App (gerente de RRHH, jefes de personal de obra, jefes de obra y soporte): nombre, correo electrónico, cargo dentro de la App y registros de acceso.',
+          'Usuarios de la App (gerente de RRHH, jefes de personal de obra, jefes de terreno y soporte): nombre, correo electrónico, cargo dentro de la App y registros de acceso.',
           'Trabajadores de terreno: nombre, RUT, cargo, especialidad, teléfono, experiencia, obras en que ha trabajado, fechas de contrato y evaluaciones al término de cada contrato (desempeño, responsabilidad, si se recomienda recontratar y comentarios).',
           'Datos sensibles: las evaluaciones pueden incluir información sobre consumo de alcohol o drogas en faena (sin observaciones, sospecha o incidente confirmado). Se trata como dato sensible: solo lo registran y ven las personas autorizadas, y solo para fines de seguridad laboral.',
           'Currículums y documentos que se adjunten a la ficha de un trabajador, guardados como archivos privados.',
@@ -64,7 +64,7 @@ export const DOCUMENTOS = {
         lista: [
           'Gerente de RRHH y Soporte: acceso a toda la información, para administrar la App.',
           'Jefe de personal de obra: base de personal e historiales para seleccionar trabajadores, y la gestión de las obras que tiene asignadas.',
-          'Jefe de obra: solo los trabajadores de sus obras cuyo contrato terminó, y las evaluaciones que él mismo registró.',
+          'Jefe de terreno: solo los trabajadores de sus obras cuyo contrato terminó, y las evaluaciones que él mismo registró.',
           'Personas sin invitación: no pueden ver ningún dato. Estas reglas se aplican en el servidor, no solo en la pantalla.',
         ],
       },
@@ -126,7 +126,7 @@ export const DOCUMENTOS = {
         lista: [
           'Uso interno y solo por invitación: no existe registro libre.',
           'Inicio de sesión con Google o con correo y contraseña verificado con un código enviado al correo.',
-          'Mínimo privilegio: cada cargo (gerente de RRHH, jefe de personal de obra, jefe de obra y soporte) ve solo lo que necesita. Los permisos se aplican en el servidor.',
+          'Mínimo privilegio: cada cargo (gerente de RRHH, jefe de personal de obra, jefe de terreno y soporte) ve solo lo que necesita. Los permisos se aplican en el servidor.',
           'Solo el gerente de RRHH asigna cargos, suspende o elimina cuentas. Nadie puede subirse de cargo ni reactivarse por su cuenta.',
           'Se revisan periódicamente los accesos y se suspenden de inmediato las cuentas de personas que dejan la empresa o el cargo.',
         ],
