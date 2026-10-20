@@ -75,7 +75,7 @@ function Formulario() {
   const [guardando, setGuardando] = useState(false);
   const [listo, setListo] = useState(null);
 
-  // El jefe de obra no carga la base de personal: los datos vienen del contrato.
+  // El jefe de terreno no carga la base de personal: los datos vienen del contrato.
   const t = trabajadores.find((x) => x.id === trabajadorId)
     ?? (contratoInicial && contratoInicial.trabajador_id === trabajadorId
       ? { id: contratoInicial.trabajador_id, nombre: contratoInicial.trabajador_nombre, rut: contratoInicial.trabajador_rut, cargo: contratoInicial.cargo }
@@ -253,7 +253,7 @@ function Formulario() {
           <Segmento nombre="Recontratar" opciones={opciones(RECONTRATAR)} valor={f.recontratar} onChange={set('recontratar')} />
         </Paso>
 
-        <Paso n={7} titulo="Comentario" ayuda="Opcional. Lo que el próximo jefe de obra debería saber.">
+        <Paso n={7} titulo="Comentario" ayuda="Opcional. Lo que el próximo jefe de terreno debería saber.">
           <textarea className="field min-h-[110px] resize-y" maxLength={500} value={f.comentario} onChange={(e) => set('comentario')(e.target.value)} placeholder="Ej: buen enfierrador, rápido y ordenado. Llegó tarde algunos lunes." />
           <p className="mt-1 text-right font-mono text-xs text-bone-600">{f.comentario.length}/500</p>
         </Paso>
