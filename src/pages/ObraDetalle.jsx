@@ -133,7 +133,7 @@ export default function ObraDetalle() {
               Jefe de personal de obra: <b className="text-bone">{obra.jefe_personal_nombre || obra.jefe_personal_email || 'Sin asignar'}</b>
             </p>
             <p className="mt-1 text-sm text-bone-400">
-              Jefe de obra: <b className="text-bone">{obra.jefe_terreno_nombre || '—'}</b>{obra.jefe_terreno_email && <span className="text-bone-500"> · {obra.jefe_terreno_email}</span>}
+              Jefe de terreno: <b className="text-bone">{obra.jefe_terreno_nombre || '—'}</b>{obra.jefe_terreno_email && <span className="text-bone-500"> · {obra.jefe_terreno_email}</span>}
             </p>
             <p className="mt-1 text-sm text-bone-500">{fecha(obra.fecha_inicio)} → {fecha(obra.fecha_termino)}</p>
           </div>
