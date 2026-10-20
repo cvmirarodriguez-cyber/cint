@@ -103,7 +103,7 @@ export default function Shell({ children }) {
 
       <main className="mx-auto max-w-6xl px-4 pb-32 pt-6 sm:px-6 md:px-10 md:pb-16 md:pt-10">{children}</main>
 
-      {/* Navegación inferior móvil: los jefes de obra usan el teléfono en obra */}
+      {/* Navegación inferior móvil: los jefes de terreno usan el teléfono en obra */}
       <nav className="fixed inset-x-3 bottom-3 z-40 grid rounded-2xl border border-white/10 bg-ink-800/90 p-1.5 shadow-slab backdrop-blur-xl md:hidden" style={{ marginBottom: 'env(safe-area-inset-bottom)', gridTemplateColumns: `repeat(${navMovil.length}, minmax(0, 1fr))` }}>
         {navMovil.map((n) => (
           <NavLink key={n.to} to={n.to} end={n.end}>
