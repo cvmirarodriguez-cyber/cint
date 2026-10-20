@@ -65,17 +65,18 @@ export const VEREDICTO = {
 
 export const PERFILES = {
   gerente_rrhh: { label: 'Gerente de RRHH', rol: 'admin' },
+  gerente_general: { label: 'Gerente general', rol: 'admin' },
   jefe_personal: { label: 'Jefe de personal de obra', rol: 'admin' },
-  jefe_obra: { label: 'Jefe de obra', rol: 'user' },
+  jefe_obra: { label: 'Jefe de terreno', rol: 'user' },
   soporte: { label: 'Soporte', rol: 'admin' },
 };
 // Cargo que se muestra: el perfil guardado o, si no hay, el que corresponde a su rol.
 export const perfilDe = (u) => u?.perfil ?? u?.data?.perfil ?? (u?.role === 'admin' ? 'jefe_personal' : 'jefe_obra');
-export const etiquetaPerfil = (u) => PERFILES[perfilDe(u)]?.label ?? 'Jefe de obra';
+export const etiquetaPerfil = (u) => PERFILES[perfilDe(u)]?.label ?? 'Jefe de terreno';
 // El servidor exige un cargo guardado: un admin sin cargo todavía no ve datos.
 export const cargoGuardado = (u) => u?.perfil ?? u?.data?.perfil ?? null;
-// Acceso total: gerente de RRHH y Soporte.
-export const esGerente = (u) => u?.role === 'admin' && ['gerente_rrhh', 'soporte'].includes(cargoGuardado(u));
+// Acceso total: gerente de RRHH, gerente general y Soporte.
+export const esGerente = (u) => u?.role === 'admin' && ['gerente_rrhh', 'gerente_general', 'soporte'].includes(cargoGuardado(u));
 export const esJefePersonal = (u) => u?.role === 'admin' && cargoGuardado(u) === 'jefe_personal';
 
 export function fecha(iso) {
