@@ -6,7 +6,7 @@ import { useDatos } from '@/lib/datos';
 import { fecha, nota } from '@/lib/dominio';
 import { Avatar, Contador, Tilt, Vacio, colorNota, ease, item, lista } from '@/components/ui';
 
-// Resumen por proyecto para el jefe de obra: progreso de evaluaciones y personal activo.
+// Resumen por proyecto para el jefe de terreno: progreso de evaluaciones y personal activo.
 export default function MisObras() {
   const { cargando, obras, contratos, evaluaciones, pendientes } = useDatos();
 
