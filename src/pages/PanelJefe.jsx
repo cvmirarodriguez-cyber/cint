@@ -9,7 +9,7 @@ import { Avatar, Contador, Tilt, Vacio, colorNota, ease, item, lista } from '@/c
 
 const Obra3D = lazy(() => import('@/components/Obra3D'));
 
-// Inicio del jefe de obra: solo lo que tiene que evaluar y lo que ya evaluó.
+// Inicio del jefe de terreno: solo lo que tiene que evaluar y lo que ya evaluó.
 export default function PanelJefe() {
   const { usuario, cargando, obras, pendientes, evaluaciones } = useDatos();
   const nombre = (usuario.full_name || '').split(' ')[0];
@@ -31,7 +31,7 @@ export default function PanelJefe() {
         </Suspense>
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink-700 from-40% via-ink-700/50 via-60% to-transparent sm:bg-gradient-to-r sm:from-25% sm:via-45% sm:via-ink-700/60 sm:to-70%" />
         <div className="relative z-10 max-w-lg p-6 pb-[210px] sm:p-10">
-          <p className="eyebrow mb-3">Jefe de obra{obras.length ? ` · ${obras.map((o) => o.nombre).join(', ')}` : ''}</p>
+          <p className="eyebrow mb-3">Jefe de terreno{obras.length ? ` · ${obras.map((o) => o.nombre).join(', ')}` : ''}</p>
           <h1 className="display break-words text-4xl sm:text-5xl">Hola{nombre ? `, ${nombre}` : ''}.</h1>
           <p className="mt-4 text-bone-400">
             {pendientes.length
