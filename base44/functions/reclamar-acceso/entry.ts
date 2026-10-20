@@ -1,6 +1,6 @@
 import { createClientFromRequest } from "npm:@base44/sdk";
 
-// La llama la app al entrar: si el correo fue invitado, aplica su perfil y, si es jefe de obra, le da acceso.
+// La llama la app al entrar: si el correo fue invitado, aplica su perfil y, si es jefe de terreno, le da acceso.
 export default async function (req: Request): Promise<Response> {
   const base44 = createClientFromRequest(req);
   const yo = await base44.auth.me().catch(() => null);
