@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@base44/sdk": "^0.8.54",
-    "@base44/vite-plugin": "^1.0.47",
+    "@base44/sdk": "^0.8.57",
+    "@base44/vite-plugin": "^1.0.48",
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
     "framer-motion": "^11.18.2",
