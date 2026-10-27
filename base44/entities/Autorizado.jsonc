@@ -10,6 +10,14 @@
     "invitado_por": {
       "type": "string"
     },
+    "nombre": {
+      "type": "string",
+      "description": "Nombre completo con que se invit\u00f3; se aplica a su cuenta al entrar"
+    },
+    "telefono": {
+      "type": "string",
+      "description": "Tel\u00e9fono de contacto; se aplica a su cuenta al entrar"
+    },
     "perfil": {
       "type": "string",
       "enum": [

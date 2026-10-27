@@ -144,7 +144,7 @@ export default function Equipo() {
                 <Avatar nombre={u.full_name || u.email} size={38} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold">{u.full_name || u.email}</p>
-                  <p className="truncate text-xs text-bone-500">{u.email} · desde {fecha(u.created_date)}</p>
+                  <p className="truncate text-xs text-bone-500">{u.email}{u.telefono ? ` · ${u.telefono}` : ''} · desde {fecha(u.created_date)}</p>
                 </div>
                 {esGerente && u.role === 'admin' && u.id !== usuario.id && !u.suspendido && u.perfil !== 'soporte' ? (
                   <select

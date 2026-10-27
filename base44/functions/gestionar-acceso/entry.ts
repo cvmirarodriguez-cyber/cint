@@ -28,6 +28,7 @@ export default async function (req: Request): Promise<Response> {
         id: u.id,
         email: u.email,
         full_name: u.full_name,
+        telefono: u.telefono ?? null,
         role: u.role,
         acceso: !u.suspendido && (u.role === "admin" || u.acceso === true || u.data?.acceso === true),
         perfil: cargoReal(u) ?? (u.role === "admin" ? "jefe_personal" : "jefe_obra"),

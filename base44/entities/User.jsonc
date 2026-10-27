@@ -102,6 +102,17 @@
           ]
         }
       }
+    },
+    "telefono": {
+      "type": "string",
+      "description": "Tel\u00e9fono de contacto del miembro del equipo",
+      "rls": {
+        "write": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
     }
   },
   "required": []
