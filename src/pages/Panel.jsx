@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AlertTriangle, ArrowUpRight, ClipboardCheck, HardHat, Star, Upload, Clock } from 'lucide-react';
 import { useDatos } from '@/lib/datos';
-import { cargoLabel, fecha, nota, resumen } from '@/lib/dominio';
+import { cargoLabel, etiquetaPerfil, fecha, nota, resumen } from '@/lib/dominio';
 import { Anillo, Avatar, Chip, Contador, Tilt, Vacio, colorNota, ease, item, lista } from '@/components/ui';
 
 const Obra3D = lazy(() => import('@/components/Obra3D'));
@@ -35,7 +35,7 @@ export default function Panel() {
   }, [trabajadores, evalsPor]);
 
   const nAlertas = useMemo(() => new Set(evaluaciones.filter((e) => e.alcohol_drogas !== 'sin_observaciones' && e.alcohol_drogas).map((e) => e.trabajador_id)).size, [evaluaciones]);
-  const nombre = (usuario.full_name || '').split(' ')[0];
+  const nombre = usuario.full_name || '';
 
   return (
     <div>
@@ -48,7 +48,7 @@ export default function Panel() {
         </ErrorBoundary3D>
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink-700 from-40% via-ink-700/50 via-60% to-transparent sm:bg-gradient-to-r sm:from-25% sm:via-45% sm:via-ink-700/60 sm:to-70%" />
         <div className="relative z-10 max-w-lg p-6 pb-[210px] sm:p-10">
-          <p className="eyebrow mb-3">{new Date().toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+          <p className="eyebrow mb-3">{new Date().toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' })} · {etiquetaPerfil(usuario)}</p>
           <h1 className="display break-words text-4xl sm:text-5xl">Hola{nombre ? `, ${nombre}` : ''}.</h1>
           <p className="mt-4 text-bone-400">
             {pendientes.length
