@@ -461,7 +461,7 @@ function PasoCobrar({ mesa, pagos, calc, guardar, recargar, setError }) {
         <Resumen mesa={mesa} calc={calc} />
         {calc.sinAsignar > 0 && <Aviso tipo="ambar">Hay {clp(calc.sinAsignar)} sin asignar. Puedes abrir el cobro igual: cada uno marca lo suyo al entrar.</Aviso>}
         <ol className="space-y-3 rounded-2xl bg-papel-claro p-4 text-sm ring-1 ring-linea">
-          {['Tus amigos escanean el QR y confirman lo que consumieron.', 'Cada uno paga su parte con Mercado Pago.', 'Con lo juntado, pagas el QR del restorán.'].map((t, i) => (
+          {['Tus amigos escanean el QR y confirman lo que consumieron.', 'Cada uno paga su parte con Mercado Pago.', 'Con lo reunido, pagas el QR del restorán.'].map((t, i) => (
             <li key={t} className="flex gap-3"><span className="num grid h-6 w-6 shrink-0 place-items-center rounded-full bg-tinta text-[11px] text-papel-claro">{i + 1}</span><span className="pt-0.5 text-tinta-500">{t}</span></li>
           ))}
         </ol>
@@ -477,7 +477,7 @@ function PasoCobrar({ mesa, pagos, calc, guardar, recargar, setError }) {
       {todos || mesa.estado === 'cerrada' ? (
         <Ticket imprime className="text-center">
           <EncabezadoBoleta restoran={mesa.restoran} codigo={mesa.codigo} fecha={mesa.created_date} />
-          <div className="my-6"><Sello texto={mesa.estado === 'cerrada' ? 'CERRADA' : 'JUNTADO'} className="text-2xl" /></div>
+          <div className="my-6"><Sello texto={mesa.estado === 'cerrada' ? 'CERRADA' : 'REUNIDO'} className="text-2xl" /></div>
           <p className="etiqueta">Recaudado</p>
           <p className="num mt-1 text-[40px] font-bold leading-none">{clp(juntado)}</p>
           <p className="mt-2 text-sm text-tinta-500">+ tu parte {clp(calc.porPersona[mesa.organizador_persona_id]?.total)}</p>
@@ -515,7 +515,7 @@ function PasoCobrar({ mesa, pagos, calc, guardar, recargar, setError }) {
       <div className="rounded-2xl bg-papel-claro p-4 ring-1 ring-linea">
         <div className="flex items-end justify-between">
           <div>
-            <span className="etiqueta">Juntado</span>
+            <span className="etiqueta">Reunido</span>
             <p className="num text-[28px] font-bold leading-tight">{clp(juntado)}<span className="text-base font-normal text-tinta-300"> / {clp(porJuntar)}</span></p>
           </div>
           <span className="num rounded-full bg-papel-oscuro px-2.5 py-1 text-xs">{listos}/{deudores.length}</span>

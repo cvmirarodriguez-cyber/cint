@@ -137,7 +137,7 @@ export default function Invitado() {
 
       {verificando && <div className="mb-4 flex items-center gap-2 rounded-xl bg-verde-100 p-4 text-sm text-verde"><Loader2 className="h-4 w-4 animate-spin" /> Confirmando tu pago con Mercado Pago…</div>}
 
-      {esOrganizador && <p className="mb-4 rounded-xl bg-papel-claro p-4 text-sm text-tinta-500 ring-1 ring-linea">Tú organizas: pagas al restorán con lo que junten los demás.</p>}
+      {esOrganizador && <p className="mb-4 rounded-xl bg-papel-claro p-4 text-sm text-tinta-500 ring-1 ring-linea">Tú organizas: pagas al restorán con lo que reúnan los demás.</p>}
 
       {editando ? (
         <section className="entra">
