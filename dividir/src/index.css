@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: light; }
+html, body { background: #fffbeb; color: #1c1917; -webkit-tap-highlight-color: transparent; }
+body { min-height: 100dvh; padding-bottom: env(safe-area-inset-bottom); }
+
+@layer components {
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-base font-semibold transition active:scale-[.98] disabled:opacity-50 disabled:active:scale-100; }
+  .btn-primario { @apply btn bg-hoja text-crema hover:bg-hoja-600; }
+  .btn-aji { @apply btn bg-aji text-white hover:bg-aji-600; }
+  .btn-suave { @apply btn bg-white text-tinta ring-1 ring-stone-200 hover:bg-stone-50; }
+  .campo { @apply w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-base outline-none placeholder:text-tinta-300 focus:border-hoja focus:ring-2 focus:ring-hoja/20; }
+  .tarjeta { @apply rounded-3xl bg-white p-5 shadow-ticket; }
+  .chip { @apply inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium ring-1 transition active:scale-95; }
+  .etiqueta { @apply text-xs font-semibold uppercase tracking-wider text-tinta-400; }
+  /* Borde dentado de boleta */
+  .boleta { position: relative; }
+  .boleta::after { content: ''; position: absolute; left: 0; right: 0; bottom: -10px; height: 10px;
+    background: radial-gradient(circle at 10px -2px, transparent 8px, #fff 8.5px) repeat-x; background-size: 20px 10px; }
+}
+
+@keyframes entra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.entra { animation: entra .35s ease both; }
+@keyframes escanea { 0% { top: 0 } 100% { top: 100% } }
+.escaner { animation: escanea 1.4s ease-in-out infinite alternate; }

@@ -1,0 +1,46 @@
+// Una cuenta de restorán. Solo la ve y edita quien la creó (el organizador).
+// Los invitados entran sin cuenta por /m/<codigo>, siempre a través de funciones del backend.
+{
+  "name": "Mesa",
+  "type": "object",
+  "properties": {
+    "restoran": { "type": "string", "description": "Nombre del restorán" },
+    "codigo": { "type": "string", "description": "Código corto para compartir (link/QR)" },
+    "estado": { "type": "string", "enum": ["armando", "cobrando", "cerrada"], "default": "armando" },
+    "modo": { "type": "string", "enum": ["items", "igual"], "default": "items" },
+    "propina_pct": { "type": "number", "default": 10 },
+    "boleta_url": { "type": "string", "description": "Foto de la boleta" },
+    "total_boleta": { "type": "number", "description": "Total impreso en la boleta, leído por la IA" },
+    "organizador_persona_id": { "type": "string", "description": "Persona que es el organizador (no paga por la app: paga al restorán)" },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "nombre": { "type": "string" },
+          "precio_unitario": { "type": "number" },
+          "cantidad": { "type": "number" },
+          "asignados": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "personas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "nombre": { "type": "string" }
+        }
+      }
+    }
+  },
+  "required": ["codigo"],
+  "rls": {
+    "create": true,
+    "read": { "created_by": "{{user.email}}" },
+    "update": { "created_by": "{{user.email}}" },
+    "delete": { "created_by": "{{user.email}}" }
+  }
+}

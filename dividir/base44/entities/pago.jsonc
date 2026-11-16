@@ -1,0 +1,26 @@
+// Pago de una persona en una mesa. Lo crean y actualizan solo las funciones del backend
+// (crear-pago, mp-webhook, verificar-pago, marcar-pagado). El organizador lo puede leer.
+{
+  "name": "Pago",
+  "type": "object",
+  "properties": {
+    "mesa_id": { "type": "string" },
+    "organizador_email": { "type": "string" },
+    "persona_id": { "type": "string" },
+    "persona_nombre": { "type": "string" },
+    "monto": { "type": "number" },
+    "estado": { "type": "string", "enum": ["pendiente", "pagado", "rechazado"], "default": "pendiente" },
+    "medio": { "type": "string", "enum": ["mercadopago", "efectivo"], "default": "mercadopago" },
+    "mp_preference_id": { "type": "string" },
+    "mp_payment_id": { "type": "string" },
+    "link_pago": { "type": "string" },
+    "pagado_en": { "type": "string", "format": "date-time" }
+  },
+  "required": ["mesa_id", "persona_id", "monto"],
+  "rls": {
+    "create": false,
+    "read": { "data.organizador_email": "{{user.email}}" },
+    "update": false,
+    "delete": false
+  }
+}

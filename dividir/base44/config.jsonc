@@ -1,0 +1,12 @@
+// Dividir: la IA lee la boleta, cada uno marca lo suyo y paga su parte con Mercado Pago.
+{
+  "name": "dividir",
+  "description": "Divide la cuenta del restorán con IA y cobra a cada uno por Mercado Pago (QR o link).",
+  "visibility": "public",
+  "site": {
+    "installCommand": "npm install",
+    "buildCommand": "npm run build",
+    "serveCommand": "npm run dev",
+    "outputDirectory": "./dist"
+  }
+}
