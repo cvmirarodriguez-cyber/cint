@@ -12,7 +12,7 @@ export default async function (req: Request): Promise<Response> {
     const sr = base44.asServiceRole;
 
     const mesa = await sr.entities.Mesa.get(mesa_id).catch(() => null);
-    if (!mesa || mesa.created_by !== user.email) return json({ error: "Mesa no encontrada" }, 404);
+    if (!mesa || mesa.created_by_id !== user.id) return json({ error: "Mesa no encontrada" }, 404);
     const persona = (mesa.personas || []).find((p: { id: string }) => p.id === persona_id);
     if (!persona) return json({ error: "Persona no encontrada" }, 404);
 
@@ -24,7 +24,7 @@ export default async function (req: Request): Promise<Response> {
     if (pagos.some((p) => p.estado === "pagado")) return json({ ok: true });
     await sr.entities.Pago.create({
       mesa_id,
-      organizador_email: user.email,
+      organizador_id: user.id,
       persona_id,
       persona_nombre: persona.nombre,
       monto: calcularMesa(mesa).porPersona[persona_id]?.total || 0,

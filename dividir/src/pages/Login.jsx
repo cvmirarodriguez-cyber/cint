@@ -1,14 +1,9 @@
 import { useState } from 'react';
-import { ArrowRight, Camera, Loader2, QrCode, Users } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { Aviso, Marca } from '@/components/ui';
+import { Avatar, Aviso, EncabezadoBoleta, Linea, Marca, Perforacion, Sello, Ticket } from '@/components/ui';
 import { safeReturnTo } from '@/lib/authReturnTo';
 
-const PASOS = [
-  { icono: Camera, t: 'Foto a la boleta', d: 'La IA lee cada plato y su precio.' },
-  { icono: Users, t: 'Cada uno marca lo suyo', d: 'O le dices a la IA quién pidió qué.' },
-  { icono: QrCode, t: 'Pagan por QR', d: 'Mercado Pago. Tú pagas al restorán con lo juntado.' },
-];
 
 export default function Login() {
   const [modo, setModo] = useState('entrar'); // entrar | registro | codigo
@@ -44,21 +39,35 @@ export default function Login() {
   };
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-md flex-col px-4 py-6">
+    <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5 py-6">
       <Marca />
-      <h1 className="mt-10 font-display text-[42px] font-extrabold leading-[1.02] tracking-tight">
-        La cuenta,<br /><span className="text-aji">dividida</span> en<br />un minuto.
+      <h1 className="mt-10 text-[40px] font-extrabold leading-[1] tracking-[-0.045em]">
+        Divide la cuenta.<br /><span className="text-tinta-400">Cobra con un QR.</span>
       </h1>
-      <ol className="mt-6 space-y-3">
-        {PASOS.map(({ icono: I, t, d }, i) => (
-          <li key={t} className="entra flex items-start gap-3" style={{ animationDelay: `${i * 80}ms` }}>
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-hoja-100 text-hoja"><I className="h-5 w-5" /></span>
-            <span><b className="block">{t}</b><span className="text-sm text-tinta-500">{d}</span></span>
-          </li>
-        ))}
-      </ol>
+      <p className="mt-4 text-[15px] text-tinta-500">Foto a la boleta, la IA reparte cada plato y cada uno paga su parte con Mercado Pago.</p>
 
-      <div className="tarjeta mt-8">
+      <div className="relative mt-8 px-6">
+        <Ticket className="!pb-5 !pt-6" imprime>
+          <EncabezadoBoleta restoran="La Picá del Puerto" codigo="7K2QF" />
+          <div className="mt-4">
+            {[['Ana', 'Pizza (½), Coca-Cola', 19412], ['Beto', '2 Pisco sour', 16323], ['Cami', 'Lomo a lo pobre', 21162]].map(([n, d, m], i) => (
+              <div key={n} className="flex items-center gap-2 py-1">
+                <Avatar nombre={n} i={i + 1} chico />
+                <Linea izq={n} sub={d} der={m} className="flex-1 !py-0" />
+              </div>
+            ))}
+          </div>
+          <Perforacion />
+          <div className="flex items-end justify-between">
+            <span className="etiqueta">Total c/ propina</span>
+            <span className="num text-2xl font-bold">$80.267</span>
+          </div>
+        </Ticket>
+        <Sello className="absolute -right-1 top-24 bg-papel-claro/40 text-[13px]" />
+      </div>
+
+      <div className="mt-8 rounded-2xl bg-papel-claro p-5 ring-1 ring-linea">
+        <p className="mb-4 text-sm text-tinta-500">Solo quien organiza necesita cuenta. Tus amigos entran escaneando el QR.</p>
         <p className="mb-4 text-sm text-tinta-500">Solo quien organiza necesita cuenta. Tus amigos entran con el QR.</p>
         {modo !== 'codigo' && (
           <>
@@ -71,8 +80,8 @@ export default function Login() {
               </svg>
               Continuar con Google
             </button>
-            <div className="my-4 flex items-center gap-3 text-xs text-tinta-300">
-              <span className="h-px flex-1 bg-stone-200" /> o con tu correo <span className="h-px flex-1 bg-stone-200" />
+            <div className="my-4 flex items-center gap-3 text-xs text-tinta-400">
+              <span className="h-px flex-1 bg-linea" /> o con tu correo <span className="h-px flex-1 bg-linea" />
             </div>
           </>
         )}
@@ -94,7 +103,7 @@ export default function Login() {
             {modo === 'entrar' ? 'Entrar' : modo === 'registro' ? 'Crear cuenta' : 'Verificar'}
           </button>
         </form>
-        <button type="button" className="mt-4 w-full text-center text-sm font-medium text-hoja" onClick={() => { setError(''); setModo(modo === 'entrar' ? 'registro' : 'entrar'); }}>
+        <button type="button" className="mt-4 w-full text-center text-sm font-medium text-tinta underline underline-offset-4" onClick={() => { setError(''); setModo(modo === 'entrar' ? 'registro' : 'entrar'); }}>
           {modo === 'entrar' ? '¿No tienes cuenta? Créala' : 'Ya tengo cuenta'}
         </button>
       </div>

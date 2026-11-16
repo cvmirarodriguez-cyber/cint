@@ -3,25 +3,47 @@
 @tailwind utilities;
 
 :root { color-scheme: light; }
-html, body { background: #fffbeb; color: #1c1917; -webkit-tap-highlight-color: transparent; }
-body { min-height: 100dvh; padding-bottom: env(safe-area-inset-bottom); }
+html, body { background: #f3f1ec; color: #0e0e0c; -webkit-tap-highlight-color: transparent; }
+body { min-height: 100dvh; font-feature-settings: 'ss01', 'cv11'; }
+.num { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 
 @layer components {
-  .btn { @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-base font-semibold transition active:scale-[.98] disabled:opacity-50 disabled:active:scale-100; }
-  .btn-primario { @apply btn bg-hoja text-crema hover:bg-hoja-600; }
-  .btn-aji { @apply btn bg-aji text-white hover:bg-aji-600; }
-  .btn-suave { @apply btn bg-white text-tinta ring-1 ring-stone-200 hover:bg-stone-50; }
-  .campo { @apply w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-base outline-none placeholder:text-tinta-300 focus:border-hoja focus:ring-2 focus:ring-hoja/20; }
-  .tarjeta { @apply rounded-3xl bg-white p-5 shadow-ticket; }
-  .chip { @apply inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium ring-1 transition active:scale-95; }
-  .etiqueta { @apply text-xs font-semibold uppercase tracking-wider text-tinta-400; }
-  /* Borde dentado de boleta */
-  .boleta { position: relative; }
-  .boleta::after { content: ''; position: absolute; left: 0; right: 0; bottom: -10px; height: 10px;
-    background: radial-gradient(circle at 10px -2px, transparent 8px, #fff 8.5px) repeat-x; background-size: 20px 10px; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-[15px] font-semibold tracking-tight transition active:scale-[.985] disabled:opacity-40 disabled:active:scale-100; }
+  .btn-primario { @apply btn bg-tinta text-papel-claro hover:bg-tinta-700; }
+  .btn-verde { @apply btn bg-verde text-white hover:bg-verde-600; }
+  .btn-suave { @apply btn bg-papel-claro text-tinta ring-1 ring-linea hover:bg-white; }
+  .campo { @apply w-full rounded-xl border border-linea bg-papel-claro px-4 py-3 text-[15px] outline-none placeholder:text-tinta-300 focus:border-tinta focus:bg-white; }
+  .chip { @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-medium ring-1 transition active:scale-95; }
+  .etiqueta { @apply font-mono text-[11px] font-medium uppercase tracking-[.14em] text-tinta-400; }
+  .panel { @apply rounded-2xl bg-papel-claro p-4 ring-1 ring-linea; }
 }
 
-@keyframes entra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-.entra { animation: entra .35s ease both; }
-@keyframes escanea { 0% { top: 0 } 100% { top: 100% } }
-.escaner { animation: escanea 1.4s ease-in-out infinite alternate; }
+/* ---------- Ticket / boleta impresa ---------- */
+.ticket-sombra { filter: drop-shadow(0 1px 0 rgba(14,14,12,.06)) drop-shadow(0 14px 24px rgba(14,14,12,.10)); }
+.ticket {
+  background: #fdfcf9;
+  --r: 6px; --p: 16px;
+  -webkit-mask:
+    radial-gradient(circle var(--r) at 50% 0, #0000 97%, #000) top / var(--p) 51% repeat-x,
+    radial-gradient(circle var(--r) at 50% 100%, #0000 97%, #000) bottom / var(--p) 51% repeat-x;
+          mask:
+    radial-gradient(circle var(--r) at 50% 0, #0000 97%, #000) top / var(--p) 51% repeat-x,
+    radial-gradient(circle var(--r) at 50% 100%, #0000 97%, #000) bottom / var(--p) 51% repeat-x;
+  padding: 26px 22px;
+}
+.ticket-papel { background-image: linear-gradient(180deg, rgba(14,14,12,.018), transparent 30%, rgba(14,14,12,.02)); }
+.perforacion { position: relative; height: 1px; margin: 18px -22px; background-image: linear-gradient(90deg, #cfcabf 50%, transparent 0); background-size: 8px 1px; }
+.perforacion::before, .perforacion::after { content: ''; position: absolute; top: -11px; width: 22px; height: 22px; border-radius: 999px; background: #f3f1ec; }
+.perforacion::before { left: -11px; } .perforacion::after { right: -11px; }
+.puntos { flex: 1; min-width: 12px; margin: 0 6px; border-bottom: 1.5px dotted #c9c4b8; transform: translateY(-4px); }
+.codigo-barras { height: 34px; background: repeating-linear-gradient(90deg, #0e0e0c 0 2px, transparent 2px 4px, #0e0e0c 4px 5px, transparent 5px 8px, #0e0e0c 8px 11px, transparent 11px 12px); opacity: .85; }
+
+.sello { border: 3px solid currentColor; border-radius: 10px; padding: 4px 14px; font-family: 'JetBrains Mono', monospace; font-weight: 700; letter-spacing: .2em; transform: rotate(-9deg); mix-blend-mode: multiply; animation: sellar .45s cubic-bezier(.2,1.6,.4,1) both; }
+@keyframes sellar { from { opacity: 0; transform: rotate(-9deg) scale(1.8); } to { opacity: .9; transform: rotate(-9deg) scale(1); } }
+
+@keyframes entra { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.entra { animation: entra .4s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes imprime { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+.imprime { animation: imprime .9s cubic-bezier(.3,.7,.2,1) both; }
+@keyframes escanea { 0% { top: 4% } 100% { top: 92% } }
+.escaner { animation: escanea 1.2s ease-in-out infinite alternate; }

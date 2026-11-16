@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "mesa_id": { "type": "string" },
-    "organizador_email": { "type": "string" },
+    "organizador_id": { "type": "string", "description": "id del usuario que creó la mesa" },
     "persona_id": { "type": "string" },
     "persona_nombre": { "type": "string" },
     "monto": { "type": "number" },
@@ -19,7 +19,7 @@
   "required": ["mesa_id", "persona_id", "monto"],
   "rls": {
     "create": false,
-    "read": { "data.organizador_email": "{{user.email}}" },
+    "read": { "data.organizador_id": "{{user.id}}" },
     "update": false,
     "delete": false
   }

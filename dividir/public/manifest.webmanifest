@@ -3,7 +3,7 @@
   "short_name": "Dividir",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#fffbeb",
-  "theme_color": "#14532d",
+  "background_color": "#f3f1ec",
+  "theme_color": "#0e0e0c",
   "icons": [{ "src": "/icono.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
 }

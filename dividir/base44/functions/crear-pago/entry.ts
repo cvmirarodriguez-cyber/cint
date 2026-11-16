@@ -29,7 +29,7 @@ export default async function (req: Request): Promise<Response> {
 
     const pago = await sr.entities.Pago.create({
       mesa_id: mesa.id,
-      organizador_email: mesa.created_by,
+      organizador_id: mesa.created_by_id,
       persona_id: persona.id,
       persona_nombre: persona.nombre,
       monto,

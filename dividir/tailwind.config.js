@@ -4,16 +4,17 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['"Bricolage Grotesque"', 'Inter', 'sans-serif'],
+        sans: ['"Inter Tight"', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       colors: {
-        crema: { DEFAULT: '#fffbeb', 100: '#fef3c7', 200: '#fde68a' },
-        hoja: { DEFAULT: '#14532d', 600: '#166534', 500: '#16a34a', 100: '#dcfce7' },
-        aji: { DEFAULT: '#f97316', 600: '#ea580c', 100: '#ffedd5' },
-        tinta: { DEFAULT: '#1c1917', 500: '#57534e', 400: '#78716c', 300: '#a8a29e' },
+        papel: { DEFAULT: '#f3f1ec', claro: '#fdfcf9', oscuro: '#e9e6df' },
+        linea: '#e3dfd6',
+        tinta: { DEFAULT: '#0e0e0c', 700: '#2b2a27', 500: '#5c5a55', 400: '#8a877f', 300: '#b9b5ac' },
+        verde: { DEFAULT: '#0b6e4f', 600: '#095c42', 100: '#e4f1ea' },
+        ambar: { DEFAULT: '#b45309', 100: '#fdf0dc' },
+        mp: { DEFAULT: '#009ee3', 600: '#0089c6' },
       },
-      boxShadow: { ticket: '0 1px 0 #e7e5e4, 0 10px 30px -12px rgba(28,25,23,.25)' },
     },
   },
   plugins: [],

@@ -1,19 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
-  ArrowLeft, Camera, Check, CheckCircle2, Copy, ExternalLink, Loader2, Lock, Plus, QrCode, Share2, Sparkles, Trash2, Users, Wallet, X,
+  ArrowLeft, ArrowRight, Banknote, Camera, Check, Copy, Image as ImageIcon, Loader2, Lock, Pause, Plus, QrCode, RotateCcw, Share2, Sparkles, Trash2, Wallet, X,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import QR from '@/components/QR';
-import { Avatar, Aviso, Cargando, colorDe } from '@/components/ui';
+import { Avatar, Aviso, Cargando, colorDe, EncabezadoBoleta, Linea, Perforacion, Sello, Ticket } from '@/components/ui';
 import { dividirConIA, leerBoleta } from '@/lib/ia';
 import { calcularMesa, clp, errorTexto, linkMesa, nuevoId, totalItem } from '@/lib/util';
 
 const PASOS = [
-  { id: 'boleta', t: 'Boleta', i: Camera },
-  { id: 'personas', t: 'Personas', i: Users },
-  { id: 'dividir', t: 'Dividir', i: Sparkles },
-  { id: 'cobrar', t: 'Cobrar', i: QrCode },
+  { id: 'boleta', t: 'Boleta' },
+  { id: 'personas', t: 'Personas' },
+  { id: 'dividir', t: 'Dividir' },
+  { id: 'cobrar', t: 'Cobrar' },
 ];
 
 export default function MesaOrganizador() {
@@ -68,53 +68,69 @@ export default function MesaOrganizador() {
     timer.current = setTimeout(ejecutar, 700);
   };
 
-  if (error && !mesa) return <div className="mx-auto max-w-md p-4"><Aviso>{error}</Aviso></div>;
+  if (error && !mesa) return <div className="mx-auto max-w-md p-5"><Aviso>{error}</Aviso></div>;
   if (!mesa) return <Cargando />;
 
   const calc = calcularMesa(mesa);
   const bloqueada = mesa.estado !== 'armando';
+  const actual = PASOS.findIndex((p) => p.id === paso);
 
   return (
-    <div className="mx-auto max-w-md px-4 pb-32 pt-4">
-      <header className="flex items-center gap-2">
-        <Link to="/" className="rounded-full p-2 hover:bg-stone-100" aria-label="Volver"><ArrowLeft className="h-5 w-5" /></Link>
+    <div className="mx-auto max-w-md px-5 pb-36 pt-4">
+      <header className="flex items-center gap-1">
+        <Link to="/" className="-ml-2 rounded-full p-2 hover:bg-papel-oscuro" aria-label="Volver"><ArrowLeft className="h-5 w-5" /></Link>
         <input
-          className="min-w-0 flex-1 bg-transparent font-display text-2xl font-extrabold outline-none placeholder:text-tinta-300"
+          className="min-w-0 flex-1 bg-transparent text-[22px] font-extrabold tracking-[-0.035em] outline-none placeholder:text-tinta-300"
           placeholder="Nombre del restorán"
           value={mesa.restoran || ''}
           onChange={(e) => guardar({ restoran: e.target.value })}
           disabled={bloqueada}
         />
-        {guardando && <Loader2 className="h-4 w-4 animate-spin text-tinta-300" />}
+        {guardando ? <Loader2 className="h-4 w-4 animate-spin text-tinta-300" /> : <span className="etiqueta">{mesa.codigo}</span>}
       </header>
 
-      <nav className="sticky top-0 z-10 -mx-4 mt-3 flex gap-1 bg-crema/90 px-4 py-2 backdrop-blur">
-        {PASOS.map(({ id: p, t, i: I }) => (
-          <button key={p} onClick={() => setPaso(p)} className={`flex flex-1 flex-col items-center gap-0.5 rounded-xl py-2 text-xs font-semibold transition ${paso === p ? 'bg-hoja text-crema' : 'text-tinta-400 hover:bg-stone-100'}`}>
-            <I className="h-4 w-4" />{t}
-          </button>
-        ))}
+      {/* Progreso */}
+      <nav className="sticky top-0 z-10 -mx-5 mt-2 bg-papel/90 px-5 pb-3 pt-2 backdrop-blur">
+        <div className="flex gap-1.5">
+          {PASOS.map(({ id: p, t }, i) => (
+            <button key={p} onClick={() => setPaso(p)} className="group flex-1 text-left">
+              <span className={`block h-1 rounded-full transition-colors ${i <= actual ? 'bg-tinta' : 'bg-linea'}`} />
+              <span className={`mt-1.5 flex items-center gap-1 text-[12px] font-semibold ${i === actual ? 'text-tinta' : 'text-tinta-400'}`}>
+                <span className="num text-[10px] opacity-60">0{i + 1}</span> {t}
+              </span>
+            </button>
+          ))}
+        </div>
       </nav>
 
       <Aviso>{error && mesa ? error : ''}</Aviso>
       {bloqueada && paso !== 'cobrar' && (
-        <div className="mt-3 flex items-center gap-2 rounded-xl bg-aji-100 px-4 py-3 text-sm text-aji-600">
-          <Lock className="h-4 w-4 shrink-0" /> El cobro está abierto. Para editar la boleta o las personas, ciérralo en «Cobrar».
+        <div className="mt-3 flex items-center gap-2 rounded-xl bg-ambar-100 px-4 py-3 text-sm text-ambar">
+          <Lock className="h-4 w-4 shrink-0" /> El cobro está abierto. Para editar, pausa el cobro en «Cobrar».
         </div>
       )}
 
       <div className="entra mt-4" key={paso}>
-        {paso === 'boleta' && <PasoBoleta mesa={mesa} guardar={guardar} bloqueada={bloqueada} calc={calc} siguiente={() => setPaso('personas')} />}
-        {paso === 'personas' && <PasoPersonas mesa={mesa} guardar={guardar} bloqueada={bloqueada} siguiente={() => setPaso('dividir')} />}
-        {paso === 'dividir' && <PasoDividir mesa={mesa} guardar={guardar} calc={calc} siguiente={() => setPaso('cobrar')} />}
+        {paso === 'boleta' && <PasoBoleta mesa={mesa} guardar={guardar} bloqueada={bloqueada} calc={calc} />}
+        {paso === 'personas' && <PasoPersonas mesa={mesa} guardar={guardar} bloqueada={bloqueada} />}
+        {paso === 'dividir' && <PasoDividir mesa={mesa} guardar={guardar} calc={calc} bloqueada={bloqueada} />}
         {paso === 'cobrar' && <PasoCobrar mesa={mesa} pagos={pagos} calc={calc} guardar={guardar} recargar={cargar} setError={setError} />}
       </div>
 
       {paso !== 'cobrar' && (
-        <div className="fixed inset-x-0 bottom-0 z-20 border-t border-stone-200 bg-white/95 backdrop-blur" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-          <div className="mx-auto flex max-w-md items-center justify-between px-4 py-3">
-            <span className="text-sm text-tinta-400">Total con {mesa.propina_pct ?? 10}% propina</span>
-            <b className="font-display text-2xl tabular-nums">{clp(calc.total)}</b>
+        <div className="fixed inset-x-0 bottom-0 z-20 border-t border-linea bg-papel-claro/95 backdrop-blur" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+          <div className="mx-auto flex max-w-md items-center gap-3 px-5 py-3">
+            <div className="flex-1">
+              <span className="etiqueta">Total · {mesa.propina_pct ?? 10}% propina</span>
+              <b className="num block text-[22px] leading-tight">{clp(calc.total)}</b>
+            </div>
+            <button
+              onClick={() => setPaso(PASOS[actual + 1].id)}
+              disabled={paso === 'boleta' && !(mesa.items || []).length}
+              className="btn-primario !px-5"
+            >
+              {['Personas', 'Dividir', 'Cobrar'][actual]} <ArrowRight className="h-4 w-4" />
+            </button>
           </div>
         </div>
       )}
@@ -123,10 +139,11 @@ export default function MesaOrganizador() {
 }
 
 /* ---------------- 1. Boleta ---------------- */
-function PasoBoleta({ mesa, guardar, bloqueada, calc, siguiente }) {
+function PasoBoleta({ mesa, guardar, bloqueada, calc }) {
   const [leyendo, setLeyendo] = useState(false);
   const [error, setError] = useState('');
-  const input = useRef(null);
+  const camara = useRef(null);
+  const galeria = useRef(null);
   const items = mesa.items || [];
 
   const subir = async (e) => {
@@ -158,69 +175,77 @@ function PasoBoleta({ mesa, guardar, bloqueada, calc, siguiente }) {
   const cuadra = !mesa.total_boleta || Math.abs(mesa.total_boleta - calc.subtotal) < 2;
 
   return (
-    <div className="space-y-4">
-      {!bloqueada && (
-        <>
-          <input ref={input} type="file" accept="image/*" capture="environment" className="hidden" onChange={subir} />
-          <button onClick={() => input.current?.click()} disabled={leyendo} className="relative flex w-full flex-col items-center gap-2 overflow-hidden rounded-3xl border-2 border-dashed border-hoja/30 bg-hoja-100/50 p-8 text-hoja active:scale-[.99]">
-            {leyendo ? (
-              <>
-                <span className="escaner absolute inset-x-0 h-1 bg-aji/70 shadow-[0_0_20px_4px_rgba(249,115,22,.5)]" />
-                <Sparkles className="h-8 w-8 animate-pulse" />
-                <b>La IA está leyendo la boleta…</b>
-              </>
-            ) : (
-              <>
-                <Camera className="h-8 w-8" />
-                <b>{items.length ? 'Agregar otra foto' : 'Sacar foto a la boleta'}</b>
-                <span className="text-sm text-hoja/70">o elegirla de tu galería</span>
-              </>
-            )}
+    <div className="space-y-5">
+      <input ref={camara} type="file" accept="image/*" capture="environment" className="hidden" onChange={subir} />
+      <input ref={galeria} type="file" accept="image/*" className="hidden" onChange={subir} />
+
+      {!bloqueada && (leyendo ? (
+        <div className="relative overflow-hidden rounded-2xl bg-tinta p-8 text-center text-papel-claro">
+          <span className="escaner absolute inset-x-6 h-0.5 bg-verde shadow-[0_0_24px_6px_rgba(11,110,79,.7)]" />
+          <Sparkles className="mx-auto h-7 w-7 animate-pulse" />
+          <p className="mt-3 font-semibold">Leyendo la boleta…</p>
+          <p className="mt-1 text-sm text-papel-claro/60">La IA está identificando cada plato y su precio</p>
+        </div>
+      ) : (
+        <div className={items.length ? 'grid grid-cols-2 gap-2' : ''}>
+          <button onClick={() => camara.current?.click()} className={`flex w-full flex-col items-center gap-2 rounded-2xl bg-tinta text-papel-claro active:scale-[.99] ${items.length ? 'p-4' : 'p-8'}`}>
+            <span className="grid h-12 w-12 place-items-center rounded-full bg-white/10"><Camera className="h-6 w-6" /></span>
+            <b>{items.length ? 'Otra foto' : 'Escanear boleta'}</b>
+            {!items.length && <span className="text-sm text-papel-claro/60">Saca una foto y la IA la lee por ti</span>}
           </button>
-        </>
-      )}
+          {!items.length ? (
+            <button onClick={() => galeria.current?.click()} className="mt-2 flex w-full items-center justify-center gap-2 py-2 text-sm font-medium text-tinta-500">
+              <ImageIcon className="h-4 w-4" /> Elegir de la galería
+            </button>
+          ) : (
+            <button onClick={() => guardar({ items: [...items, { id: nuevoId(), nombre: '', cantidad: 1, precio_unitario: 0, asignados: [] }] })} className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-papel-claro p-4 ring-1 ring-linea">
+              <span className="grid h-12 w-12 place-items-center rounded-full bg-papel-oscuro"><Plus className="h-6 w-6" /></span>
+              <b>Ítem a mano</b>
+            </button>
+          )}
+        </div>
+      ))}
       <Aviso>{error}</Aviso>
 
-      {items.length > 0 && (
-        <div className="boleta tarjeta !rounded-b-none">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="etiqueta">Detalle ({items.length})</span>
-            {mesa.boleta_url && <a href={mesa.boleta_url} target="_blank" rel="noreferrer" className="text-xs font-medium text-hoja">Ver foto</a>}
-          </div>
-          <ul className="divide-y divide-dashed divide-stone-200">
+      {items.length > 0 ? (
+        <Ticket imprime key={items.length}>
+          <EncabezadoBoleta restoran={mesa.restoran} codigo={mesa.codigo} fecha={mesa.created_date} />
+          <div className="mt-4 flex justify-between border-b border-dashed border-linea pb-1.5"><span className="etiqueta">Cant · Detalle</span><span className="etiqueta">Precio</span></div>
+          <ul>
             {items.map((it) => (
-              <li key={it.id} className="flex items-center gap-2 py-2">
-                <input type="number" inputMode="numeric" min="1" className="w-10 rounded-lg bg-stone-50 px-1 py-1 text-center text-sm tabular-nums" value={it.cantidad} onChange={(e) => cambiarItem(it.id, { cantidad: Math.max(1, Number(e.target.value) || 1) })} disabled={bloqueada} aria-label="Cantidad" />
-                <input className="min-w-0 flex-1 bg-transparent py-1 text-sm font-medium outline-none" value={it.nombre} onChange={(e) => cambiarItem(it.id, { nombre: e.target.value })} disabled={bloqueada} aria-label="Nombre" />
-                <input type="number" inputMode="numeric" className="w-20 rounded-lg bg-stone-50 px-2 py-1 text-right text-sm tabular-nums" value={it.precio_unitario} onChange={(e) => cambiarItem(it.id, { precio_unitario: Math.round(Number(e.target.value) || 0) })} disabled={bloqueada} aria-label="Precio unitario" />
-                {!bloqueada && <button onClick={() => guardar({ items: items.filter((x) => x.id !== it.id) })} className="p-1 text-tinta-300 hover:text-red-600" aria-label="Quitar"><Trash2 className="h-4 w-4" /></button>}
+              <li key={it.id} className="group flex items-center gap-1.5 border-b border-dashed border-linea/70 py-1.5">
+                <input type="number" inputMode="numeric" min="1" className="num w-8 bg-transparent text-center text-sm outline-none" value={it.cantidad} onChange={(e) => cambiarItem(it.id, { cantidad: Math.max(1, Number(e.target.value) || 1) })} disabled={bloqueada} aria-label="Cantidad" />
+                <input className="min-w-0 flex-1 bg-transparent py-1 text-sm outline-none placeholder:text-tinta-300" placeholder="Nombre del ítem" value={it.nombre} onChange={(e) => cambiarItem(it.id, { nombre: e.target.value })} disabled={bloqueada} aria-label="Nombre" />
+                <span className="num text-xs text-tinta-400">$</span>
+                <input type="number" inputMode="numeric" className="num w-[70px] bg-transparent text-right text-sm outline-none" value={it.precio_unitario * (it.cantidad || 1)} onChange={(e) => cambiarItem(it.id, { precio_unitario: Math.round((Number(e.target.value) || 0) / (it.cantidad || 1)) })} disabled={bloqueada} aria-label="Precio total del ítem" />
+                {!bloqueada && <button onClick={() => guardar({ items: items.filter((x) => x.id !== it.id) })} className="p-1 text-tinta-300 hover:text-red-700" aria-label="Quitar"><Trash2 className="h-3.5 w-3.5" /></button>}
               </li>
             ))}
           </ul>
-          {!bloqueada && (
-            <button onClick={() => guardar({ items: [...items, { id: nuevoId(), nombre: '', cantidad: 1, precio_unitario: 0, asignados: [] }] })} className="mt-2 flex items-center gap-1 text-sm font-semibold text-hoja">
-              <Plus className="h-4 w-4" /> Agregar ítem
-            </button>
-          )}
-          <div className="mt-4 space-y-1 border-t border-stone-200 pt-3 text-sm">
-            <Fila t="Subtotal" v={clp(calc.subtotal)} />
-            {mesa.total_boleta ? <Fila t="Total impreso en la boleta" v={clp(mesa.total_boleta)} alerta={!cuadra} /> : null}
-            {!cuadra && <p className="text-xs text-aji-600">No cuadra con la boleta: revisa los precios leídos.</p>}
+          <div className="mt-3">
+            <Linea izq="Subtotal" der={calc.subtotal} />
+            <Linea izq={`Propina sugerida ${mesa.propina_pct ?? 10}%`} der={calc.propina} />
+            {mesa.total_boleta ? <Linea izq="Subtotal impreso" der={mesa.total_boleta} className={cuadra ? '' : 'text-ambar'} /> : null}
           </div>
-        </div>
+          <Perforacion />
+          <div className="flex items-end justify-between">
+            <span className="etiqueta">Total a pagar</span>
+            <span className="num text-[26px] font-bold leading-none">{clp(calc.total)}</span>
+          </div>
+          {!cuadra && <p className="mt-3 rounded-lg bg-ambar-100 px-3 py-2 text-xs text-ambar">No cuadra con lo impreso: revisa los precios leídos.</p>}
+          {cuadra && mesa.total_boleta ? <p className="mt-3 flex items-center gap-1.5 text-xs text-verde"><Check className="h-3.5 w-3.5" /> Cuadra con la boleta</p> : null}
+          <div className="codigo-barras mt-5" />
+          {mesa.boleta_url && <a href={mesa.boleta_url} target="_blank" rel="noreferrer" className="etiqueta mt-2 block text-center underline">Ver foto original</a>}
+        </Ticket>
+      ) : !leyendo && (
+        <p className="text-center text-sm text-tinta-400">Funciona con boletas, comandas y pre-cuentas.</p>
       )}
-
-      {items.length > 0 && <button onClick={siguiente} className="btn-primario mt-6 w-full">Siguiente: ¿quiénes comieron?</button>}
     </div>
   );
 }
 
-function Fila({ t, v, alerta }) {
-  return <div className={`flex justify-between ${alerta ? 'text-aji-600' : ''}`}><span className="text-tinta-500">{t}</span><b className="tabular-nums">{v}</b></div>;
-}
-
 /* ---------------- 2. Personas ---------------- */
-function PasoPersonas({ mesa, guardar, bloqueada, siguiente }) {
+function PasoPersonas({ mesa, guardar, bloqueada }) {
   const [nombre, setNombre] = useState('');
   const personas = mesa.personas || [];
 
@@ -238,31 +263,34 @@ function PasoPersonas({ mesa, guardar, bloqueada, siguiente }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-tinta-500">Agrega a los que están en la mesa. También pueden sumarse solos escaneando el QR.</p>
+      <div>
+        <h2 className="text-xl font-bold tracking-tight">¿Quiénes están en la mesa?</h2>
+        <p className="mt-1 text-sm text-tinta-500">También pueden sumarse solos al escanear el QR.</p>
+      </div>
       {!bloqueada && (
         <form onSubmit={agregar} className="flex gap-2">
-          <input className="campo" placeholder="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} autoFocus />
+          <input className="campo" placeholder="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} autoFocus maxLength={30} />
           <button className="btn-primario !px-4" aria-label="Agregar"><Plus className="h-5 w-5" /></button>
         </form>
       )}
-      <ul className="space-y-2">
+      <ul className="overflow-hidden rounded-2xl bg-papel-claro ring-1 ring-linea">
         {personas.map((p, i) => (
-          <li key={p.id} className="flex items-center gap-3 rounded-2xl bg-white p-3 ring-1 ring-stone-100">
+          <li key={p.id} className="flex items-center gap-3 border-b border-linea px-4 py-3 last:border-0">
             <Avatar nombre={p.nombre} i={i} />
-            <span className="flex-1 font-medium">{p.nombre}{p.id === mesa.organizador_persona_id && <span className="ml-2 text-xs text-tinta-400">(tú, organizas)</span>}</span>
-            {!bloqueada && p.id !== mesa.organizador_persona_id && (
-              <button onClick={() => quitar(p.id)} className="p-1 text-tinta-300 hover:text-red-600" aria-label={`Quitar a ${p.nombre}`}><X className="h-4 w-4" /></button>
+            <span className="flex-1 font-medium">{p.nombre}</span>
+            {p.id === mesa.organizador_persona_id ? <span className="etiqueta">Organizas</span> : !bloqueada && (
+              <button onClick={() => quitar(p.id)} className="p-1 text-tinta-300 hover:text-red-700" aria-label={`Quitar a ${p.nombre}`}><X className="h-4 w-4" /></button>
             )}
           </li>
         ))}
       </ul>
-      <button onClick={siguiente} className="btn-primario w-full">Siguiente: dividir</button>
+      <p className="etiqueta text-center">{personas.length} {personas.length === 1 ? 'persona' : 'personas'}</p>
     </div>
   );
 }
 
 /* ---------------- 3. Dividir ---------------- */
-function PasoDividir({ mesa, guardar, calc, siguiente }) {
+function PasoDividir({ mesa, guardar, calc, bloqueada }) {
   const [texto, setTexto] = useState('');
   const [pensando, setPensando] = useState(false);
   const [resumen, setResumen] = useState('');
@@ -286,7 +314,7 @@ function PasoDividir({ mesa, guardar, calc, siguiente }) {
     setError('');
     setResumen('');
     try {
-      const r = await dividirConIA({ items, personas, instruccion: texto });
+      const r = await dividirConIA({ items, personas, instruccion: texto, organizador: personas.find((p) => p.id === mesa.organizador_persona_id)?.nombre });
       const lista = [...personas];
       const idDe = (nombre) => {
         const n = String(nombre || '').trim();
@@ -294,6 +322,7 @@ function PasoDividir({ mesa, guardar, calc, siguiente }) {
         const yo = /^(yo|m[ií]o|organizador)$/i.test(n) ? lista.find((p) => p.id === mesa.organizador_persona_id) : null;
         const p = yo || lista.find((x) => x.nombre.toLowerCase() === n.toLowerCase());
         if (p) return p.id;
+        if (bloqueada) return null;
         const nueva = { id: nuevoId(), nombre: n.slice(0, 30) };
         lista.push(nueva);
         return nueva.id;
@@ -309,81 +338,88 @@ function PasoDividir({ mesa, guardar, calc, siguiente }) {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-1 rounded-2xl bg-stone-100 p-1">
-        {[['items', 'Cada uno lo suyo'], ['igual', 'Parejo']].map(([m, t]) => (
-          <button key={m} onClick={() => guardar({ modo: m }, true)} className={`rounded-xl py-2.5 text-sm font-semibold ${mesa.modo === m ? 'bg-white shadow' : 'text-tinta-400'}`}>{t}</button>
+      <div className="grid grid-cols-2 gap-1 rounded-xl bg-papel-oscuro p-1">
+        {[['items', 'Cada uno lo suyo'], ['igual', 'Partes iguales']].map(([m, t]) => (
+          <button key={m} onClick={() => guardar({ modo: m }, true)} className={`rounded-lg py-2.5 text-sm font-semibold transition ${mesa.modo === m ? 'bg-papel-claro shadow-sm' : 'text-tinta-400'}`}>{t}</button>
         ))}
       </div>
 
       {mesa.modo === 'items' && (
         <>
-          <div className="tarjeta !p-4">
-            <label className="mb-2 flex items-center gap-2 text-sm font-semibold"><Sparkles className="h-4 w-4 text-aji" /> Cuéntale a la IA quién pidió qué</label>
-            <textarea className="campo min-h-[84px] resize-none text-sm" placeholder="Ej: Ana y yo compartimos la pizza, Beto se tomó las 2 cervezas y el postre lo dividimos entre todos" value={texto} onChange={(e) => setTexto(e.target.value)} />
-            <button onClick={usarIA} disabled={pensando || !texto.trim()} className="btn-aji mt-2 w-full !py-3">
-              {pensando ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />} Dividir con IA
+          <div className="rounded-2xl bg-tinta p-4 text-papel-claro">
+            <label htmlFor="ia" className="flex items-center gap-2 text-sm font-semibold"><Sparkles className="h-4 w-4 text-[#5ee0a8]" /> Cuéntale a la IA quién pidió qué</label>
+            <textarea id="ia" className="mt-3 min-h-[92px] w-full resize-none rounded-xl bg-white/10 px-3.5 py-3 text-sm text-papel-claro outline-none placeholder:text-papel-claro/40 focus:bg-white/15" placeholder="Ej: Ana y yo compartimos la pizza, Beto se tomó los 2 piscos y el postre lo dividimos entre todos" value={texto} onChange={(e) => setTexto(e.target.value)} />
+            <button onClick={usarIA} disabled={pensando || !texto.trim()} className="btn mt-2 w-full bg-papel-claro !py-3 text-tinta">
+              {pensando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />} {pensando ? 'Repartiendo…' : 'Dividir con IA'}
             </button>
-            <Aviso>{error}</Aviso>
-            {resumen && <p className="mt-2 text-sm text-hoja">✓ {resumen}</p>}
+            {error && <p className="mt-2 text-sm text-red-300">{error}</p>}
+            {resumen && <p className="mt-3 flex gap-2 text-sm text-[#5ee0a8]"><Check className="mt-0.5 h-4 w-4 shrink-0" />{resumen}</p>}
           </div>
 
-          <ul className="space-y-3">
-            {items.map((it) => {
-              const sin = !(it.asignados || []).length;
-              return (
-                <li key={it.id} className={`rounded-2xl bg-white p-3 ring-1 ${sin ? 'ring-aji/40' : 'ring-stone-100'}`}>
-                  <div className="flex items-baseline justify-between gap-2">
-                    <b className="text-sm">{it.cantidad > 1 && `${it.cantidad}× `}{it.nombre || 'Ítem'}</b>
-                    <span className="text-sm tabular-nums text-tinta-500">{clp(totalItem(it))}</span>
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {personas.map((p, i) => {
-                      const on = (it.asignados || []).includes(p.id);
-                      return (
-                        <button key={p.id} onClick={() => alternar(it.id, p.id)} className={`chip ${on ? 'text-white ring-transparent' : 'bg-white text-tinta-500 ring-stone-200'}`} style={on ? { backgroundColor: colorDe(i) } : undefined}>
-                          {on && <Check className="h-3.5 w-3.5" />}{p.nombre}
-                        </button>
-                      );
-                    })}
-                    <button onClick={() => todosEn(it.id)} className="chip bg-stone-50 text-tinta-400 ring-stone-200">Todos</button>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-          {calc.sinAsignar > 0 && <Aviso>Quedan {clp(calc.sinAsignar)} sin asignar. Tus amigos también pueden marcar lo suyo desde el QR.</Aviso>}
+          <div>
+            <p className="etiqueta mb-2">O toca los nombres en cada ítem</p>
+            <ul className="overflow-hidden rounded-2xl bg-papel-claro ring-1 ring-linea">
+              {items.map((it) => {
+                const sin = !(it.asignados || []).length;
+                return (
+                  <li key={it.id} className="border-b border-linea px-4 py-3 last:border-0">
+                    <div className="flex items-baseline gap-2">
+                      {sin && <span className="h-1.5 w-1.5 shrink-0 translate-y-[-2px] rounded-full bg-ambar" title="Sin asignar" />}
+                      <b className="flex-1 text-sm font-semibold">{it.cantidad > 1 && <span className="num font-normal text-tinta-400">{it.cantidad}× </span>}{it.nombre || 'Ítem'}</b>
+                      <span className="num text-sm">{clp(totalItem(it))}</span>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {personas.map((p, i) => {
+                        const on = (it.asignados || []).includes(p.id);
+                        return (
+                          <button key={p.id} onClick={() => alternar(it.id, p.id)} className={`chip ${on ? 'text-white ring-transparent' : 'bg-transparent text-tinta-500 ring-linea'}`} style={on ? { backgroundColor: colorDe(i) } : undefined}>
+                            {on && <Check className="h-3 w-3" />}{p.nombre}
+                          </button>
+                        );
+                      })}
+                      <button onClick={() => todosEn(it.id)} className="chip bg-papel-oscuro text-tinta-500 ring-transparent">Todos</button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+          {calc.sinAsignar > 0 && <Aviso tipo="ambar">Quedan {clp(calc.sinAsignar)} sin asignar. Tus amigos también pueden marcar lo suyo desde el QR.</Aviso>}
         </>
       )}
 
       <div>
         <span className="etiqueta">Propina</span>
-        <div className="mt-2 flex gap-2">
+        <div className="mt-2 grid grid-cols-4 gap-1 rounded-xl bg-papel-oscuro p-1">
           {[0, 10, 15, 20].map((p) => (
-            <button key={p} onClick={() => guardar({ propina_pct: p })} className={`chip flex-1 justify-center !py-2.5 ${Number(mesa.propina_pct ?? 10) === p ? 'bg-hoja text-crema ring-hoja' : 'bg-white ring-stone-200'}`}>{p}%</button>
+            <button key={p} onClick={() => guardar({ propina_pct: p })} className={`num rounded-lg py-2 text-sm font-medium transition ${Number(mesa.propina_pct ?? 10) === p ? 'bg-papel-claro shadow-sm' : 'text-tinta-400'}`}>{p}%</button>
           ))}
         </div>
       </div>
 
       <Resumen mesa={mesa} calc={calc} />
-      <button onClick={siguiente} className="btn-primario w-full">Siguiente: cobrar</button>
     </div>
   );
 }
 
 function Resumen({ mesa, calc }) {
   return (
-    <div className="tarjeta !p-4">
-      <span className="etiqueta">Cuánto pone cada uno</span>
-      <ul className="mt-2 divide-y divide-stone-100">
-        {(mesa.personas || []).map((p, i) => (
-          <li key={p.id} className="flex items-center gap-2 py-2">
-            <Avatar nombre={p.nombre} i={i} chico />
-            <span className="flex-1 text-sm">{p.nombre}</span>
-            <b className="tabular-nums">{clp(calc.porPersona[p.id]?.total)}</b>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <Ticket>
+      <p className="etiqueta text-center">Cuánto pone cada uno</p>
+      <div className="mt-3">
+        {(mesa.personas || []).map((p, i) => {
+          const d = calc.porPersona[p.id];
+          return (
+            <div key={p.id} className="flex items-center gap-2.5 py-1.5">
+              <Avatar nombre={p.nombre} i={i} chico />
+              <Linea izq={p.nombre} der={d?.total || 0} sub={d?.items?.length ? d.items.map((x) => x.nombre + (x.compartido ? ' (compartido)' : '')).join(', ') : mesa.modo === 'igual' ? 'Partes iguales' : 'Sin ítems'} className="min-w-0 flex-1 !py-0" />
+            </div>
+          );
+        })}
+      </div>
+      <Perforacion />
+      <Linea izq={calc.sinAsignar ? 'Asignado' : 'Total'} der={Object.values(calc.porPersona).reduce((a, x) => a + x.total, 0)} fuerte />
+    </Ticket>
   );
 }
 
@@ -396,15 +432,18 @@ function PasoCobrar({ mesa, pagos, calc, guardar, recargar, setError }) {
   const deudores = personas.filter((p) => p.id !== mesa.organizador_persona_id && (calc.porPersona[p.id]?.total || 0) > 0);
   const pagoDe = (pid) => pagos.find((p) => p.persona_id === pid && p.estado === 'pagado');
   const juntado = pagos.filter((p) => p.estado === 'pagado').reduce((a, p) => a + (p.monto || 0), 0);
+  const porJuntar = deudores.reduce((a, p) => a + (calc.porPersona[p.id]?.total || 0), 0);
   const listos = deudores.filter((p) => pagoDe(p.id)).length;
   const todos = deudores.length > 0 && listos === deudores.length;
 
-  const compartir = async () => {
-    const texto = `Paga tu parte de ${mesa.restoran || 'la cuenta'} aquí:`;
-    if (navigator.share) return navigator.share({ title: 'Dividir la cuenta', text: texto, url: link }).catch(() => {});
-    await navigator.clipboard?.writeText(link);
+  const copiar = async () => {
+    await navigator.clipboard?.writeText(link).catch(() => {});
     setCopiado(true);
     setTimeout(() => setCopiado(false), 1500);
+  };
+  const compartir = async () => {
+    if (navigator.share) return navigator.share({ title: 'Dividir la cuenta', text: `Paga tu parte de ${mesa.restoran || 'la cuenta'}:`, url: link }).catch(() => {});
+    copiar();
   };
 
   const efectivo = async (pid, deshacer) => {
@@ -418,14 +457,15 @@ function PasoCobrar({ mesa, pagos, calc, guardar, recargar, setError }) {
 
   if (mesa.estado === 'armando') {
     return (
-      <div className="space-y-4">
+      <div className="space-y-5">
         <Resumen mesa={mesa} calc={calc} />
-        {calc.sinAsignar > 0 && <Aviso>Hay {clp(calc.sinAsignar)} sin asignar. Puedes abrir el cobro igual: cada uno marca lo suyo al entrar.</Aviso>}
-        <div className="rounded-2xl bg-hoja-100 p-4 text-sm text-hoja">
-          Al abrir el cobro, cada uno escanea el QR, confirma lo que consumió y paga su parte con Mercado Pago.
-          La plata llega a tu cuenta de Mercado Pago y con eso pagas el QR del restorán.
-        </div>
-        <button onClick={() => guardar({ estado: 'cobrando' }, true)} className="btn-aji w-full" disabled={!(mesa.items || []).length}>
+        {calc.sinAsignar > 0 && <Aviso tipo="ambar">Hay {clp(calc.sinAsignar)} sin asignar. Puedes abrir el cobro igual: cada uno marca lo suyo al entrar.</Aviso>}
+        <ol className="space-y-3 rounded-2xl bg-papel-claro p-4 text-sm ring-1 ring-linea">
+          {['Tus amigos escanean el QR y confirman lo que consumieron.', 'Cada uno paga su parte con Mercado Pago.', 'Con lo juntado, pagas el QR del restorán.'].map((t, i) => (
+            <li key={t} className="flex gap-3"><span className="num grid h-6 w-6 shrink-0 place-items-center rounded-full bg-tinta text-[11px] text-papel-claro">{i + 1}</span><span className="pt-0.5 text-tinta-500">{t}</span></li>
+          ))}
+        </ol>
+        <button onClick={() => guardar({ estado: 'cobrando' }, true)} className="btn-primario w-full" disabled={!(mesa.items || []).length}>
           <QrCode className="h-5 w-5" /> Abrir cobro
         </button>
       </div>
@@ -433,65 +473,79 @@ function PasoCobrar({ mesa, pagos, calc, guardar, recargar, setError }) {
   }
 
   return (
-    <div className="space-y-4">
-      {todos ? (
-        <div className="entra rounded-3xl bg-hoja p-5 text-crema">
-          <CheckCircle2 className="h-10 w-10 text-aji" />
-          <h2 className="mt-2 font-display text-2xl font-extrabold">¡Todos pagaron!</h2>
-          <p className="mt-1 text-crema/80">Juntaste <b className="text-white">{clp(juntado)}</b>. Tu parte es {clp(calc.porPersona[mesa.organizador_persona_id]?.total)}.</p>
-          <ol className="mt-4 space-y-1.5 text-sm">
-            <li>1. Abre la app de <b>Mercado Pago</b></li>
-            <li>2. Toca <b>Pagar con QR</b> y escanea el QR del restorán</li>
-            <li>3. Paga <b className="text-aji">{clp(calc.total)}</b></li>
-          </ol>
-          <a href="https://www.mercadopago.cl/" target="_blank" rel="noreferrer" className="btn mt-4 w-full bg-crema text-hoja"><Wallet className="h-5 w-5" /> Abrir Mercado Pago</a>
-          <button onClick={() => guardar({ estado: 'cerrada' }, true)} className="mt-2 w-full py-2 text-sm text-crema/70">Ya pagué, cerrar mesa</button>
-        </div>
+    <div className="space-y-5">
+      {todos || mesa.estado === 'cerrada' ? (
+        <Ticket imprime className="text-center">
+          <EncabezadoBoleta restoran={mesa.restoran} codigo={mesa.codigo} fecha={mesa.created_date} />
+          <div className="my-6"><Sello texto={mesa.estado === 'cerrada' ? 'CERRADA' : 'JUNTADO'} className="text-2xl" /></div>
+          <p className="etiqueta">Recaudado</p>
+          <p className="num mt-1 text-[40px] font-bold leading-none">{clp(juntado)}</p>
+          <p className="mt-2 text-sm text-tinta-500">+ tu parte {clp(calc.porPersona[mesa.organizador_persona_id]?.total)}</p>
+          <Perforacion />
+          {mesa.estado !== 'cerrada' && (
+            <div className="text-left">
+              <p className="etiqueta mb-2">Paga al restorán</p>
+              <ol className="space-y-1.5 text-sm text-tinta-700">
+                <li><span className="num text-tinta-400">01</span> Abre la app de Mercado Pago</li>
+                <li><span className="num text-tinta-400">02</span> Toca «Pagar con QR» y escanea el del restorán</li>
+                <li><span className="num text-tinta-400">03</span> Paga <b className="num">{clp(calc.total)}</b></li>
+              </ol>
+              <a href="https://www.mercadopago.cl/" target="_blank" rel="noreferrer" className="btn mt-4 w-full bg-mp text-white hover:bg-mp-600"><Wallet className="h-5 w-5" /> Abrir Mercado Pago</a>
+              <button onClick={() => guardar({ estado: 'cerrada' }, true)} className="mt-2 w-full py-2 text-sm font-medium text-tinta-500">Ya pagué, cerrar mesa</button>
+            </div>
+          )}
+        </Ticket>
       ) : (
-        <div className="tarjeta text-center">
-          <p className="etiqueta">Escaneen para pagar</p>
-          <QR texto={link} className="mx-auto mt-3 w-56" />
-          <p className="mt-2 font-mono text-lg font-bold tracking-[.3em] text-hoja">{mesa.codigo}</p>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <button onClick={compartir} className="btn-suave !py-2.5 text-sm"><Share2 className="h-4 w-4" /> Compartir</button>
-            <button onClick={async () => { await navigator.clipboard?.writeText(link); setCopiado(true); setTimeout(() => setCopiado(false), 1500); }} className="btn-suave !py-2.5 text-sm">
-              {copiado ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />} {copiado ? 'Copiado' : 'Copiar link'}
-            </button>
+        <Ticket className="text-center">
+          <EncabezadoBoleta restoran={mesa.restoran} codigo={mesa.codigo} fecha={mesa.created_date} />
+          <QR texto={link} className="mx-auto mt-5 w-52" />
+          <p className="mt-3 text-sm text-tinta-500">Escaneen con la cámara para pagar su parte</p>
+          <Perforacion />
+          <div className="flex items-center justify-between">
+            <span className="etiqueta">Código</span>
+            <span className="num text-xl font-bold tracking-[.25em]">{mesa.codigo}</span>
           </div>
-        </div>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <button onClick={compartir} className="btn-primario !py-2.5 text-sm"><Share2 className="h-4 w-4" /> Compartir</button>
+            <button onClick={copiar} className="btn-suave !py-2.5 text-sm">{copiado ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />} {copiado ? 'Copiado' : 'Copiar link'}</button>
+          </div>
+        </Ticket>
       )}
 
-      <div className="tarjeta !p-4">
+      <div className="rounded-2xl bg-papel-claro p-4 ring-1 ring-linea">
         <div className="flex items-end justify-between">
-          <div><span className="etiqueta">Juntado</span><p className="font-display text-3xl font-extrabold tabular-nums text-hoja">{clp(juntado)}</p></div>
-          <span className="text-sm text-tinta-400">{listos}/{deudores.length} pagaron</span>
+          <div>
+            <span className="etiqueta">Juntado</span>
+            <p className="num text-[28px] font-bold leading-tight">{clp(juntado)}<span className="text-base font-normal text-tinta-300"> / {clp(porJuntar)}</span></p>
+          </div>
+          <span className="num rounded-full bg-papel-oscuro px-2.5 py-1 text-xs">{listos}/{deudores.length}</span>
         </div>
-        <div className="mt-2 h-2 overflow-hidden rounded-full bg-stone-100">
-          <div className="h-full rounded-full bg-hoja-500 transition-all duration-700" style={{ width: `${deudores.length ? (listos / deudores.length) * 100 : 0}%` }} />
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-papel-oscuro">
+          <div className="h-full rounded-full bg-verde transition-all duration-700" style={{ width: `${porJuntar ? Math.min(100, (juntado / porJuntar) * 100) : 0}%` }} />
         </div>
-        <ul className="mt-3 divide-y divide-stone-100">
+        <ul className="mt-3">
           {personas.map((p, i) => {
             const pago = pagoDe(p.id);
             const monto = calc.porPersona[p.id]?.total || 0;
             const org = p.id === mesa.organizador_persona_id;
             return (
-              <li key={p.id} className="flex items-center gap-2 py-2.5">
+              <li key={p.id} className="flex items-center gap-2.5 border-t border-linea py-3">
                 <Avatar nombre={p.nombre} i={i} chico />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium">{p.nombre}</span>
+                  <span className="block truncate text-sm font-semibold">{p.nombre}</span>
                   <span className="text-xs text-tinta-400">
                     {org ? 'Paga al restorán' : pago ? (pago.medio === 'efectivo' ? 'Efectivo / transferencia' : 'Mercado Pago') : monto ? 'Pendiente' : 'Sin consumo'}
                     {pago && pago.monto !== monto && !org ? ` · pagó ${clp(pago.monto)}` : ''}
                   </span>
                 </span>
-                <b className="text-sm tabular-nums">{clp(monto)}</b>
+                <b className={`num text-sm ${pago ? 'text-tinta-300 line-through' : ''}`}>{clp(monto)}</b>
                 {!org && monto > 0 && (pago ? (
                   pago.medio === 'efectivo'
-                    ? <button onClick={() => efectivo(p.id, true)} className="chip bg-hoja-100 text-hoja ring-transparent" disabled={ocupado === p.id}><Check className="h-3.5 w-3.5" /> Listo</button>
-                    : <span className="chip bg-hoja-100 text-hoja ring-transparent"><Check className="h-3.5 w-3.5" /> Pagó</span>
+                    ? <button onClick={() => efectivo(p.id, true)} className="chip bg-verde-100 text-verde ring-transparent" disabled={ocupado === p.id} title="Deshacer"><Check className="h-3.5 w-3.5" /> Pagó</button>
+                    : <span className="chip bg-verde-100 text-verde ring-transparent"><Check className="h-3.5 w-3.5" /> Pagó</span>
                 ) : (
-                  <button onClick={() => efectivo(p.id)} className="chip bg-white text-tinta-500 ring-stone-200" disabled={ocupado === p.id}>
-                    {ocupado === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Efectivo'}
+                  <button onClick={() => efectivo(p.id)} className="chip text-tinta-500 ring-linea" disabled={ocupado === p.id} title="Marcar como pagado en efectivo">
+                    {ocupado === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Banknote className="h-3.5 w-3.5" />} Efectivo
                   </button>
                 ))}
               </li>
@@ -501,13 +555,13 @@ function PasoCobrar({ mesa, pagos, calc, guardar, recargar, setError }) {
       </div>
 
       {mesa.estado === 'cobrando' && (
-        <button onClick={() => guardar({ estado: 'armando' }, true)} className="w-full py-2 text-sm text-tinta-400">
-          Pausar cobro para editar la cuenta
+        <button onClick={() => guardar({ estado: 'armando' }, true)} className="flex w-full items-center justify-center gap-1.5 py-2 text-sm text-tinta-400">
+          <Pause className="h-4 w-4" /> Pausar cobro para editar la cuenta
         </button>
       )}
       {mesa.estado === 'cerrada' && (
-        <button onClick={() => guardar({ estado: 'cobrando' }, true)} className="w-full py-2 text-sm text-tinta-400">
-          <ExternalLink className="mr-1 inline h-4 w-4" /> Reabrir cobro
+        <button onClick={() => guardar({ estado: 'cobrando' }, true)} className="flex w-full items-center justify-center gap-1.5 py-2 text-sm text-tinta-400">
+          <RotateCcw className="h-4 w-4" /> Reabrir cobro
         </button>
       )}
     </div>

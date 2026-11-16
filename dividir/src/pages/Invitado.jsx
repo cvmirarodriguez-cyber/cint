@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { ArrowRight, Check, CheckCircle2, Clock, Loader2, Lock, UserPlus } from 'lucide-react';
+import { ArrowRight, Check, Clock, Loader2, Lock, ShieldCheck, UserPlus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { Avatar, Aviso, Cargando, Marca } from '@/components/ui';
+import { Avatar, Aviso, Cargando, EncabezadoBoleta, Linea, Marca, Perforacion, Sello, Ticket } from '@/components/ui';
 import { clp, errorTexto, totalItem } from '@/lib/util';
 
 const clave = (codigo) => `dividir:${codigo}`;
@@ -97,129 +97,130 @@ export default function Invitado() {
   if (!persona) {
     return (
       <Pantalla mesa={mesa}>
-        <h1 className="font-display text-3xl font-extrabold">¿Quién eres?</h1>
-        <p className="mt-1 text-tinta-500">Elige tu nombre o súmate a la mesa.</p>
-        <div className="mt-5 flex flex-wrap gap-2">
-          {mesa.personas.filter((p) => p.id !== mesa.organizador_persona_id).map((p) => (
-            <button key={p.id} onClick={(e) => unirme(e, p.id)} disabled={ocupado} className="chip bg-white !py-2.5 !pl-1.5 !pr-4 text-base ring-stone-200">
-              <Avatar nombre={p.nombre} i={mesa.personas.indexOf(p)} chico /> {p.nombre}
-              {p.pago === 'pagado' && <Check className="h-4 w-4 text-hoja-500" />}
+        <Ticket className="!pb-6">
+          <EncabezadoBoleta restoran={mesa.restoran} codigo={mesa.codigo} />
+          <Perforacion />
+          <h1 className="text-center text-2xl font-extrabold tracking-tight">¿Quién eres?</h1>
+          <p className="mt-1 text-center text-sm text-tinta-500">Elige tu nombre o súmate a la mesa.</p>
+          <div className="mt-5 flex flex-wrap justify-center gap-2">
+            {mesa.personas.filter((p) => p.id !== mesa.organizador_persona_id).map((p) => (
+              <button key={p.id} onClick={(e) => unirme(e, p.id)} disabled={ocupado} className="chip bg-papel !py-2 !pl-1.5 !pr-4 text-[15px] ring-linea">
+                <Avatar nombre={p.nombre} i={mesa.personas.indexOf(p)} chico /> {p.nombre}
+                {p.pago === 'pagado' && <Check className="h-4 w-4 text-verde" />}
+              </button>
+            ))}
+          </div>
+          <form onSubmit={unirme} className="mt-5 flex gap-2">
+            <input className="campo" placeholder="Soy otra persona: mi nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} maxLength={30} />
+            <button className="btn-primario !px-4" disabled={ocupado || !nombre.trim()} aria-label="Sumarme">
+              {ocupado ? <Loader2 className="h-5 w-5 animate-spin" /> : <UserPlus className="h-5 w-5" />}
             </button>
-          ))}
-        </div>
-        <form onSubmit={unirme} className="mt-6 flex gap-2">
-          <input className="campo" placeholder="Tu nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} maxLength={30} />
-          <button className="btn-primario !px-4" disabled={ocupado || !nombre.trim()} aria-label="Sumarme">
-            {ocupado ? <Loader2 className="h-5 w-5 animate-spin" /> : <UserPlus className="h-5 w-5" />}
-          </button>
-        </form>
-        <Aviso>{error}</Aviso>
+          </form>
+          <Aviso>{error}</Aviso>
+        </Ticket>
       </Pantalla>
     );
   }
 
+  const pagadosN = mesa.personas.filter((p) => p.pago === 'pagado').length;
+
   return (
     <Pantalla mesa={mesa}>
-      <div className="flex items-center gap-3">
+      <div className="mb-4 flex items-center gap-3">
         <Avatar nombre={persona.nombre} i={indice} />
-        <div className="flex-1">
-          <p className="text-sm text-tinta-400">Hola,</p>
-          <b className="font-display text-xl">{persona.nombre}</b>
+        <div className="flex-1 leading-tight">
+          <p className="text-xs text-tinta-400">Tu cuenta</p>
+          <b className="text-lg tracking-tight">{persona.nombre}</b>
         </div>
-        {!pagado && <button className="text-sm text-tinta-400" onClick={() => { setYo(null); guardarYo(codigo, null); setMarcados(null); }}>No soy yo</button>}
+        {!pagado && <button className="text-sm text-tinta-400 underline underline-offset-4" onClick={() => { setYo(null); guardarYo(codigo, null); setMarcados(null); }}>No soy yo</button>}
       </div>
 
-      {verificando && <div className="mt-4 flex items-center gap-2 rounded-2xl bg-hoja-100 p-4 text-hoja"><Loader2 className="h-5 w-5 animate-spin" /> Confirmando tu pago…</div>}
+      {verificando && <div className="mb-4 flex items-center gap-2 rounded-xl bg-verde-100 p-4 text-sm text-verde"><Loader2 className="h-4 w-4 animate-spin" /> Confirmando tu pago con Mercado Pago…</div>}
 
-      {pagado ? (
-        <div className="entra mt-6 rounded-3xl bg-hoja p-6 text-center text-crema">
-          <CheckCircle2 className="mx-auto h-14 w-14 text-aji" />
-          <h1 className="mt-3 font-display text-3xl font-extrabold">¡Pagaste!</h1>
-          <p className="mt-1 text-crema/80">Tu parte de {mesa.restoran} quedó lista. Gracias 🙌</p>
-        </div>
-      ) : esOrganizador ? (
-        <p className="mt-6 rounded-2xl bg-hoja-100 p-4 text-hoja">Tú organizas: pagas al restorán con lo que junten los demás.</p>
-      ) : null}
+      {esOrganizador && <p className="mb-4 rounded-xl bg-papel-claro p-4 text-sm text-tinta-500 ring-1 ring-linea">Tú organizas: pagas al restorán con lo que junten los demás.</p>}
 
-      {mesa.modo === 'items' && !pagado && (
-        <section className="mt-6">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="etiqueta">{editando ? 'Toca lo que consumiste' : 'Lo tuyo'}</span>
-            {puedeEditar && !editando && <button className="text-sm font-semibold text-hoja" onClick={() => setMarcados(new Set(misItems))}>Editar</button>}
-          </div>
-          <ul className="space-y-2">
-            {mesa.items.filter((it) => editando || misItems.has(it.id)).map((it) => {
-              const on = editando ? marcados.has(it.id) : true;
+      {editando ? (
+        <section className="entra">
+          <h1 className="text-2xl font-extrabold tracking-tight">¿Qué consumiste?</h1>
+          <p className="mt-1 text-sm text-tinta-500">Si algo lo compartiste, márcalo igual: se divide entre quienes lo marquen.</p>
+          <ul className="mt-4 overflow-hidden rounded-2xl bg-papel-claro ring-1 ring-linea">
+            {mesa.items.map((it) => {
+              const on = marcados.has(it.id);
               const otros = it.asignados.filter((x) => x !== yo).length;
               return (
-                <li key={it.id}>
+                <li key={it.id} className="border-b border-linea last:border-0">
                   <button
-                    disabled={!editando}
                     onClick={() => setMarcados((s) => { const n = new Set(s); n.has(it.id) ? n.delete(it.id) : n.add(it.id); return n; })}
-                    className={`flex w-full items-center gap-3 rounded-2xl p-3 text-left ring-1 transition ${on && editando ? 'bg-hoja-100 ring-hoja/30' : 'bg-white ring-stone-100'}`}
+                    className={`flex w-full items-center gap-3 px-4 py-3.5 text-left transition ${on ? 'bg-verde-100/60' : ''}`}
                   >
-                    {editando && <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-lg ${on ? 'bg-hoja text-white' : 'ring-1 ring-stone-300'}`}>{on && <Check className="h-4 w-4" />}</span>}
+                    <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-md transition ${on ? 'bg-tinta text-white' : 'ring-1 ring-tinta-300'}`}>{on && <Check className="h-3.5 w-3.5" />}</span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-medium">{it.cantidad > 1 && `${it.cantidad}× `}{it.nombre}</span>
-                      {otros > 0 && <span className="text-xs text-tinta-400">compartido con {otros} más</span>}
+                      <span className="block text-sm font-medium">{it.cantidad > 1 && <span className="num text-tinta-400">{it.cantidad}× </span>}{it.nombre}</span>
+                      {otros > 0 && <span className="text-xs text-tinta-400">{otros === 1 ? '1 persona más lo marcó' : `${otros} personas más lo marcaron`}</span>}
                     </span>
-                    <span className="text-sm tabular-nums text-tinta-500">{clp(totalItem(it))}</span>
+                    <span className="num text-sm">{clp(totalItem(it))}</span>
                   </button>
                 </li>
               );
             })}
-            {!editando && misItems.size === 0 && <li className="rounded-2xl border-2 border-dashed border-stone-200 p-5 text-center text-sm text-tinta-400">Aún no marcas nada.</li>}
           </ul>
-          {editando && (
-            <button onClick={confirmarItems} disabled={ocupado} className="btn-primario mt-3 w-full">
-              {ocupado ? <Loader2 className="h-5 w-5 animate-spin" /> : <Check className="h-5 w-5" />} Listo, eso es lo mío
-            </button>
-          )}
-        </section>
-      )}
-
-      {!pagado && !esOrganizador && !editando && (
-        <section className="boleta tarjeta mt-6 !rounded-b-none">
-          {persona.detalle.map((d, i) => (
-            <div key={i} className="flex justify-between py-0.5 text-sm"><span className="text-tinta-500">{d.nombre}{d.compartido ? ' (parte)' : ''}</span><span className="tabular-nums">{clp(d.monto)}</span></div>
-          ))}
-          {mesa.modo === 'igual' && <p className="text-sm text-tinta-500">La cuenta se divide parejo entre {mesa.personas.length}.</p>}
-          <div className="mt-2 flex items-end justify-between border-t border-dashed border-stone-200 pt-3">
-            <span className="text-sm text-tinta-400">Tu parte con {mesa.propina_pct}% propina</span>
-            <b className="font-display text-3xl font-extrabold tabular-nums">{clp(persona.monto)}</b>
-          </div>
-        </section>
-      )}
-
-      <Aviso>{error}</Aviso>
-
-      {!pagado && !esOrganizador && !editando && (
-        mesa.estado === 'cobrando' ? (
-          <button onClick={pagar} disabled={ocupado || persona.monto < 50} className="btn mt-8 w-full bg-[#009ee3] text-white hover:bg-[#0089c6]">
-            {ocupado ? <Loader2 className="h-5 w-5 animate-spin" /> : <ArrowRight className="h-5 w-5" />}
-            Pagar {clp(persona.monto)} con Mercado Pago
+          <Aviso>{error}</Aviso>
+          <button onClick={confirmarItems} disabled={ocupado} className="btn-primario mt-4 w-full">
+            {ocupado ? <Loader2 className="h-5 w-5 animate-spin" /> : <Check className="h-5 w-5" />} Listo, eso es lo mío
           </button>
-        ) : (
-          <p className="mt-8 flex items-center gap-2 rounded-2xl bg-stone-100 p-4 text-sm text-tinta-500">
-            {mesa.estado === 'cerrada' ? <Lock className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
-            {mesa.estado === 'cerrada' ? 'Esta mesa ya está cerrada.' : 'El organizador está terminando de armar la cuenta. Puedes ir marcando lo tuyo.'}
-          </p>
-        )
+        </section>
+      ) : (
+        <div className="relative">
+          <Ticket imprime>
+            <EncabezadoBoleta restoran={mesa.restoran} codigo={mesa.codigo} />
+            <div className="mt-4 flex justify-between border-b border-dashed border-linea pb-1.5"><span className="etiqueta">Detalle de {persona.nombre}</span>{puedeEditar && <button className="etiqueta !text-tinta underline" onClick={() => setMarcados(new Set(misItems))}>Editar</button>}</div>
+            <div className="mt-1">
+              {persona.detalle.map((d, i) => <Linea key={i} izq={d.nombre} sub={d.compartido ? 'Compartido' : null} der={d.monto} />)}
+              {mesa.modo === 'igual' && <Linea izq={`Cuenta ÷ ${mesa.personas.length}`} der={Math.round(persona.monto / (1 + mesa.propina_pct / 100))} />}
+              {mesa.modo === 'items' && !persona.detalle.length && <p className="py-3 text-center text-sm text-tinta-400">Aún no marcas nada.</p>}
+              <Linea izq={`Propina ${mesa.propina_pct}%`} der={persona.monto - persona.detalle.reduce((a, d) => a + d.monto, 0) - (mesa.modo === 'igual' ? Math.round(persona.monto / (1 + mesa.propina_pct / 100)) : 0)} className="text-tinta-500" />
+            </div>
+            <Perforacion />
+            <div className="flex items-end justify-between">
+              <span className="etiqueta">{esOrganizador ? 'Tu parte' : pagado ? 'Pagaste' : 'Total a pagar'}</span>
+              <span className="num text-[34px] font-bold leading-none">{clp(persona.monto)}</span>
+            </div>
+            <div className="codigo-barras mt-6" />
+            <p className="etiqueta mt-2 text-center">{pagadosN} de {Math.max(0, mesa.personas.length - 1)} pagaron · mesa {clp(mesa.total)}</p>
+          </Ticket>
+          {pagado && <div className="pointer-events-none absolute inset-x-0 top-[38%] text-center"><Sello className="bg-papel-claro/60 text-3xl" /></div>}
+        </div>
       )}
 
-      <p className="mt-6 text-center text-xs text-tinta-300">
-        {mesa.personas.filter((p) => p.pago === 'pagado').length} de {mesa.personas.length - 1} ya pagaron · Total mesa {clp(mesa.total)}
-      </p>
+      {!editando && !esOrganizador && (pagado ? (
+        <p className="mt-6 text-center text-sm text-tinta-500">Listo, tu parte quedó pagada. Gracias 🙌</p>
+      ) : (
+        <>
+          <Aviso>{error}</Aviso>
+          {mesa.estado === 'cobrando' ? (
+            <button onClick={pagar} disabled={ocupado || persona.monto < 50} className="btn mt-6 w-full bg-mp !py-4 text-white hover:bg-mp-600">
+              {ocupado ? <Loader2 className="h-5 w-5 animate-spin" /> : <ArrowRight className="h-5 w-5" />}
+              Pagar {clp(persona.monto)} con Mercado Pago
+            </button>
+          ) : (
+            <p className="mt-6 flex items-center gap-2 rounded-xl bg-papel-claro p-4 text-sm text-tinta-500 ring-1 ring-linea">
+              {mesa.estado === 'cerrada' ? <Lock className="h-4 w-4 shrink-0" /> : <Clock className="h-4 w-4 shrink-0" />}
+              {mesa.estado === 'cerrada' ? 'Esta mesa ya está cerrada.' : 'El organizador está terminando de armar la cuenta. Puedes ir marcando lo tuyo.'}
+            </p>
+          )}
+          <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-tinta-400"><ShieldCheck className="h-3.5 w-3.5" /> Pago seguro procesado por Mercado Pago</p>
+        </>
+      ))}
     </Pantalla>
   );
 }
 
 function Pantalla({ mesa, children }) {
   return (
-    <div className="mx-auto min-h-dvh max-w-md px-4 py-5">
+    <div className="mx-auto min-h-dvh max-w-md px-5 py-5">
       <div className="mb-6 flex items-center justify-between">
         <Marca />
-        {mesa && <span className="truncate pl-3 text-sm font-semibold text-tinta-500">{mesa.restoran}</span>}
+        {mesa && <span className="etiqueta">Mesa {mesa.codigo}</span>}
       </div>
       <div className="entra">{children}</div>
     </div>
