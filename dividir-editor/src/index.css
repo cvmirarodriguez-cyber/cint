@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+    --font-heading: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+    --font-body: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+    --font-display: ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body;
+  }
+}
+
+/* ================= Dividir ================= */
+
+:root {
+  color-scheme: light;
+  --papel: 243 241 236; --papel-claro: 253 252 249; --papel-oscuro: 233 230 223; --linea: 227 223 214;
+  --tinta: 14 14 12; --tinta-700: 43 42 39; --tinta-500: 92 90 85; --tinta-400: 138 135 127; --tinta-300: 185 181 172;
+  --verde: 11 110 79; --verde-600: 9 92 66; --verde-100: 228 241 234;
+  --ambar: 180 83 9; --ambar-100: 253 240 220;
+  --bloque: 14 14 12; --bloque-texto: 253 252 249;
+  --puntos: 201 196 184; --perfo: 207 202 191; --sombra: 14 14 12; --sello-mezcla: multiply;
+}
+:root[data-tema="oscuro"] {
+  color-scheme: dark;
+  --papel: 17 17 15; --papel-claro: 29 28 26; --papel-oscuro: 40 39 36; --linea: 54 52 48;
+  --tinta: 242 239 232; --tinta-700: 214 210 201; --tinta-500: 170 166 157; --tinta-400: 132 128 120; --tinta-300: 94 91 85;
+  --verde: 94 224 168; --verde-600: 120 232 184; --verde-100: 20 48 38;
+  --ambar: 245 176 66; --ambar-100: 52 37 15;
+  --bloque: 36 35 32; --bloque-texto: 242 239 232;
+  --puntos: 76 73 68; --perfo: 76 73 68; --sombra: 0 0 0; --sello-mezcla: normal;
+}
+html, body { background: rgb(var(--papel)); color: rgb(var(--tinta)); -webkit-tap-highlight-color: transparent; }
+html.transicion * { transition: background-color .25s ease, color .25s ease, border-color .25s ease !important; }
+body { min-height: 100dvh; font-feature-settings: 'ss01', 'cv11'; }
+.num { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+
+@layer components {
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-[15px] font-semibold tracking-tight transition active:scale-[.985] disabled:opacity-40 disabled:active:scale-100; }
+  .btn-primario { @apply btn bg-tinta text-papel-claro hover:bg-tinta-700; }
+  .btn-verde { @apply btn bg-verde text-white hover:bg-verde-600; }
+  .btn-suave { @apply btn bg-papel-claro text-tinta ring-1 ring-linea hover:bg-white; }
+  .campo { @apply w-full rounded-xl border border-linea bg-papel-claro px-4 py-3 text-[15px] outline-none placeholder:text-tinta-300 focus:border-tinta focus:bg-white; }
+  .chip { @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-medium ring-1 transition active:scale-95; }
+  .etiqueta { @apply font-mono text-[11px] font-medium uppercase tracking-[.14em] text-tinta-400; }
+  .panel { @apply rounded-2xl bg-papel-claro p-4 ring-1 ring-linea; }
+}
+
+/* ---------- Ticket / boleta impresa ---------- */
+.ticket-sombra { filter: drop-shadow(0 1px 0 rgb(var(--sombra) / .06)) drop-shadow(0 14px 24px rgb(var(--sombra) / .12)); }
+[data-tema="oscuro"] .ticket-sombra { filter: drop-shadow(0 0 0.5px rgb(255 255 255 / .12)) drop-shadow(0 14px 28px rgb(0 0 0 / .5)); }
+.ticket {
+  background: rgb(var(--papel-claro));
+  --r: 6px; --p: 16px;
+  -webkit-mask:
+    radial-gradient(circle var(--r) at 50% 0, #0000 97%, #000) top / var(--p) 51% repeat-x,
+    radial-gradient(circle var(--r) at 50% 100%, #0000 97%, #000) bottom / var(--p) 51% repeat-x;
+          mask:
+    radial-gradient(circle var(--r) at 50% 0, #0000 97%, #000) top / var(--p) 51% repeat-x,
+    radial-gradient(circle var(--r) at 50% 100%, #0000 97%, #000) bottom / var(--p) 51% repeat-x;
+  padding: 26px 22px;
+}
+.ticket-papel { background-image: linear-gradient(180deg, rgb(var(--sombra) / .02), transparent 30%, rgb(var(--sombra) / .025)); }
+.perforacion { position: relative; height: 1px; margin: 18px -22px; background-image: linear-gradient(90deg, rgb(var(--perfo)) 50%, transparent 0); background-size: 8px 1px; }
+.perforacion::before, .perforacion::after { content: ''; position: absolute; top: -11px; width: 22px; height: 22px; border-radius: 999px; background: rgb(var(--papel)); }
+.perforacion::before { left: -11px; } .perforacion::after { right: -11px; }
+.puntos { flex: 1; min-width: 12px; margin: 0 6px; border-bottom: 1.5px dotted rgb(var(--puntos)); transform: translateY(-4px); }
+.codigo-barras { --c: rgb(var(--tinta)); height: 34px; background: repeating-linear-gradient(90deg, var(--c) 0 2px, transparent 2px 4px, var(--c) 4px 5px, transparent 5px 8px, var(--c) 8px 11px, transparent 11px 12px); opacity: .85; }
+
+.sello { border: 3px solid currentColor; border-radius: 10px; padding: 4px 14px; font-family: 'JetBrains Mono', monospace; font-weight: 700; letter-spacing: .2em; transform: rotate(-9deg); mix-blend-mode: var(--sello-mezcla); animation: sellar .45s cubic-bezier(.2,1.6,.4,1) both; }
+@keyframes sellar { from { opacity: 0; transform: rotate(-9deg) scale(1.8); } to { opacity: .9; transform: rotate(-9deg) scale(1); } }
+
+@keyframes entra { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.entra { animation: entra .4s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes imprime { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+.imprime { animation: imprime .9s cubic-bezier(.3,.7,.2,1) both; }
+@keyframes escanea { 0% { top: 4% } 100% { top: 92% } }
+.escaner { animation: escanea 1.2s ease-in-out infinite alternate; }
