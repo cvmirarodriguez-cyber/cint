@@ -180,18 +180,18 @@ function PasoBoleta({ mesa, guardar, bloqueada, calc }) {
       <input ref={galeria} type="file" accept="image/*" className="hidden" onChange={subir} />
 
       {!bloqueada && (leyendo ? (
-        <div className="relative overflow-hidden rounded-2xl bg-tinta p-8 text-center text-papel-claro">
+        <div className="relative overflow-hidden rounded-2xl bg-bloque p-8 text-center text-bloque-texto">
           <span className="escaner absolute inset-x-6 h-0.5 bg-verde shadow-[0_0_24px_6px_rgba(11,110,79,.7)]" />
           <Sparkles className="mx-auto h-7 w-7 animate-pulse" />
           <p className="mt-3 font-semibold">Leyendo la boleta…</p>
-          <p className="mt-1 text-sm text-papel-claro/60">La IA está identificando cada plato y su precio</p>
+          <p className="mt-1 text-sm text-bloque-texto/60">La IA está identificando cada plato y su precio</p>
         </div>
       ) : (
         <div className={items.length ? 'grid grid-cols-2 gap-2' : ''}>
-          <button onClick={() => camara.current?.click()} className={`flex w-full flex-col items-center gap-2 rounded-2xl bg-tinta text-papel-claro active:scale-[.99] ${items.length ? 'p-4' : 'p-8'}`}>
+          <button onClick={() => camara.current?.click()} className={`flex w-full flex-col items-center gap-2 rounded-2xl bg-bloque text-bloque-texto ring-1 ring-white/5 active:scale-[.99] ${items.length ? 'p-4' : 'p-8'}`}>
             <span className="grid h-12 w-12 place-items-center rounded-full bg-white/10"><Camera className="h-6 w-6" /></span>
             <b>{items.length ? 'Otra foto' : 'Escanear boleta'}</b>
-            {!items.length && <span className="text-sm text-papel-claro/60">Saca una foto y la IA la lee por ti</span>}
+            {!items.length && <span className="text-sm text-bloque-texto/60">Saca una foto y la IA la lee por ti</span>}
           </button>
           {!items.length ? (
             <button onClick={() => galeria.current?.click()} className="mt-2 flex w-full items-center justify-center gap-2 py-2 text-sm font-medium text-tinta-500">
@@ -218,7 +218,7 @@ function PasoBoleta({ mesa, guardar, bloqueada, calc }) {
                 <input className="min-w-0 flex-1 bg-transparent py-1 text-sm outline-none placeholder:text-tinta-300" placeholder="Nombre del ítem" value={it.nombre} onChange={(e) => cambiarItem(it.id, { nombre: e.target.value })} disabled={bloqueada} aria-label="Nombre" />
                 <span className="num text-xs text-tinta-400">$</span>
                 <input type="number" inputMode="numeric" className="num w-[70px] bg-transparent text-right text-sm outline-none" value={it.precio_unitario * (it.cantidad || 1)} onChange={(e) => cambiarItem(it.id, { precio_unitario: Math.round((Number(e.target.value) || 0) / (it.cantidad || 1)) })} disabled={bloqueada} aria-label="Precio total del ítem" />
-                {!bloqueada && <button onClick={() => guardar({ items: items.filter((x) => x.id !== it.id) })} className="p-1 text-tinta-300 hover:text-red-700" aria-label="Quitar"><Trash2 className="h-3.5 w-3.5" /></button>}
+                {!bloqueada && <button onClick={() => guardar({ items: items.filter((x) => x.id !== it.id) })} className="p-1 text-tinta-300 hover:text-red-500" aria-label="Quitar"><Trash2 className="h-3.5 w-3.5" /></button>}
               </li>
             ))}
           </ul>
@@ -279,7 +279,7 @@ function PasoPersonas({ mesa, guardar, bloqueada }) {
             <Avatar nombre={p.nombre} i={i} />
             <span className="flex-1 font-medium">{p.nombre}</span>
             {p.id === mesa.organizador_persona_id ? <span className="etiqueta">Organizas</span> : !bloqueada && (
-              <button onClick={() => quitar(p.id)} className="p-1 text-tinta-300 hover:text-red-700" aria-label={`Quitar a ${p.nombre}`}><X className="h-4 w-4" /></button>
+              <button onClick={() => quitar(p.id)} className="p-1 text-tinta-300 hover:text-red-500" aria-label={`Quitar a ${p.nombre}`}><X className="h-4 w-4" /></button>
             )}
           </li>
         ))}
@@ -346,10 +346,10 @@ function PasoDividir({ mesa, guardar, calc, bloqueada }) {
 
       {mesa.modo === 'items' && (
         <>
-          <div className="rounded-2xl bg-tinta p-4 text-papel-claro">
+          <div className="rounded-2xl bg-bloque p-4 text-bloque-texto ring-1 ring-white/5">
             <label htmlFor="ia" className="flex items-center gap-2 text-sm font-semibold"><Sparkles className="h-4 w-4 text-[#5ee0a8]" /> Cuéntale a la IA quién pidió qué</label>
-            <textarea id="ia" className="mt-3 min-h-[92px] w-full resize-none rounded-xl bg-white/10 px-3.5 py-3 text-sm text-papel-claro outline-none placeholder:text-papel-claro/40 focus:bg-white/15" placeholder="Ej: Ana y yo compartimos la pizza, Beto se tomó los 2 piscos y el postre lo dividimos entre todos" value={texto} onChange={(e) => setTexto(e.target.value)} />
-            <button onClick={usarIA} disabled={pensando || !texto.trim()} className="btn mt-2 w-full bg-papel-claro !py-3 text-tinta">
+            <textarea id="ia" className="mt-3 min-h-[92px] w-full resize-none rounded-xl bg-white/10 px-3.5 py-3 text-sm text-bloque-texto outline-none placeholder:text-bloque-texto/40 focus:bg-white/15" placeholder="Ej: Ana y yo compartimos la pizza, Beto se tomó los 2 piscos y el postre lo dividimos entre todos" value={texto} onChange={(e) => setTexto(e.target.value)} />
+            <button onClick={usarIA} disabled={pensando || !texto.trim()} className="btn mt-2 w-full bg-bloque-texto !py-3 text-bloque">
               {pensando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />} {pensando ? 'Repartiendo…' : 'Dividir con IA'}
             </button>
             {error && <p className="mt-2 text-sm text-red-300">{error}</p>}

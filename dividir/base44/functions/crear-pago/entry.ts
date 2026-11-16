@@ -2,14 +2,12 @@
 // El monto SIEMPRE se calcula aquí, a partir de la mesa guardada.
 import { createClientFromRequest } from "npm:@base44/sdk";
 import { calcularMesa } from "../../shared/calculo.js";
-import { json, leerBody, mesaPorCodigo, mp } from "../../shared/backend.js";
-
-const ORIGEN_OK = /^(https:\/\/[a-z0-9-]+(\.[a-z0-9-]+)*\.base44\.app|https?:\/\/localhost(:\d+)?)$/;
+import { claveOk, json, leerBody, mesaPorCodigo, mp, origenValido } from "../../shared/backend.js";
 
 export default async function (req: Request): Promise<Response> {
   try {
     const sr = createClientFromRequest(req).asServiceRole;
-    const { codigo, persona_id, origen } = await leerBody(req);
+    const { codigo, persona_id, origen, clave } = await leerBody(req);
     const mesa = await mesaPorCodigo(sr, codigo);
     if (!mesa) return json({ error: "No encontramos esa mesa" }, 404);
     if (mesa.estado !== "cobrando") return json({ error: "El organizador todavía no abre el cobro" }, 409);
@@ -18,6 +16,7 @@ export default async function (req: Request): Promise<Response> {
     if (!persona) return json({ error: "Persona no encontrada" }, 404);
     if (persona.id === mesa.organizador_persona_id)
       return json({ error: "El organizador paga directo al restorán" }, 409);
+    if (!(await claveOk(persona, clave))) return json({ error: "Ese nombre lo tomó otro teléfono" }, 403);
 
     const monto = calcularMesa(mesa).porPersona[persona.id]?.total || 0;
     if (monto < 50) return json({ error: "No tienes nada que pagar" }, 400);
@@ -37,7 +36,7 @@ export default async function (req: Request): Promise<Response> {
       medio: "mercadopago",
     });
 
-    const base = typeof origen === "string" && ORIGEN_OK.test(origen) ? origen : null;
+    const base = origenValido(origen) ? origen : null;
     const volver = base ? `${base}/m/${mesa.codigo}?p=${persona.id}` : undefined;
     const pref = await mp("/checkout/preferences", {
       method: "POST",

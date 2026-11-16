@@ -2,19 +2,22 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Check, Clock, Loader2, Lock, ShieldCheck, UserPlus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import TemaToggle from '@/components/TemaToggle';
 import { Avatar, Aviso, Cargando, EncabezadoBoleta, Linea, Marca, Perforacion, Sello, Ticket } from '@/components/ui';
 import { clp, errorTexto, totalItem } from '@/lib/util';
 
 const clave = (codigo) => `dividir:${codigo}`;
-const leerYo = (codigo) => { try { return localStorage.getItem(clave(codigo)); } catch { return null; } };
-const guardarYo = (codigo, id) => { try { id ? localStorage.setItem(clave(codigo), id) : localStorage.removeItem(clave(codigo)); } catch { /* sin almacenamiento */ } };
+// En este teléfono guardamos quién eres en la mesa y la clave que te dio el servidor al tomar tu nombre.
+const leerSesion = (codigo) => { try { const v = JSON.parse(localStorage.getItem(clave(codigo)) || 'null'); return v && typeof v === 'object' ? v : null; } catch { return null; } };
+const guardarSesion = (codigo, v) => { try { v ? localStorage.setItem(clave(codigo), JSON.stringify(v)) : localStorage.removeItem(clave(codigo)); } catch { /* sin almacenamiento */ } };
 
 export default function Invitado() {
   const { codigo: crudo } = useParams();
   const codigo = (crudo || '').toUpperCase();
   const [params, setParams] = useSearchParams();
   const [mesa, setMesa] = useState(null);
-  const [yo, setYo] = useState(() => params.get('p') || leerYo(codigo));
+  const [yo, setYo] = useState(() => leerSesion(codigo)?.id || null);
+  const claveYo = () => leerSesion(codigo)?.clave;
   const [error, setError] = useState('');
   const [nombre, setNombre] = useState('');
   const [marcados, setMarcados] = useState(null); // Set de item ids mientras edita
@@ -32,7 +35,6 @@ export default function Invitado() {
   // Vuelta desde Mercado Pago: confirmar el pago al tiro (no esperar el aviso).
   useEffect(() => {
     if (!params.get('p')) return;
-    guardarYo(codigo, params.get('p'));
     llamar('verificar-pago', { persona_id: params.get('p') })
       .then((m) => m && setMesa(m))
       .catch(() => {})
@@ -58,9 +60,10 @@ export default function Invitado() {
     setError('');
     setOcupado(true);
     try {
-      const r = await llamar('reclamar', personaId ? { persona_id: personaId } : { nombre });
+      const previa = leerSesion(codigo);
+      const r = await llamar('reclamar', personaId ? { persona_id: personaId, clave: previa?.id === personaId ? previa.clave : undefined } : { nombre });
       setYo(r.persona_id);
-      guardarYo(codigo, r.persona_id);
+      guardarSesion(codigo, { id: r.persona_id, clave: r.clave });
       setMesa(r.mesa);
       if (r.mesa.modo === 'items' && !r.mesa.items.some((it) => it.asignados.includes(r.persona_id))) setMarcados(new Set());
     } catch (err) { setError(errorTexto(err)); }
@@ -71,7 +74,7 @@ export default function Invitado() {
     setOcupado(true);
     setError('');
     try {
-      const r = await llamar('reclamar', { persona_id: yo, item_ids: [...marcados] });
+      const r = await llamar('reclamar', { persona_id: yo, clave: claveYo(), item_ids: [...marcados] });
       setMesa(r.mesa);
       setMarcados(null);
     } catch (err) { setError(errorTexto(err)); }
@@ -82,7 +85,7 @@ export default function Invitado() {
     setOcupado(true);
     setError('');
     try {
-      const r = await llamar('crear-pago', { persona_id: yo, origen: window.location.origin });
+      const r = await llamar('crear-pago', { persona_id: yo, clave: claveYo(), origen: window.location.origin });
       window.location.href = r.link_pago;
     } catch (err) {
       setError(errorTexto(err));
@@ -106,7 +109,7 @@ export default function Invitado() {
             {mesa.personas.filter((p) => p.id !== mesa.organizador_persona_id).map((p) => (
               <button key={p.id} onClick={(e) => unirme(e, p.id)} disabled={ocupado} className="chip bg-papel !py-2 !pl-1.5 !pr-4 text-[15px] ring-linea">
                 <Avatar nombre={p.nombre} i={mesa.personas.indexOf(p)} chico /> {p.nombre}
-                {p.pago === 'pagado' && <Check className="h-4 w-4 text-verde" />}
+                {p.pago === 'pagado' ? <Check className="h-4 w-4 text-verde" /> : p.tomada && leerSesion(codigo)?.id !== p.id && <Lock className="h-3.5 w-3.5 text-tinta-300" />}
               </button>
             ))}
           </div>
@@ -132,7 +135,7 @@ export default function Invitado() {
           <p className="text-xs text-tinta-400">Tu cuenta</p>
           <b className="text-lg tracking-tight">{persona.nombre}</b>
         </div>
-        {!pagado && <button className="text-sm text-tinta-400 underline underline-offset-4" onClick={() => { setYo(null); guardarYo(codigo, null); setMarcados(null); }}>No soy yo</button>}
+        {!pagado && <button className="text-sm text-tinta-400 underline underline-offset-4" onClick={() => { setYo(null); setMarcados(null); }}>No soy yo</button>}
       </div>
 
       {verificando && <div className="mb-4 flex items-center gap-2 rounded-xl bg-verde-100 p-4 text-sm text-verde"><Loader2 className="h-4 w-4 animate-spin" /> Confirmando tu pago con Mercado Pago…</div>}
@@ -153,7 +156,7 @@ export default function Invitado() {
                     onClick={() => setMarcados((s) => { const n = new Set(s); n.has(it.id) ? n.delete(it.id) : n.add(it.id); return n; })}
                     className={`flex w-full items-center gap-3 px-4 py-3.5 text-left transition ${on ? 'bg-verde-100/60' : ''}`}
                   >
-                    <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-md transition ${on ? 'bg-tinta text-white' : 'ring-1 ring-tinta-300'}`}>{on && <Check className="h-3.5 w-3.5" />}</span>
+                    <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-md transition ${on ? 'bg-tinta text-papel-claro' : 'ring-1 ring-tinta-300'}`}>{on && <Check className="h-3.5 w-3.5" />}</span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-medium">{it.cantidad > 1 && <span className="num text-tinta-400">{it.cantidad}× </span>}{it.nombre}</span>
                       {otros > 0 && <span className="text-xs text-tinta-400">{otros === 1 ? '1 persona más lo marcó' : `${otros} personas más lo marcaron`}</span>}
@@ -220,7 +223,7 @@ function Pantalla({ mesa, children }) {
     <div className="mx-auto min-h-dvh max-w-md px-5 py-5">
       <div className="mb-6 flex items-center justify-between">
         <Marca />
-        {mesa && <span className="etiqueta">Mesa {mesa.codigo}</span>}
+        <TemaToggle />
       </div>
       <div className="entra">{children}</div>
     </div>

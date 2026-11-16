@@ -64,6 +64,8 @@ export default async function (req: Request): Promise<Response> {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me().catch(() => null);
     if (!user) return json({ error: "Inicia sesión" }, 401);
+    // Cada llamada gasta créditos de la app: solo organizadores autorizados (admin).
+    if (user.role !== "admin") return json({ error: "Solo el administrador puede usar la IA" }, 403);
     const Core = base44.asServiceRole.integrations.Core;
     const body = await leerBody(req);
 

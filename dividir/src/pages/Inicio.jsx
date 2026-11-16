@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, ChevronRight, Loader2, LogOut, Receipt, ScanLine } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import TemaToggle from '@/components/TemaToggle';
 import { Aviso, Cargando, Marca } from '@/components/ui';
 import { calcularMesa, clp, errorTexto, nuevoCodigo, nuevoId } from '@/lib/util';
 
@@ -40,22 +41,29 @@ export default function Inicio({ usuario }) {
     <div className="mx-auto max-w-md px-5 py-6">
       <header className="flex items-center justify-between">
         <Marca />
+        <div className="flex items-center gap-1">
+        <TemaToggle />
         <button className="rounded-full p-2 text-tinta-400 hover:bg-papel-oscuro" onClick={() => base44.auth.logout('/')} aria-label="Cerrar sesión"><LogOut className="h-5 w-5" /></button>
+        </div>
       </header>
 
       <p className="mt-10 text-tinta-400">Hola{nombre ? `, ${nombre}` : ''}</p>
       <h1 className="text-[34px] font-extrabold leading-tight tracking-[-0.04em]">¿Dividimos una cuenta?</h1>
 
-      <button onClick={nueva} disabled={creando} className="entra group mt-6 flex w-full items-center gap-4 rounded-2xl bg-tinta p-5 text-left text-papel-claro active:scale-[.99]">
+      {usuario.role !== 'admin' ? (
+        <Aviso tipo="ambar">Tu cuenta aún no puede crear mesas. Pídele al administrador de la app que te habilite.</Aviso>
+      ) : (
+      <button onClick={nueva} disabled={creando} className="entra group mt-6 flex w-full items-center gap-4 rounded-2xl bg-bloque p-5 text-left text-bloque-texto ring-1 ring-white/5 active:scale-[.99]">
         <span className="grid h-12 w-12 place-items-center rounded-xl bg-white/10">
           {creando ? <Loader2 className="h-6 w-6 animate-spin" /> : <ScanLine className="h-6 w-6" />}
         </span>
         <span className="flex-1">
           <b className="block text-lg tracking-tight">Nueva cuenta</b>
-          <span className="text-sm text-papel-claro/60">Escanea la boleta y la IA hace el resto</span>
+          <span className="text-sm text-bloque-texto/60">Escanea la boleta y la IA hace el resto</span>
         </span>
         <ArrowRight className="h-5 w-5 opacity-60 transition group-hover:translate-x-1" />
       </button>
+      )}
 
       <Aviso>{error}</Aviso>
 

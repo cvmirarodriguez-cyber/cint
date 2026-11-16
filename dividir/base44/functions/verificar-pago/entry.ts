@@ -5,10 +5,18 @@ import { aplicarPagoMP, json, leerBody, mesaPorCodigo, mp, vistaPublica } from "
 
 export default async function (req: Request): Promise<Response> {
   try {
-    const sr = createClientFromRequest(req).asServiceRole;
+    const base44 = createClientFromRequest(req);
+    const sr = base44.asServiceRole;
     const { codigo, persona_id } = await leerBody(req);
     const mesa = await mesaPorCodigo(sr, codigo);
     if (!mesa) return json({ error: "No encontramos esa mesa" }, 404);
+    // Un invitado solo verifica lo suyo; revisar toda la mesa es solo para el organizador.
+    if (typeof persona_id !== "string") {
+      const user = await base44.auth.me().catch(() => null);
+      if (!user || user.id !== mesa.created_by_id) return json({ error: "No autorizado" }, 403);
+    } else if (!(mesa.personas || []).some((p) => p.id === persona_id)) {
+      return json({ error: "Persona no encontrada" }, 404);
+    }
 
     const filtro: Record<string, string> = { mesa_id: mesa.id, estado: "pendiente" };
     if (typeof persona_id === "string") filtro.persona_id = persona_id;

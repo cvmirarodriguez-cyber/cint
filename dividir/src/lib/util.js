@@ -5,7 +5,7 @@ export const nuevoId = () => Math.random().toString(36).slice(2, 10);
 // Código para compartir: sin letras confundibles (0/O, 1/I).
 export function nuevoCodigo() {
   const abc = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  const arr = crypto.getRandomValues(new Uint8Array(6));
+  const arr = crypto.getRandomValues(new Uint8Array(8));
   return Array.from(arr, (n) => abc[n % abc.length]).join('');
 }
 

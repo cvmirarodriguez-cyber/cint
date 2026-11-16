@@ -1,4 +1,5 @@
 // Una cuenta de restorán. Solo la ve y edita quien la creó (el organizador).
+// Solo un admin puede crear mesas: los cobros llegan a la cuenta de Mercado Pago de la app.
 // Los invitados entran sin cuenta por /m/<codigo>, siempre a través de funciones del backend.
 {
   "name": "Mesa",
@@ -31,14 +32,15 @@
         "type": "object",
         "properties": {
           "id": { "type": "string" },
-          "nombre": { "type": "string" }
+          "nombre": { "type": "string" },
+          "clave_hash": { "type": "string", "description": "Hash de la clave del teléfono que tomó este nombre" }
         }
       }
     }
   },
   "required": ["codigo"],
   "rls": {
-    "create": true,
+    "create": { "user_condition": { "role": "admin" } },
     "read": { "created_by_id": "{{user.id}}" },
     "update": { "created_by_id": "{{user.id}}" },
     "delete": { "created_by_id": "{{user.id}}" }

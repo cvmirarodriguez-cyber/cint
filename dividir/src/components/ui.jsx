@@ -12,7 +12,7 @@ export function Cargando({ texto }) {
 export function Marca({ className = '' }) {
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
-      <img src="/icono.svg" alt="" className="h-8 w-8" />
+      <img src="/icono.svg" alt="" className="h-8 w-8 rounded-[9px] dark:ring-1 dark:ring-white/15" />
       <span className="text-[19px] font-extrabold tracking-[-0.04em]">dividir<span className="text-verde">.</span></span>
     </div>
   );
@@ -32,7 +32,7 @@ export function Avatar({ nombre, i, chico }) {
 
 export function Aviso({ tipo = 'error', children }) {
   if (!children) return null;
-  const c = tipo === 'error' ? 'bg-red-50 text-red-800 ring-red-200' : tipo === 'ambar' ? 'bg-ambar-100 text-ambar ring-ambar/20' : 'bg-verde-100 text-verde ring-verde/20';
+  const c = tipo === 'error' ? 'bg-red-50 text-red-800 ring-red-200 dark:bg-red-950/40 dark:text-red-300 dark:ring-red-900/60' : tipo === 'ambar' ? 'bg-ambar-100 text-ambar ring-ambar/20' : 'bg-verde-100 text-verde ring-verde/20';
   return <p className={`mt-3 rounded-xl px-4 py-3 text-sm ring-1 ${c}`}>{children}</p>;
 }
 

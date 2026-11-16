@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import TemaToggle from '@/components/TemaToggle';
 import { Avatar, Aviso, EncabezadoBoleta, Linea, Marca, Perforacion, Sello, Ticket } from '@/components/ui';
 import { safeReturnTo } from '@/lib/authReturnTo';
 
@@ -40,7 +41,7 @@ export default function Login() {
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5 py-6">
-      <Marca />
+      <div className="flex items-center justify-between"><Marca /><TemaToggle /></div>
       <h1 className="mt-10 text-[40px] font-extrabold leading-[1] tracking-[-0.045em]">
         Divide la cuenta.<br /><span className="text-tinta-400">Cobra con un QR.</span>
       </h1>

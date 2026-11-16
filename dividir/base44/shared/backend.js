@@ -2,6 +2,27 @@
 import { secrets } from "base44:runtime";
 import { calcularMesa } from "./calculo.js";
 
+// Únicos orígenes a los que Mercado Pago puede devolver al invitado (evita redirecciones a sitios ajenos).
+// Si la app usa un dominio propio, agrégalo aquí.
+export const ORIGENES = ["https://dividir-cba75987.base44.app"];
+export const origenValido = (o) =>
+  typeof o === "string" && (ORIGENES.includes(o) || /^http:\/\/localhost(:\d+)?$/.test(o));
+
+// Clave por teléfono: al tomar un nombre, el invitado recibe una clave aleatoria; solo guardamos su hash.
+export function nuevaClave() {
+  return Array.from(crypto.getRandomValues(new Uint8Array(18)), (b) => b.toString(16).padStart(2, "0")).join("");
+}
+export async function hashClave(clave) {
+  const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(String(clave)));
+  return Array.from(new Uint8Array(d), (b) => b.toString(16).padStart(2, "0")).join("");
+}
+// true si la persona no tiene dueño todavía o si la clave coincide.
+export async function claveOk(persona, clave) {
+  if (!persona?.clave_hash) return true;
+  if (typeof clave !== "string" || clave.length < 16) return false;
+  return (await hashClave(clave)) === persona.clave_hash;
+}
+
 export const json = (data, status = 200) => Response.json(data, { status });
 
 export async function leerBody(req) {
@@ -14,8 +35,9 @@ export async function leerBody(req) {
 
 export async function mesaPorCodigo(sr, codigo) {
   if (typeof codigo !== "string" || !/^[A-Z0-9]{4,10}$/.test(codigo)) return null;
-  const [mesa] = await sr.entities.Mesa.filter({ codigo });
-  return mesa || null;
+  const mesas = await sr.entities.Mesa.filter({ codigo });
+  // Un código duplicado nunca debe resolver a una mesa ambigua.
+  return mesas.length === 1 ? mesas[0] : null;
 }
 
 // Vista pública de la mesa: lo que un invitado necesita para elegir lo suyo y pagar.
@@ -42,6 +64,7 @@ export function vistaPublica(mesa, pagos) {
     personas: (mesa.personas || []).map((p) => ({
       id: p.id,
       nombre: p.nombre,
+      tomada: !!p.clave_hash,
       monto: calc.porPersona[p.id]?.total || 0,
       detalle: calc.porPersona[p.id]?.items || [],
       pago: pagoDe[p.id] || null,
